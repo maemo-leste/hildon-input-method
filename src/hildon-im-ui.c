@@ -957,6 +957,11 @@ hildon_im_ui_show(HildonIMUI *self)
   /* IM may not be loaded yet! */
   activate_plugin (self, self->priv->current_plugin, TRUE);
   hildon_im_plugin_enable (HILDON_IM_PLUGIN(self->priv->current_plugin->widget), FALSE);
+  /* The plugin draws itself, or it doesn't need a UI */
+  if (self->priv->current_plugin != NULL &&
+      (self->priv->current_plugin->info->type == HILDON_IM_TYPE_HIDDEN 
+          || self->priv->current_plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE))
+      return;
   if (self->priv->ui_is_visible && GTK_WIDGET_VISIBLE (self->priv->current_plugin->widget))
     gtk_widget_show(GTK_WIDGET(self));
 }
@@ -2932,7 +2937,7 @@ static void
 activate_plugin (HildonIMUI *self, PluginData *plugin,
     gboolean init)
 {
-  gboolean need_packing, activate_special = FALSE;
+  gboolean activate_special = FALSE;
   
   g_return_if_fail (HILDON_IM_IS_UI(self));
   g_return_if_fail (plugin != NULL);
@@ -2944,23 +2949,21 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
   if (CURRENT_PLUGIN(self) && CURRENT_IM_PLUGIN(self))
     hildon_im_plugin_transition(CURRENT_IM_PLUGIN(self), TRUE);
 
-  if (plugin->info->type == HILDON_IM_TYPE_SPECIAL)
+  if (plugin->info->type == HILDON_IM_TYPE_SPECIAL || plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE)
     activate_special = TRUE;
 
   hide_controlmenu (self);
   flush_plugins(self, plugin, FALSE);
 
   /* Make sure current plugin is created and packed! */
-  if (plugin->widget == NULL)
+  if (plugin->widget == NULL && plugin->info->type != HILDON_IM_TYPE_HIDDEN)
   {
-    plugin->widget = GTK_WIDGET (hildon_im_plugin_create (self, 
-          plugin->filename));
+    plugin->widget = GTK_WIDGET (hildon_im_plugin_create (self, plugin->filename));
     if (plugin->widget == NULL)
     {
       g_warning ("Unable create widget for %s", plugin->info->name);
       return;
     }
-    need_packing = TRUE;
 
     if (activate_special == TRUE)
     {
@@ -2968,10 +2971,6 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
                        G_CALLBACK (hildon_im_ui_unlatch_special),
                        self);
     }
-  }
-  else
-  {
-    need_packing = FALSE;
   }
 
   set_basic_buttons (self);
@@ -2989,7 +2988,7 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
 #endif
 
   set_current_plugin (self, plugin);
-  self->priv->ui_is_visible = TRUE;
+  
   hildon_im_plugin_enable (CURRENT_IM_PLUGIN (self), init);
   hildon_im_plugin_transition(CURRENT_IM_PLUGIN(self), FALSE);
 
@@ -3004,17 +3003,32 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
 
   if (plugin->menu != NULL)  
   {
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (plugin->menu),
-        TRUE);
+    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (plugin->menu), TRUE);
   }
 
-  if (need_packing)
-  {
-    gtk_box_pack_start(self->priv->im_box, plugin->widget, TRUE, TRUE, 0);
-  }   
   
-  gtk_widget_show (plugin->widget);
-  hildon_im_ui_resize_window(self);
+  if (plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE && GTK_IS_WINDOW (plugin->widget))
+  {
+    XSetTransientForHint(GDK_DISPLAY(),
+                         GDK_WINDOW_XID(GTK_WIDGET(plugin->widget)->window),
+                         self->priv->app_window);
+    /* gdk_window_set_transient_for (GTK_WIDGET(plugin->widget)->window, gdk_xid_table_lookup (self->priv->app_window)); */
+    gtk_window_set_modal (GTK_WINDOW (plugin->widget), TRUE);
+    gtk_window_present (GTK_WINDOW (plugin->widget));
+  }
+
+  self->priv->ui_is_visible = GTK_WIDGET_VISIBLE (plugin->widget) &&
+                              plugin->info->type != HILDON_IM_TYPE_HIDDEN &&
+                              plugin->info->type != HILDON_IM_TYPE_SPECIAL_STANDALONE;
+  /* needs packing */
+  if (self->priv->ui_is_visible)
+    gtk_box_pack_start(self->priv->im_box, plugin->widget, TRUE, TRUE, 0);
+
+  if (plugin->info->type != HILDON_IM_TYPE_HIDDEN)
+    gtk_widget_show (plugin->widget);
+  
+  if (self->priv->ui_is_visible)
+    hildon_im_ui_resize_window(self);
 }
 
 void 

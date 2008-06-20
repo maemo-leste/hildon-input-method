@@ -88,7 +88,12 @@ typedef enum
   /* The plugin is loaded at startup and never removed */
   HILDON_IM_TYPE_PERSISTENT,
   /* The plugin doesn't fall into any of categories above */
-  HILDON_IM_TYPE_OTHERS
+  HILDON_IM_TYPE_OTHERS,
+  /* TODO New in Fremantle:
+   * The plugin doesn't have a graphical UI */
+  HILDON_IM_TYPE_HIDDEN,
+  /* A special plugin that has its own window */
+  HILDON_IM_TYPE_SPECIAL_STANDALONE
 } HildonIMPluginType;
 
 struct _HildonIMPluginIface
