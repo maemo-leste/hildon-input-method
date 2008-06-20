@@ -1,0 +1,661 @@
+2008-05-30  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* version 2.0.4
+	* src/hildon-im-ui.h: Keep en_GB as the default if the gconf key is
+	accidentally removed.
+	* hildon-input-method-ui3.schemas: Removed default language from
+	schema.	
+
+2008-05-29  Richard Sun  <richard.sun@nokia.com>
+
+	* version 2.0.3
+	* hildon-input-method-ui3.schemas, src/hildon-im-ui.h: 
+	use "en_US" as default language. (part fixes for NB#85987) 
+
+2008-02-11  Mohammad Anwari  <mohammad.anwari@nokia.com>
+
+	* Version 2.0.2
+	* src/hildon-im-ui.c: Added checks to the existence of the current
+	plugin. Fixes NB#82208.
+
+2008-02-06  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Version 2.0.1
+	* hildon-input-method-ui3.schemas: Added thumb_detection key
+	* src/hildon-im-ui.c: Added missing keyboard mode override from
+	  stylus-as-finger detection change.
+
+2008-02-05  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* src/hildon-im-ui.c: Remove control menu from the screen when the
+	plugin is changed. Fixes NB#74819, NB#78863.
+
+2008-02-05  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h]: Added gconf option to treat stylus
+	  as finger activation.
+
+2008-01-31  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Fix rare crash on toggling the
+	  special plugin. Fixes NB#78312.
+
+2008-01-11  Richard Sun  <richard.sun@nokia.com>
+
+	* Version 2.0.0
+
+2007-10-30  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Version 1.99.33
+
+2007-10-29  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-main.c: Added dbus message filter to catch
+	  the locale change signal during the first boot wizard.
+	  Fixes NB#74315.
+
+2007-10-25  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-plugin.[c,h]:
+	- New hildon_im_plugin_button_activated API deprecates
+	  hildon_im_plugin_mode_a and hildon_im_plugin_mode_b
+	* src/hildon-im-ui.[c,h]:
+	- Added hildon_im_ui_button_set_long_press API
+	- Introduced HildonIMButton type for common buttons
+	- Added plugin callback for every common button activation
+
+2007-10-24  Mohammad Anwari  <mdamt@maemo.org>
+
+	* Version 1.99.32
+
+2007-10-22  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Don't show the IM UI if the
+	  user is activating a shortcut. Fixes NB#73124.
+
+2007-10-12  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Version 1.99.31
+	* src/hildon-im-ui.c: Plugins must be able to depend on
+	  hildon_im_ui_restore_previous_mode disabling the plugin.
+	  In case a previous plugin cannot be found, flush the
+	  plugins. Partial fix for NB#73028.
+
+2007-10-08  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Version 1.99.30
+	* src/hildon-im-ui.c: Fixed plugins with a trigger of finger
+	  type not activating if no other plugin has been previously
+	  loaded. Partial fix for NB#72402.
+
+2007-09-26  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Fixed plugins not receiving the fullscreen
+	  notification if the IM was already allocated full width at
+	  startup. Fixes NB#71164.
+
+2007-09-25  Mohammad Anwari  <mdamt@maemo.org>
+
+	* Version 1.99.29
+
+
+2007-09-25  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Do not automatically switch to another
+	  plugin when the current plugin doesn't support the selected
+	  language. Fixes NB#71161.
+
+2007-09-21  Mohammad Anwari  <mdamt@maemo.org>
+
+	* Version 1.99.28
+
+2007-09-21  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Run hildon_im_plugin_language for every plugin loaded.
+	  Second part of fix for NB#64487.
+
+2007-09-21  Mohammad Anwari  <mdamt@maemo.org>
+
+	* Version 1.99.27
+
+2007-09-20  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c:
+	- Fixed label widget corruption in the tools menu when the
+	  translations are not available.
+
+2007-09-19  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Show self on start of multi key sequence.
+	  Fixes NB#69199.
+
+2007-09-11  Mohammad Anwari  <mdamt@maemo.org>
+
+	* Version 1.99.26
+
+2007-09-11  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Fixed stylus plugin being unconditionally loaded whenever
+	  the enable stylus plugins gconf value changed.
+
+2007-09-10  Mohammad Anwari  <mdamt@maemo.org>
+
+	* src/Makefile.am: Added internal.h to SOURCES in order to get into make dist.
+
+2007-09-10  Richard Sun  <richard.sun@nokia.com>
+
+	* src/hildon-im-ui.c: 
+	- Add filter to listen "_NET_WORKAREA" property to
+	reset UI work area width. Fixes: NB#68624
+	- code cleanup and fix some memory leak
+	
+2007-09-07  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Fixed plugins being enabled without the
+	init parameter at input method startup in some cases
+
+2007-09-06  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Fixed stylus plugin being unconditionally loaded at startup
+
+2007-09-06  Mohammad Anwari  <mdamt@maemo.org>
+
+	* src/hildon-im-ui.c:
+	- Sets the stylus plugin to be ready when the enable_stylus_im just be set to true. Fixes: NB#68637.
+	- Make sure the UI is not visible when setting the stylus plugin is enabled but not yet triggered.
+
+2007-09-03  Mohammad Anwari  <mdamt@maemo.org>
+
+	* src/hildon-im-ui.[ch], configure.ac: Non-maemo combo:
+	- Put MAEMO_CHANGES guard for non-maemo platforms (removed input modes and
+	clipboard stuff).
+	- Removed dependency to xsp
+	- Used "en" if no languages available in gconf.
+	- Added sanity checks when no plugins is loaded.
+	- Now it sets the plugin based on the value in gconf if sytlus UI is enabled.
+
+2007-09-03  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Version 1.99.24
+	* src/cache.c: Fixed build warning caused by bogus range check
+
+2007-09-03  Mohammad Anwari  <mdamt@maemo.org>
+
+	* src/hildon-im-ui.c: Set the main ui's widget name for theming purpose.
+	Fixes: NB#66771 (part 1 of 2).
+
+2007-08-31  Mohammad Anwari  <mdamt@maemo.org>
+
+	* Version 1.99.23
+
+2007-08-29  Mohammad Anwari  <mdamt@maemo.org>
+
+	* src/hildon-im-ui.c:
+	- Removed the "buffer zone" of size 24 px on the left size of the UI.
+	- Rely on the _NET_WORKAREA instead of putting hardcoded screen informations.
+	Fixes: NB#66823.
+
+2007-08-29  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h]:
+	- Cleaned up the header a bit
+	- Removed unused hildon_im_ui_add_upper_widget API
+
+2007-08-27  Mohammad Anwari  <mdamt@maemo.org>
+
+	* configure.ac: Turn on -Werror on CFLAGS
+	* src/{hildon-im-languages.c,hildon-im-recache.c,hildon-im-settings-plugins.c}:
+	Removed crufts.
+	* Makefile.am: Removed .launch target. Utilize the new maemo-launcher-dev to
+	do the symlinks etc. Fixes: NB#65904.
+
+2007-08-22  Mohammad Anwari  <mdamt@maemo.org>
+
+	* src/hildon-im-ui.c: Don't show the plugin if the plugin is hidden by itself.
+	Partial fix for NB#65363.
+
+2007-08-14  Mohammad Anwari  <mdamt@maemo.org>
+
+	* Version 1.99.22
+	* src/hildon-im-settings-plugin.h: Added HILDON_IM_SETTINGS_TAB_TITLE mask.
+	Partial fix for NB#65441.
+
+2007-08-13  Mohammad Anwari  <mdamt@maemo.org>
+
+	* Version 1.99.21
+
+2007-07-26  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h]: Replace the option to disable all
+	  virtual input methods with one that only disables the stylus
+	  specific methods. Fixes NB#64060.
+
+2007-07-19  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Version 1.99.20
+	* src/hildon-im-main.c, keyboard.sh:
+	- Create HIM directory before running the configurator
+
+2007-07-18  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+        * src/hildon-im-ui.c:
+        - Move accels and mnemonics settings to plugins
+
+2007-07-16  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c:
+	- Remove unecessary setting of keyboard state internally, state
+	  should always come from a plugin.
+	- Don't play finger trigger sound if virtual IM is disabled. Fixes NB#63256.
+
+2007-07-10  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h]:
+	- Removed multiline check API, use HILDON_GTK_INPUT_MODE_MULTILINE
+	  flag of HildonGtkInputMode.
+	- Show "unable to cut/copy" insensitive message on secret editors.
+	  Fixes NB#55426.
+
+2007-07-09  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 1.99.19
+	* src/hildon-im-ui.c: Call enable during show so it is now consistently called
+	for all kind of plugins. Supporting fixes to NB#62547
+
+2007-07-05  Richard Sun  <richard.sun@nokia.com>
+
+	*  src/hildon-im-settings-plugin.{c,h}:
+	- remove two API which handle model state of application launched from IM menu 
+	- Leave application model state to plugin
+
+2007-07-04  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c:
+	- Fixed copied banner not using the proper text domain.
+	- Show copied banner on HILDON_IM_CLIPBOARD_COPIED message.
+	  Fixes NB#62216.
+
+2007-07-04  Richard Sun  <richard.sun@nokia.com>
+
+	* src/hildon-im-settings-plugin.{c,h}:
+	- Add two functions: "hildon_im_settings_plugin_manager_set_model",
+	"hildon_im_settings_plugin_manager_get_model" to allow application run 
+	from HIM menu can communicate its model status with IM setting plugin manager.
+
+2007-07-04  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Call enable on the current plugin before
+	  forcing the visibility on a key press in order to ensure that
+	  the plugin tells the correct mode to the context.
+
+2007-07-03  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* keyboard.sh: Now monitor .configured again before running the configurator.
+	* src/hildon-im-languages.c: Get the endonyms from gconf.
+	* src/ui.c: 
+	  The endonyms shall be always successfully created, either from the
+	  translation library/database or just copied from the language code if the
+		resulting endonym is NULL.
+	* src/{cache.[ch], hildon-im-recache.c, hildon-im-plugin.[ch]}: 
+	  Replaced the unused new_func with description.
+
+2007-07-03  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Require full Return key press & release
+	  cycle before attempting to load a plugin or insert a newline.
+	  Fixes NB#61819, NB#62480.
+
+2007-07-02  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Fixed wrong plugin being presented on key
+	  press due to the saved trigger type not matching the active plugin
+	
+2007-06-29  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 1:1.99.18
+	* Sync the version to Hildon suite version
+
+2007-06-28  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-plugin.[c,h], src/hildon-im-ui.c:
+	Include hardware keycode in plugin_key_event API
+	* src/hildon-im-ui.[c,h]: Added internal context options mask,
+	hildon_im_ui_set_context_options API
+
+2007-06-26  Richard Sun  <richard.sun@nokia.com>
+
+	* hildon-input-method-ui-3.0.pc.in: 
+	- reverse himmenudir to /usr/share/hildon-input-method
+	* src/hildon-im-ui.c: change IM_MENU_DIR
+
+2007-06-21  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Version 3.8.13
+	* hildon-input-method-ui-3.0.pc.in: Correct himmenudir variable. Fixes NB#61306.
+
+2007-06-19  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* configure.ac, src/hildon-im-main.c, src/hildon-im-widget-loader.c:
+	- Added stricter compiler warnings
+	* src/hildon-im-ui.[c,h], src/hildon-im-plugin.[c,h]:
+	- Added hildon_im_ui_set_visible API for overriding the UI visibility
+	  from the plugins
+	- Added hildon_im_plugin_keyboard_state_changed API for plugin notification
+
+2007-06-12  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* src/hildon-im-ui.c: Show the image widget of the button when replacing the
+	label widget. Fixes the defect about the Shift icon in proprietary vkb plugin not
+	showing after returning from the example plugin.
+
+2007-06-12  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.12
+	* src/hildon-im-ui.c: Add a placeholder for secondary language even the
+	language is not set in gconf. Fixes NB#59965.
+	* keyboard.sh: Always run the configurator if exists.
+
+2007-06-08  Richard Sun  <richard.sun@nokia.com>
+
+	* hildon-input-method-ui-3.0.pc.in: change HIM menu installable
+	directory (Fixes: NB#58804)
+
+2007-06-06  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c:
+	- Update fullscreen keyboard sound
+	- Remove unused functions hildon_ui_send_hide_message, im_menu_compare
+
+2007-06-05  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* Version 3.8.11
+	* src/hildon-im-ui.c: Don't resolve non-existent secondary language description on startup
+
+2007-06-04  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.10
+	* src/hildon-im-settings-plugin.c: Always clean up plugins (not the modules)
+	after use.
+
+2007-05-30  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-settings-plugin.c:
+	- Settings plugin manager takes responsibility to free the keys when storing internal values
+	- Fix two compiler warnings
+	* src/hildon-im-main.c: g_thread_init before gtk_init
+
+2007-05-22  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Inform context(s) when the client widget
+	changes. Fixes modifiers not clearing.
+
+2007-05-18  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c:
+	- find_plugin_by_trigger_type can now find a plugin when omitting the trigger
+	- Don't send KEYBOARD_CONNECTED and KEYBOARD_DISCONNECTED messages anymore
+	- Don't handle the TOGGLE message
+	- Update client window on key messages, fixes fullscreen plugin communications
+	  not worked if activation was from a key press
+	- Handle the newline/fullscreen plugin/UI toggle logic on return and enter keys internally
+
+2007-05-15  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.9
+	* keyboard.sh: Fixed a typo in the script.
+
+2007-05-14  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Fixed disabling of virtual IMs preventing loading of plugins with the keyboard trigger
+
+2007-05-14  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* src/hildon-im-ui.c: Fixed missing IM menu.
+
+2007-05-11  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.8
+
+2007-05-11  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h]:
+	- Fixed all plugins failing to flush after encountering one plugin that shouldn't be flushed
+	- Added possibility to call plugin API for each loaded plugin
+	- Inform all loaded plugins of client widget changes and key events
+
+2007-05-10  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h], src/hildon-im-plugin.h:
+	- Add a new type of persistent plugin, loads at startup and stays in memory
+	- Add hildon_im_ui_set_keyboard_state API
+	- Fixed set_current_plugin_by_name not activating the plugin
+
+2007-05-09  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.7
+	* Makefile.am, configure.ac, hildon-input-method-header-3.0.pc: Removed
+	him-header.
+
+2007-05-09  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h], src/cache.c, hildon-im-recache.c, hildon-im-plugin.[c,h]:
+	- Removed public API: hildon_im_ui_delayed_hide
+	- Added plugin API: hildon_im_plugin_surrounding_received
+	- Removed menu and hiding timeouts
+	- Replaced FKB specific parts with general support for fullscreen plugins
+	- Replaced HildonIMKbMode with more focused HildonIMTrigger
+	- Removed some unused browser specific code
+	- Major cleanup of the IM UI show/hide logic by allowing the existing
+	  IM UI to remain open while a fullscreen plugin is open
+
+2007-05-08  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.6
+	* keyboard.sh: Call him-configurator if exists.
+	* keyboard.defs: Removed unused environment variable.
+	* src/hildon-im-ui.c: Hide virtual IMs if told to do so.
+
+2007-05-07  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h], hildon-input-method-ui3.schemas:
+	  Removed XSP pressure adjustment API
+
+2007-05-04  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.5.
+
+2007-05-04  Richard Sun  <richard.sun@nokia.com>
+
+	* src/hildon-im-ui.c: Add insensitive message for Cut, Copy, Paste. Fixes NB#55426.
+	
+2007-05-04  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c:
+	- Set the GTK accels and mnemonics settings
+	- Tell context on startup the kb mode. Fixes NB#55979
+
+2007-05-04  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* src/hildon-im-ui.c:
+	- Plugins have NULL in their languages field are assumed to support the currently
+	active language.
+
+2007-05-03  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* src/hildon-im-ui.c:
+	- Fixed a bug about missing secondary language in menu. NB#55571.
+	- Also notify the plugin when secondary language is empty.
+	* License changed to LGPL. 
+
+2007-05-02  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.4
+
+2007-05-03  Richard Sun  <richard.sun@nokia.com>
+
+	* src/hildon-im-settings-plugin.{c, h}: add two functions to handle
+	osso_context from TIS 
+
+2007-05-02  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.3
+
+2007-04-30  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* src/hildon-im-ui.h: Get rid of old gconfs.
+	* src/hildon-im-ui.c: GCONF_CURRENT_LANGUAGE is now an int.
+
+2007-04-30  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.2
+	* src/hildon-im-ui.c: 
+	- Removed crufts.
+	- Sync some new renamed constants from hildon-im-protocol.h.
+	- New APIs: hildon_im_ui_set_language_setting, hildon_im_ui_set_active_language_index
+	- Reloading plugins may work.
+	* src/hildon-im-settings-plugin.*: Dialog is now a flag of a tab.
+
+2007-04-26  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.1
+	* src/hildon-im-settings-plugin.*: 
+	- value_changed interface now also contains the key, the type, and the value changed.
+	- Added HildonIMSettingsPluginManager.
+	- Now pass the GtkSizeGroup in create_widget instead of data.
+	- Added HILDON_IM_SETTINGS_SELECTED_LANGUAGE for describing language which is currently selected
+	  when doing the settings in the language section.
+	- Added the forgotten HILDON_IM_SETTINGS_TAB
+	* src/hildon-im-ui.c: finally removed the autocaps when listening gconf key changes.
+
+2007-04-26  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Support HILDON_GTK_INPUT_MODE_DICTIONARY
+
+2007-04-24  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.8.0
+	* src/hildon-im-ui.h: Moved some gconf keys to the plugins.
+	* src/hildon-im-plugin.*, src/hildon-im-ui.*: Removed completion_language_changed interface.
+
+2007-04-24  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Fix two glib criticals
+
+2007-04-23  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c, src/cache.c:
+	- Fixed two minor leaks
+	- Notify plugins of all settings changes
+
+2007-04-19  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.[c,h], src/hildon-im-ui-plugin[c,h]:
+	- Implemented shared plugin buffer through which the wc prefix is communicated between plugins
+	- Fixed crash when going from plugin to previous plugin if plugin was loaded at startup
+
+2007-04-16  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.6.1
+	* src/hildon-im-ui.c: Fixed incorrect cast to an HildonIMPlugin. Removed references to imengines.
+
+2007-04-16  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.6.0
+	* src/hildon-im-ui.*: Replaced language related settings to be string.
+	* Removed dependency to libimengines.
+
+2007-04-11  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* src/cache.c: Add one more byte to give a string a NULL terminator.
+
+2007-04-10  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-ui.c: Size allocation fixes
+
+2007-04-09  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* Version 3.4.2
+	* src/*.h, src/*.c: Nuked hildon-im-keyboard.*, replaced with hildon-im-ui.*.
+	* src/hildon-im-recache.c: Return TRUE if the plugin is not HIM's.
+
+2007-04-04  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* src/hildon-im-settings-plugin.*: Implemented internal values, added
+	documentation.
+
+2007-03-30  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+
+	* 3.4.1
+	* src/hildon-im-settings-plugin.*: Hildon IM Settigns Plugin
+
+2007-03-23  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* Version 3.2.1
+	* src/hildon-im-recache.c: Return 0 when succesfully building the cache.
+
+2007-03-19  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* Version 3.2.0
+	* src/hildon-im-keyboard.c: 
+	- Moved menu building for plugins and languages
+	  separated so it can be called anytime for plugin reloading purpose.
+	- Bring back normal mode plugin when returning from FKB and it needs
+	  to restore the normal UI.
+
+2007-03-16  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* configure.ac: Replaced hildon-libs in favor of hildon-1
+	* src/hildon-im-keyboard.*, src/cache.*, src/hildon-im-recache.c:
+	Implemented plugin cache
+	* src/hildon-im-keyboard.c, configure.ac, debian/control:
+	Applying patch from Gabriel Schulhof <gabriel.schulhof@nokia.com> to
+	replace libosso-help to hildon-help
+	* src/hildon-im-keyboard.* src/hildon-im-plugin.h:
+	- Moved some constants to private part
+	- Restructure the HildonIMPluginInfo
+
+2007-02-22  Tomas Junnonen  <tomas.junnonen@nokia.com>
+
+	* src/hildon-im-keyboard.[c,h], hildon-im-plugin.[c,h]:
+	- Propagate auto case setting to IM context
+	- New plugin API for propagating key events
+	- Resizable IM, plugin tells the height
+
+2007-02-16  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* Version 3.0.3-1 
+	* src/hildon-im-keyboard.h,hildon-im-plugin.h: Only define MAEMO_CHANGES if not yet defined.
+
+2007-02-16  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* Version 3.0.1-1 
+	* src/hildon-im-keyboard.h: Added reference to gtk/gtkenums.h and
+	added MAEMO_cHANGES definition.
+	
+2007-02-13  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* Version 3.0.0-1 
+	* src/hildon-im-keyboard.c: Hildon Consolidation: 
+	- Replaced gtk_object_sink to g_object_ref_sink
+	- gtk_infoprint to HildonBanner.
+
+2007-02-08  Mohammad Anwari  <Mohammad.Anwari@nokia.com>
+	
+	* configure.ac, hildon-input-method-ui-3.0.pc.in,
+	hildon-im-widget-loader.c: Added himwidgetdir.
+
+2006-12-02  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* src/hildon-im-keyboard.c,hildon-im-plugin.*: Removed IM_GROUP_*, Renamed IM_TYPE_* to HILDON_IM_TYPE_*, Renamed DEFAULT_PRIORITY to HILDON_IM_DEFAULT_PLUGIN_PRIORITY, Renamed BUTTON_* to HILDON_IM_BUTTON_*
+	* src/hildon-im-keyboard.c: Filtering plugins which go the menu with prepare_im_menu().
+
+2006-11-30  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* src/hildon-im-keyboard.c: Implemented pluggable menu entries, removing of common buttons.
+
+2006-11-29  Mohammad Anwari  <Mohammad.Anwari@nokia.com> 
+
+	* New branch
+	* src/Makefile.am: Moved target to libhildon-im-ui.la
+	* configure.ac, Makefile.am, debian/*: Some name changes
+	* src/hildon-im-keyboard.c: Removed unused codes.

@@ -1,0 +1,2 @@
+debian/tmp/usr/lib/libhildon-im-ui.so.*
+debian/tmp/etc/gconf/*

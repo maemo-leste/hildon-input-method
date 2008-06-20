@@ -1,0 +1,24 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/autotools.mk
+
+DEB_DH_STRIP_ARGS := --dbg-package=libhildon-im-ui3 --dbg-package=hildon-input-method
+
+ifeq (,$(findstring nolauncher,$(DEB_BUILD_OPTIONS)))
+	LAUNCHER=--enable-maemo-launcher
+else
+	LAUNCHER=--disable-maemo-launcher
+endif
+
+debian/stamp-autotools-files:
+	./autogen.sh
+	touch debian/stamp-autotools-files
+
+common-build-arch common-build-indep:: debian/stamp-autotools-files
+	make
+
+DEB_CONFIGURE_USER_FLAGS := $(LAUNCHER)
+
+install/hildon-input-method::
+	dh_maemolauncher -Pdebian/tmp -phildon-input-method

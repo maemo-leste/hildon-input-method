@@ -1,0 +1,13 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+himmenudir=@prefix@/share/hildon-input-method
+himwidgetsdir=@libdir@/@im_widget_dir@
+himplugindir=@libdir@/@im_plugin_dir@
+
+Name: hildon-input-method-ui
+Description: Hildon Input Method UI library
+Version: @VERSION@ 
+Libs: -L${libdir} -lhildon-im-ui 
+Cflags: -I${includedir}/hildon-input-method

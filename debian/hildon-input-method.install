@@ -1,0 +1,4 @@
+debian/tmp/usr/share/man/*
+debian/tmp/usr/bin/hildon-input-method*
+debian/tmp/usr/bin/hildon-im-recache
+debian/tmp/etc/osso-af-init/*

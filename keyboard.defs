@@ -1,0 +1,4 @@
+#! /bin/sh
+# keyboard.defs - Keyboard defines sourced before keyboard is run
+# These are defined in apps launched after keyboard in af-base-apps, too.
+

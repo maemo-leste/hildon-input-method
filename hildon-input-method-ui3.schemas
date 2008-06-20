@@ -1,0 +1,77 @@
+<gconfschemafile>
+  <schemalist>
+    <schema>
+      <key>/schemas/apps/osso/inputmethod/hildon-im-languages/language-1</key>
+      <applyto>/apps/osso/inputmethod/hildon-im-languages/language-1</applyto>
+      <owner>hildon-input-method</owner>
+      <type>string</type>
+      <default></default>
+      <locale name="C">
+        <short>Second Language</short>
+        <long>The language the user will mostly likely to use to input.</long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/osso/inputmethod/input_method_plugin</key>
+      <applyto>/apps/osso/inputmethod/input_method_plugin</applyto>
+      <owner>hildon-input-method</owner>
+      <type>string</type>
+      <default>000_hildon_western_vkb</default>
+      <locale name="C">
+        <short>Current input method</short>
+        <long>ID of the selected input method.</long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/osso/inputmethod/hildon-im-languages/current</key>
+      <applyto>/apps/osso/inputmethod/hildon-im-languages/current</applyto>
+      <owner>hildon-input-method</owner>
+      <type>int</type>
+      <default>0</default>
+      <locale name="C">
+        <short>Current Language Index</short>
+        <long>Index to the current language</long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/osso/inputmethod/thumb_detection</key>
+      <applyto>/apps/osso/inputmethod/thumb_detection</applyto>
+      <owner>hildon-input-method</owner>
+      <type>int</type>
+      <default>0</default>
+      <locale name="C">
+        <short>Thumb detection method</short>
+        <long>Controls how to determine if the user wants the thumb UI</long>
+      </locale>
+    </schema>
+
+    <schema>
+      <key>/schemas/apps/osso/inputmethod/launch_finger_kb_on_select</key>
+      <applyto>/apps/osso/inputmethod/launch_finger_kb_on_select</applyto>
+      <owner>hildon-input-method</owner>
+      <type>bool</type>
+      <default>true</default>
+      <locale name="C">
+        <short>Launch finger keyboard on keypad select press</short>
+        <long>When this feature is enabled the finger keyboard can be launched
+	by pressing the select hardware key</long>
+      </locale>
+    </schema>
+
+   <schema>
+     <key>/schemas/apps/osso/inputmethod/hildon-im-languages/list</key>
+     <applyto>/apps/osso/inputmethod/hildon-im-languages/list</applyto>
+     <owner>hildon-input-method</owner>
+     <type>list</type>
+     <list_type>string</list_type>
+     <default>[]</default>
+     <locale name="C">
+       <short>Available Languages</short>
+       <long>Available languages.</long>
+     </locale>
+   </schema>
+  </schemalist>
+</gconfschemafile>

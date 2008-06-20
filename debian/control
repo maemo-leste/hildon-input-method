@@ -1,0 +1,48 @@
+Source: hildon-input-method
+Section: x11
+Priority: optional
+Maintainer: Mohammad Anwari <Mohammad.Anwari@nokia.com>
+Build-Depends: debhelper, cdbs, pkg-config, libgtk2.0-dev (>= 2:2.6.10-1.osso4), libosso-dev (>=0.9.10-2), libgconf2-dev, libhildon1-dev, libaudiofile-dev, libhildonhelp-dev, hildon-input-method-framework-dev (>= 1:1.99.16-1), libdbus-1-dev, maemo-launcher-dev (>= 0.23-1)
+Standards-Version: 3.6.0
+
+Package: hildon-input-method
+Section: x11
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: Hildon Input method
+ This package provides Hildon Input Method application binary.
+
+Package: libhildon-im-ui3
+Section: x11
+Architecture: any
+Conflicts: libhildon-input-method-ui2 (<< 3.0.0-1), libhildon-input-method-ui-sdk2 (<< 3.0.0-1)
+Replaces: libhildon-input-method-ui2 (<< 3.0.0-1)
+Depends: ${shlibs:Depends}, ${misc:Depends}, hildon-input-method-l10n-mr0 | hildon-input-method-l10n-mr, hildon-common-strings-l10n-mr | hildon-common-strings-l10n-mr0
+Description: Hildon Input method UI library
+ This package does install the common part of the Hildon
+ Input Method. The common part the the  UI, plugin management, etc.
+
+Package: libhildon-im-ui-dev
+Section: x11
+Architecture: all
+Provides: libhildon-input-method-ui-dev
+Replaces: libhildon-input-method-ui-dev (<< 3.0.0-1), hildon-input-method-header
+Conflicts: libhildon-input-method-ui-dev (<< 3.0.0-1), hildon-input-method-header
+Depends: libhildon-im-ui3 (= ${Source-Version}), hildon-input-method-framework-dev, libxsp-dev, ${shlibs:Depends}, ${misc:Depends}
+Description: Development package for Hildon Input Method UI
+ This package installs the development package for Hildon Input Method UI.
+
+Package: libhildon-im-ui3-dbg
+Section: x11
+Architecture: any
+Depends: libhildon-im-ui3 (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Debug versions of the Hildon Input Method UI library
+ Symbols for Hildon Input Method UI library.
+
+Package: hildon-input-method-dbg
+Section: x11
+Architecture: any
+Depends: hildon-input-method (= ${Source-Version}), ${shlibs:Depends}, ${misc:Depends}
+Description: Hildon Input method debugging package.
+ This package provides symbols of Hildon Input Method application binary.
+
