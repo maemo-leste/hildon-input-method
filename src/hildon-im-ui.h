@@ -67,12 +67,13 @@ typedef struct _HildonIMUIPrivate HildonIMUIPrivate;
 #define HILDON_IM_GCONF_DIR "/apps/osso/inputmethod"
 
 #define HILDON_IM_GCONF_ENABLE_STYLUS_IM           HILDON_IM_GCONF_DIR       "/enable-stylus-im"
+#define HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT HILDON_IM_GCONF_DIR       "/launch_finger_kb_on_select"
+#define HILDON_IM_GCONF_THUMB_DETECTION            HILDON_IM_GCONF_DIR       "/thumb_detection"
 #define HILDON_IM_GCONF_LANG_DIR                   HILDON_IM_GCONF_DIR       "/hildon-im-languages"
 #define _HILDON_IM_GCONF_LANGUAGE                  HILDON_IM_GCONF_LANG_DIR  "/language-"
 #define HILDON_IM_GCONF_PRIMARY_LANGUAGE           _HILDON_IM_GCONF_LANGUAGE "0"
 #define HILDON_IM_GCONF_SECONDARY_LANGUAGE         _HILDON_IM_GCONF_LANGUAGE "1"
-#define HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT HILDON_IM_GCONF_DIR       "/launch_finger_kb_on_select"
-#define HILDON_IM_GCONF_THUMB_DETECTION            HILDON_IM_GCONF_DIR       "/thumb_detection"
+#define HILDON_IM_GCONF_CURRENT_LANGUAGE           HILDON_IM_GCONF_LANG_DIR "/current"
 
 
 #define HILDON_IM_DEFAULT_LANGUAGE IM_en_GB
