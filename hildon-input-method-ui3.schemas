@@ -17,7 +17,7 @@
       <applyto>/apps/osso/inputmethod/input_method_plugin</applyto>
       <owner>hildon-input-method</owner>
       <type>string</type>
-      <default>000_hildon_western_vkb</default>
+      <default>hildon_keyboard_assistant</default>
       <locale name="C">
         <short>Current input method</short>
         <long>ID of the selected input method.</long>
