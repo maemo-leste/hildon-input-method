@@ -3006,27 +3006,15 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
     gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (plugin->menu), TRUE);
   }
 
-  
-  if (plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE && GTK_IS_WINDOW (plugin->widget))
-  {
-    XSetTransientForHint(GDK_DISPLAY(),
-                         GDK_WINDOW_XID(GTK_WIDGET(plugin->widget)->window),
-                         self->priv->app_window);
-    /* gdk_window_set_transient_for (GTK_WIDGET(plugin->widget)->window, gdk_xid_table_lookup (self->priv->app_window)); */
-    gtk_window_set_modal (GTK_WINDOW (plugin->widget), TRUE);
-    gtk_window_present (GTK_WINDOW (plugin->widget));
-  }
-
   self->priv->ui_is_visible = GTK_WIDGET_VISIBLE (plugin->widget) &&
-                              plugin->info->type != HILDON_IM_TYPE_HIDDEN &&
-                              plugin->info->type != HILDON_IM_TYPE_SPECIAL_STANDALONE;
+                              plugin->info->type != HILDON_IM_TYPE_HIDDEN;
   /* needs packing */
-  if (self->priv->ui_is_visible)
+  if (self->priv->ui_is_visible && plugin->info->type != HILDON_IM_TYPE_SPECIAL_STANDALONE)
     gtk_box_pack_start(self->priv->im_box, plugin->widget, TRUE, TRUE, 0);
 
   if (plugin->info->type != HILDON_IM_TYPE_HIDDEN)
-    gtk_widget_show (plugin->widget);
-  
+    gtk_widget_show_all (plugin->widget);
+
   if (self->priv->ui_is_visible)
     hildon_im_ui_resize_window(self);
 }
