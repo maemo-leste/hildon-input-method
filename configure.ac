@@ -17,7 +17,7 @@ AC_SUBST(MAJORVERSION)
 AM_INIT_AUTOMAKE(hildon-input-method, $VERSION)
 AM_CONFIG_HEADER(config.h)
 
-CFLAGS="$CFLAGS -Werror -Wall -Wmissing-prototypes -Wmissing-declarations"
+CFLAGS="$CFLAGS -Werror -Wall -Wmissing-prototypes -Wmissing-declarations -fno-strict-aliasing"
 
 GCCVERSION=`gcc -dumpversion`;
 if test x$GCCVERSION = "x3.4.4"
