@@ -1,8 +1,14 @@
+hildon-input-method (1:2.1.2-1~unreleased) unstable; urgency=low
+
+  * Pre-beta release for Fremantle.
+
+ -- Felipe Erias Morandeira <femorandeira@maemo.org>  Wed, 27 Aug 2008 12:00:00 +0200
+
 hildon-input-method (1:2.1.1-1) unstable; urgency=low
 
-  * Pre-alpha release for Fremantle. 
+  * Alpha release for Fremantle. 
 
- -- Felipe Erias Morandeira <femorandeira@maemo.org>  Mon, 26 Aug 2008 12:00:00 +0200
+ -- Felipe Erias Morandeira <femorandeira@maemo.org>  Tue, 26 Aug 2008 12:00:00 +0200
 
 hildon-input-method (1:2.1.0-1) unstable; urgency=low
 
