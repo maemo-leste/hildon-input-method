@@ -1,8 +1,8 @@
-hildon-input-method (1:2.1.2-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.2-1) unstable; urgency=low
 
-  * Pre-beta release for Fremantle. Merged into trunk.
+  * Version 2.1.2-1. Pre-beta release for Fremantle. Merged into trunk.
 
- -- Felipe Erias Morandeira <femorandeira@maemo.org>  Wed, 27 Aug 2008 12:00:00 +0200
+ -- Felipe Erias Morandeira <femorandeira@maemo.org>  Mon, 8 Sept 2008 12:00:00 +0200
 
 hildon-input-method (1:2.1.1-1) unstable; urgency=low
 
