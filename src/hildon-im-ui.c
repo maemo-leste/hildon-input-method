@@ -1980,8 +1980,12 @@ hildon_im_ui_x_window_want_im_hidden(Window window)
        desktop case happens when all windows are closed, we want to hide IM
        then as well of course.. */
     ret = strcmp(type_str, "_NET_WM_WINDOW_TYPE_NORMAL") == 0 ||
-            strcmp(type_str, "_NET_WM_WINDOW_TYPE_DIALOG") == 0 ||
-            strcmp(type_str, "_NET_WM_WINDOW_TYPE_DESKTOP") == 0;
+          strcmp(type_str, "_NET_WM_WINDOW_TYPE_DIALOG") == 0 ||
+          strcmp(type_str, "_NET_WM_WINDOW_TYPE_DESKTOP") == 0 ||
+          strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_HOME_APPLET") == 0 ||
+          strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_STACKABLE") == 0 ||
+          strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_APP_MENU") == 0;
+    /* Not: _NET_WM_WINDOW_TYPE_NOTIFICATION _NET_WM_WINDOW_TYPE_INPUT */
     XFree(type_str);
   }
 
