@@ -1,3 +1,7 @@
+2008-10-13  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 2.1.5-1.
+
 2008-10-10  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* hildon-im-ui.c (hildon_im_ui_x_window_want_im_hidden) :
