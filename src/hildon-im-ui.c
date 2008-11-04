@@ -1269,9 +1269,12 @@ hildon_im_ui_set_keyboard_state(HildonIMUI *self,
       hildon_im_ui_hide(self);
       set_plugin_to_stylus_im (self);
     }
-    else if (GTK_WIDGET_VISIBLE(self))
+    else 
     {
-      hildon_im_ui_hide(self);
+      if (GTK_WIDGET_VISIBLE(self))
+      {
+        hildon_im_ui_hide(self);
+      }
       flush_plugins(self, NULL, FALSE);
     }
   }

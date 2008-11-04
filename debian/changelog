@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.6-1~unreleased) unstable; urgency=low
+
+  * Version 1:2.1.6-1~unreleased
+  * Fixes: NB#90682.
+
+ -- Felipe Erias Morandeira <femorandeira@maemo.org>  Tue, 4 Nov 2008 12:00:00 +0200
+ 
 hildon-input-method (1:2.1.5-1) unstable; urgency=low
 
   * Version 1:2.1.5-1
