@@ -111,6 +111,8 @@ main(int argc, char *argv[])
 
   if (!g_thread_supported ()) g_thread_init (NULL);
   gtk_init(&argc, &argv);
+  /* TODO call hildon_init() here
+   * or replace both calls with hildon_gtk_init() */
 
   gconf_init(argc, argv, NULL);
 

@@ -37,6 +37,18 @@
     </schema>
 
     <schema>
+      <key>/schemas/apps/osso/inputmethod/use_finger_kb</key>
+      <applyto>/apps/osso/inputmethod/use_finger_kb</applyto>
+      <owner>hildon-input-method</owner>
+      <type>bool</type>
+      <default>false</default>
+      <locale name="C">
+        <short>Use virtual Finger Keyboard</short>
+        <long>This feature enables/disables the use of the Finger Keyboard</long>
+      </locale>
+    </schema>
+
+    <schema>
       <key>/schemas/apps/osso/inputmethod/thumb_detection</key>
       <applyto>/apps/osso/inputmethod/thumb_detection</applyto>
       <owner>hildon-input-method</owner>

@@ -1,3 +1,15 @@
+2008-11-28  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 2.1.7-1
+	* debian/control : Remove the dependency with libaudiofile-dev
+	* hildon-input-method-ui3.schemas : Added the boolean key 
+	/schemas/apps/osso/inputmethod/use_finger_kb.
+	* hildon-im-ui.h : Defined HILDON_IM_GCONF_USE_FINGER_KB.
+	* hildon-im-ui.c (self->priv->use_finger_kb) : Store the value of
+	/apps/osso/inputmethod/use_finger_kb
+	(hildon_im_ui_show) : Don't launch the finger keyboard if
+	self->priv->use_finger_kb is FALSE.
+
 2008-11-07  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.6-1

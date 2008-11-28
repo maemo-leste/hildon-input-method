@@ -214,6 +214,7 @@ struct _HildonIMUIPrivate
   gboolean select_launches_fullscreen_plugin;
   HildonIMThumbDetection thumb_detection;
   gboolean return_key_pressed;
+  gboolean use_finger_kb;
 
   GtkWidget *menu;
   GSList *all_methods;
@@ -915,6 +916,13 @@ hildon_im_ui_show(HildonIMUI *self)
   {
     return;
   }
+  
+  if (!self->priv->use_finger_kb &&
+      (self->priv->trigger == HILDON_IM_TRIGGER_STYLUS
+          || self->priv->trigger == HILDON_IM_TRIGGER_FINGER))
+  {
+    return;
+  }
 
   /* Remember the window which caused the IM to be shown, so we can send
      hide event to the same window when we're hiding */
@@ -941,7 +949,8 @@ hildon_im_ui_show(HildonIMUI *self)
 
     activate_plugin(self, plugin, TRUE);
     return;
-  } else
+  }
+  else
   {
     /* Something went wrong, the plugin name, the widget and the kb mode
        are not in sync. The one known case is MCE intercepting the home
@@ -954,7 +963,8 @@ hildon_im_ui_show(HildonIMUI *self)
     }
   }
 
-  /* IM may not be loaded yet! */
+  /* IM may not be loaded yet!
+   * TODO is hildon_im_plugin_enable called too many times? */
   activate_plugin (self, self->priv->current_plugin, TRUE);
   hildon_im_plugin_enable (HILDON_IM_PLUGIN(self->priv->current_plugin->widget), FALSE);
   /* The plugin draws itself, or it doesn't need a UI */
@@ -1447,6 +1457,13 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
       self->priv->thumb_detection = gconf_value_get_int(value);
     }
   }
+  else if (strcmp(key, HILDON_IM_GCONF_USE_FINGER_KB) == 0)
+  {
+    if (value->type == GCONF_VALUE_BOOL)
+    {
+      self->priv->use_finger_kb = gconf_value_get_bool(value);
+    }
+  }
 
   for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
   {
@@ -1504,6 +1521,9 @@ hildon_im_ui_load_gconf(HildonIMUI *self)
 
   self->priv->thumb_detection =
     gconf_client_get_int(self->client, HILDON_IM_GCONF_THUMB_DETECTION, NULL);
+  
+  self->priv->use_finger_kb =
+    gconf_client_get_bool(self->client, HILDON_IM_GCONF_USE_FINGER_KB, NULL);
 
   gvalue = gconf_client_get (self->client, HILDON_IM_GCONF_ENABLE_STYLUS_IM, NULL);
   if (gvalue == NULL)
