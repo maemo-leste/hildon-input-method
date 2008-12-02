@@ -49,18 +49,6 @@
     </schema>
 
     <schema>
-      <key>/schemas/apps/osso/inputmethod/thumb_detection</key>
-      <applyto>/apps/osso/inputmethod/thumb_detection</applyto>
-      <owner>hildon-input-method</owner>
-      <type>int</type>
-      <default>1</default>
-      <locale name="C">
-        <short>Thumb detection method</short>
-        <long>Controls how to determine if the user wants the thumb UI</long>
-      </locale>
-    </schema>
-
-    <schema>
       <key>/schemas/apps/osso/inputmethod/launch_finger_kb_on_select</key>
       <applyto>/apps/osso/inputmethod/launch_finger_kb_on_select</applyto>
       <owner>hildon-input-method</owner>

@@ -68,7 +68,6 @@ typedef struct _HildonIMUIPrivate HildonIMUIPrivate;
 
 #define HILDON_IM_GCONF_ENABLE_STYLUS_IM           HILDON_IM_GCONF_DIR       "/enable-stylus-im"
 #define HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT HILDON_IM_GCONF_DIR       "/launch_finger_kb_on_select"
-#define HILDON_IM_GCONF_THUMB_DETECTION            HILDON_IM_GCONF_DIR       "/thumb_detection"
 #define HILDON_IM_GCONF_LANG_DIR                   HILDON_IM_GCONF_DIR       "/hildon-im-languages"
 #define _HILDON_IM_GCONF_LANGUAGE                  HILDON_IM_GCONF_LANG_DIR  "/language-"
 #define HILDON_IM_GCONF_PRIMARY_LANGUAGE           _HILDON_IM_GCONF_LANGUAGE "0"
@@ -108,15 +107,6 @@ typedef enum
   HILDON_IM_NUMBER_INPUT_SOUND,
   HILDON_IM_FINGER_TRIGGER_SOUND
 } HildonIMUISound;
-
-typedef enum
-{
-  HILDON_IM_THUMB_DETECT_FINGER,
-  HILDON_IM_THUMB_DETECT_FINGER_AND_STYLUS,
-  HILDON_IM_THUMB_DETECT_NEVER,
-} HildonIMThumbDetection;
-
-#define HILDON_IM_DEFAULT_THUMB_DETECTION HILDON_IM_THUMB_DETECT_FINGER
 
 struct _HildonIMUI
 {

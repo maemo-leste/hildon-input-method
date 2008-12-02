@@ -212,7 +212,6 @@ struct _HildonIMUIPrivate
   Window transiency;
 
   gboolean select_launches_fullscreen_plugin;
-  HildonIMThumbDetection thumb_detection;
   gboolean return_key_pressed;
   gboolean use_finger_kb;
 
@@ -476,18 +475,20 @@ set_current_plugin_by_name (HildonIMUI *self, const gchar *name)
     g_warning ("No input method plugin specified.");
     g_warning ("Will try to get the available plugin.");
     plugin = find_plugin_by_trigger_type (self,
-        HILDON_IM_TRIGGER_STYLUS, HILDON_IM_TYPE_DEFAULT);
-  } else {
+                            HILDON_IM_TRIGGER_KEYBOARD, HILDON_IM_TYPE_DEFAULT);
+  }
+  else
+  {
     plugin = find_plugin_by_name (self, name); 
 
     if (plugin == NULL)
     {
       g_warning ("Input method specified in the configuration: %s.",
-          name);
+                 name);
       g_warning ("However this IM is not available.");
       g_warning ("Will try to get the available plugin.");
       plugin = find_plugin_by_trigger_type (self,
-          HILDON_IM_TRIGGER_STYLUS, HILDON_IM_TYPE_DEFAULT);
+                            HILDON_IM_TRIGGER_KEYBOARD, HILDON_IM_TYPE_DEFAULT);
     }
   }
 
@@ -905,12 +906,8 @@ hildon_im_ui_show(HildonIMUI *self)
 {
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
-  if (self->priv->current_plugin == NULL &&
-      self->priv->trigger != HILDON_IM_TRIGGER_FINGER)
-    return;
-
-  if ((self->priv->enable_stylus_ui == FALSE &&
-       self->priv->trigger == HILDON_IM_TRIGGER_STYLUS) &&
+  if (self->priv->enable_stylus_ui == FALSE &&
+      self->priv->trigger == HILDON_IM_TRIGGER_STYLUS &&
       self->priv->keyboard_available == FALSE &&
       self->priv->ui_is_visible == TRUE)
   {
@@ -918,8 +915,7 @@ hildon_im_ui_show(HildonIMUI *self)
   }
   
   if (!self->priv->use_finger_kb &&
-      (self->priv->trigger == HILDON_IM_TRIGGER_STYLUS
-          || self->priv->trigger == HILDON_IM_TRIGGER_FINGER))
+      (self->priv->trigger == HILDON_IM_TRIGGER_FINGER))
   {
     return;
   }
@@ -935,8 +931,13 @@ hildon_im_ui_show(HildonIMUI *self)
     plugin = find_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_FINGER, -1);
     if (plugin == NULL) 
     {
-      g_warning ("No finger plugin installed");
-      return;
+      self->priv->trigger = HILDON_IM_TRIGGER_STYLUS;
+      plugin = find_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_STYLUS, -1);
+      if  (plugin == NULL)
+      {
+        g_warning ("No finger plugin installed");
+        return;
+      }
     }
 
     /* If the plugin is loaded, but now shown, ask it to reshow itself */
@@ -1022,7 +1023,7 @@ hildon_im_ui_restore_previous_mode_real(HildonIMUI *self)
   }
   else
   {
-    plugin = last_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_STYLUS,
+    plugin = last_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_FINGER,
                                        HILDON_IM_TYPE_DEFAULT);
   }
   if (plugin)
@@ -1450,13 +1451,6 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
         hildon_im_ui_hide(self);
     }
   }
-  else if (strcmp(key, HILDON_IM_GCONF_THUMB_DETECTION) == 0)
-  {
-    if (value->type == GCONF_VALUE_INT)
-    {
-      self->priv->thumb_detection = gconf_value_get_int(value);
-    }
-  }
   else if (strcmp(key, HILDON_IM_GCONF_USE_FINGER_KB) == 0)
   {
     if (value->type == GCONF_VALUE_BOOL)
@@ -1519,9 +1513,6 @@ hildon_im_ui_load_gconf(HildonIMUI *self)
   self->priv->select_launches_fullscreen_plugin =
     gconf_client_get_bool(self->client, HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT, NULL);
 
-  self->priv->thumb_detection =
-    gconf_client_get_int(self->client, HILDON_IM_GCONF_THUMB_DETECTION, NULL);
-  
   self->priv->use_finger_kb =
     gconf_client_get_bool(self->client, HILDON_IM_GCONF_USE_FINGER_KB, NULL);
 
@@ -1639,41 +1630,18 @@ hildon_im_ui_set_client(HildonIMUI *self,
 
   if (show)
   {
-    gboolean finger_detected = FALSE;
-
-    if (THUMB_LAUNCHES_FULLSCREEN_PLUGIN &&
-        self->priv->keyboard_available == FALSE)
-    {
-
-      if (self->priv->trigger == HILDON_IM_TRIGGER_FINGER &&
-          (self->priv->thumb_detection == HILDON_IM_THUMB_DETECT_FINGER_AND_STYLUS ||
-           self->priv->thumb_detection == HILDON_IM_THUMB_DETECT_FINGER))
-      {
-        finger_detected = TRUE;
-      }
-
-      if (self->priv->trigger == HILDON_IM_TRIGGER_STYLUS &&
-          self->priv->thumb_detection == HILDON_IM_THUMB_DETECT_FINGER_AND_STYLUS)
-      {
-        self->priv->trigger = HILDON_IM_TRIGGER_FINGER;
-        finger_detected = TRUE;
-      }
-
-      if (finger_detected)
-        hildon_im_ui_play_sound(self, HILDON_IM_FINGER_TRIGGER_SOUND);
-    }
-    
-    /* If finger launching is disabled in gconf, revert to stylus method */
-    if (self->priv->trigger == HILDON_IM_TRIGGER_FINGER &&
-        self->priv->thumb_detection == HILDON_IM_THUMB_DETECT_NEVER)
-    {
-      self->priv->trigger = HILDON_IM_TRIGGER_STYLUS;
-    }
-
     /* When the keyboard is available, non-keyboard plugins are disabled */
     if (self->priv->keyboard_available == TRUE)
     {
       self->priv->trigger = HILDON_IM_TRIGGER_KEYBOARD;
+    }
+
+    if (THUMB_LAUNCHES_FULLSCREEN_PLUGIN &&
+        self->priv->keyboard_available == FALSE &&
+        (self->priv->trigger == HILDON_IM_TRIGGER_FINGER
+            || self->priv->trigger == HILDON_IM_TRIGGER_STYLUS))
+    {
+      hildon_im_ui_play_sound(self, HILDON_IM_FINGER_TRIGGER_SOUND);
     }
 
     hildon_im_ui_show(self);
@@ -2384,7 +2352,7 @@ hildon_im_ui_init(HildonIMUI *self)
 
   /* default */
   priv->options = 0;
-  priv->trigger = HILDON_IM_TRIGGER_STYLUS;
+  priv->trigger = HILDON_IM_TRIGGER_FINGER;
   priv->transiency = 0;
   priv->repeat_done = FALSE;
   priv->repeat_timeout_id = 0;

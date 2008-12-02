@@ -47,6 +47,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <dbus/dbus.h>
+#include <hildon/hildon.h>
 
 #define LOCALE_IFACE "com.nokia.LocaleChangeNotification"
 #define LOCALE_SIGNAL "locale_changed"
@@ -110,7 +111,7 @@ main(int argc, char *argv[])
   DBusError dbus_error_code;
 
   if (!g_thread_supported ()) g_thread_init (NULL);
-  gtk_init(&argc, &argv);
+  hildon_gtk_init(&argc, &argv);
   /* TODO call hildon_init() here
    * or replace both calls with hildon_gtk_init() */
 

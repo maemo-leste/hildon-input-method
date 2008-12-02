@@ -1,3 +1,15 @@
+2008-12-02  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 1:2.1.8-1~unreleased
+	* hildon-input-method-ui3.schemas:
+	Removed the deprecated key /apps/osso/inputmethod/thumb_detection.
+	* hildon-im-ui.h : Removed HILDON_IM_GCONF_THUMB_DETECTION and the
+	enum type HildonIMThumbDetection.
+	* hildon-im-ui.c : Removed the handling of that GConf key and the field
+	thumb_detection in HildonIMUIPrivate. Use HILDON_IM_TRIGGER_FINGER
+	in most cases where HILDON_IM_TRIGGER_STYLUS was being used.
+	* hildon-im-main.c : Use hildon_gtk_init().
+
 2008-11-28  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.7-1
