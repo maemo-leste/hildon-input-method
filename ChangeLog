@@ -1,3 +1,9 @@
+2008-12-16  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* configure.ac : Perform PKG_PROG_PKG_CONFIG after AC_PROG_LIBTOOL, in
+	order to locate "pkg-config".
+	Fixes NB#95829.
+
 2008-12-02  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 1:2.1.8-1~unreleased
