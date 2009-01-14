@@ -1014,7 +1014,7 @@ static gboolean
 hildon_im_ui_restore_previous_mode_real(HildonIMUI *self)
 {
   PluginData *plugin;
-  g_assert(HILDON_IM_IS_UI(self) == TRUE);
+  g_return_val_if_fail(HILDON_IM_IS_UI(self), FALSE);
 
   if (self->priv->keyboard_available)
   {
@@ -3226,7 +3226,7 @@ hildon_im_ui_send_utf8(HildonIMUI *self, const gchar *utf8)
 
     next_start = get_next_packet_start(utf8);
     len = next_start - utf8;
-    g_assert(0 <= len && len < HILDON_IM_CLIENT_MESSAGE_BUFFER_SIZE);
+    g_return_if_fail (0 <= len && len < HILDON_IM_CLIENT_MESSAGE_BUFFER_SIZE);
 
     /*this call will take care of adding the null terminator*/
     memset( &event, 0, sizeof(XEvent) );
@@ -3303,7 +3303,7 @@ hildon_im_ui_send_surrounding_content(HildonIMUI *self,
 
     next_start = get_next_packet_start(surrounding);
     len = next_start - surrounding;
-    g_assert(0 <= len && len < HILDON_IM_CLIENT_MESSAGE_BUFFER_SIZE);
+    g_return_if_fail(0 <= len && len < HILDON_IM_CLIENT_MESSAGE_BUFFER_SIZE);
 
     /*this call will take care of adding the null terminator*/
     memset( &event, 0, sizeof(XEvent) );
@@ -3875,7 +3875,7 @@ hildon_im_ui_set_context_options (HildonIMUI *self,
 {
   HildonIMOptionMask old_options;
 
-  g_assert(HILDON_IM_IS_UI(self));
+  g_return_if_fail(HILDON_IM_IS_UI(self));
 
   old_options = self->priv->options;
 
@@ -3917,7 +3917,7 @@ free_additional_menu (HildonIMUI *self)
 {
   HildonIMUIPrivate *priv;
   
-  g_assert(HILDON_IM_IS_UI(self));
+  g_return_if_fail(HILDON_IM_IS_UI(self));
   priv = self->priv;
 
   if (priv->additional_menu != NULL)
@@ -3937,7 +3937,7 @@ add_additional_menu (HildonIMUI *self, const gchar *file)
   HildonIMUIPrivate *priv;
   GKeyFile *key_file;
 
-  g_assert(HILDON_IM_IS_UI(self));
+  g_return_if_fail(HILDON_IM_IS_UI(self));
   priv = self->priv;
 
   if (!g_str_has_suffix (file, ".desktop"))
@@ -4059,7 +4059,7 @@ populate_additional_menu (HildonIMUI *self)
   HildonIMUIPrivate *priv;  
   GDir *dir;
   
-  g_assert(HILDON_IM_IS_UI(self));
+  g_return_if_fail(HILDON_IM_IS_UI(self));
   priv = self->priv;
 
   free_additional_menu (self);

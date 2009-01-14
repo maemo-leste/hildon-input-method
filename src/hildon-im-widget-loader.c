@@ -98,8 +98,9 @@ hildon_im_widget_loader_load(GTypeModule *module)
   HildonIMWidgetLoader *widget_loader = HILDON_IM_WIDGET_LOADER(module);
   gboolean re;
 
-  g_assert(widget_loader->library_name != NULL &&
-           widget_loader->widget_name != NULL);
+  g_return_val_if_fail(widget_loader->library_name != NULL &&
+                       widget_loader->widget_name != NULL,
+                       FALSE);
 
   widget_loader->library = g_module_open(widget_loader->library_name, 0);
 
