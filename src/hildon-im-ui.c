@@ -3808,8 +3808,7 @@ hildon_im_ui_get_visibility(HildonIMUI *self)
   is_secret_mode = (mode & HILDON_GTK_INPUT_MODE_INVISIBLE) != 0;
   is_dictionary_mode = (mode & HILDON_GTK_INPUT_MODE_DICTIONARY) != 0;
 
-  return is_secret_mode == FALSE &&
-         is_dictionary_mode == TRUE;
+  return is_dictionary_mode && !is_secret_mode;
 #else
   return TRUE;
 #endif
