@@ -1,3 +1,9 @@
+2009-02-13  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 1:2.1.11-1~unreleased
+	* hildon-im-ui.c (hildon_im_ui_show) : ignore finger events if there is
+	a keyboard available.
+
 2009-01-29  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 1:2.1.10-1

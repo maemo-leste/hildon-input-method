@@ -90,6 +90,10 @@ GtkWidget *hildon_im_settings_plugin_create_widget (HildonIMSettingsPlugin *,
 void hildon_im_settings_plugin_value_changed (HildonIMSettingsPlugin *plugin, const gchar *, GType, gpointer);
 void hildon_im_settings_plugin_save_data (HildonIMSettingsPlugin *, HildonIMSettingsCategory);
 
+/* TODO split the APIs of HildonIMSettingsPlugin and 
+ * HildonIMSettingsPluginManager in two sets of source files 
+ */
+
 /* Settings Manager */
 HildonIMSettingsPluginManager *hildon_im_settings_plugin_manager_new (void);
 void hildon_im_settings_plugin_manager_destroy (HildonIMSettingsPluginManager *);

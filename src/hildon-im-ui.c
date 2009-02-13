@@ -914,7 +914,7 @@ hildon_im_ui_show(HildonIMUI *self)
     return;
   }
   
-  if (!self->priv->use_finger_kb &&
+  if ((self->priv->keyboard_available || !self->priv->use_finger_kb) &&
       (self->priv->trigger == HILDON_IM_TRIGGER_FINGER))
   {
     return;
@@ -4287,35 +4287,35 @@ hildon_im_ui_set_visible(HildonIMUI *ui, gboolean visible)
 
 static void hildon_im_ui_get_work_area (HildonIMUI *self)
 {
-	Display *dpy;
-	Atom act_type;
-	gint status, act_format;
-	gulong nitems, bytes;
-	unsigned char *data = NULL;
-	gulong *data_l;
-			
-	dpy = GDK_DISPLAY();
-	status = XGetWindowProperty (dpy, 
-			 GDK_ROOT_WINDOW(),
-			 XInternAtom(dpy, "_NET_WORKAREA", True),
-			 0, (~0L), False,
-			 AnyPropertyType,
-			 &act_type, &act_format, &nitems, &bytes,
-			 (unsigned char**)&data);
-	 
-	if (status == Success && nitems > 3) 
-       	{
-		data_l = (gulong *) data + 2; /* screen width is in the third value */
-		if (*data_l > 0)
-		{
-			self->priv->width = *data_l;
-		}
-	}
+  Display *dpy;
+  Atom act_type;
+  gint status, act_format;
+  gulong nitems, bytes;
+  unsigned char *data = NULL;
+  gulong *data_l;
 
-	if (data)
-	{
-		XFree(data);
-	}
+  dpy = GDK_DISPLAY();
+  status = XGetWindowProperty (dpy, 
+                               GDK_ROOT_WINDOW(),
+                               XInternAtom(dpy, "_NET_WORKAREA", True),
+                               0, (~0L), False,
+                               AnyPropertyType,
+                               &act_type, &act_format, &nitems, &bytes,
+                               (unsigned char**)&data);
+
+  if (status == Success && nitems > 3) 
+  {
+    data_l = (gulong *) data + 2; /* screen width is in the third value */
+    if (*data_l > 0)
+    {
+      self->priv->width = *data_l;
+    }
+  }
+
+  if (data)
+  {
+    XFree(data);
+  }
 }
 
 static void
