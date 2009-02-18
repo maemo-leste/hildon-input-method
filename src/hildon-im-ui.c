@@ -2951,7 +2951,7 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
   flush_plugins(self, plugin, FALSE);
 
   /* Make sure current plugin is created and packed! */
-  if (plugin->widget == NULL && plugin->info->type != HILDON_IM_TYPE_HIDDEN)
+  if (plugin->widget == NULL)
   {
     plugin->widget = GTK_WIDGET (hildon_im_plugin_create (self, plugin->filename));
     if (plugin->widget == NULL)
