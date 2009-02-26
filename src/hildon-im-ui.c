@@ -1170,7 +1170,8 @@ hildon_im_ui_button_released(GtkButton *button, gpointer data)
   }
 
   i = get_button_enum(self->priv, GTK_WIDGET(button));
-  if (self->priv->pressed_button != i ||
+  if (i < 0                           ||
+      self->priv->pressed_button != i ||
       self->priv->pressed_ontop == FALSE)
   {
     return;
@@ -3973,9 +3974,9 @@ add_additional_menu (HildonIMUI *self, const gchar *file)
     }
     else 
     {
+      g_warning ("Type %s in %s is not supported", value, file);
       g_free (entry);
       g_free (value);
-      g_warning ("Type %s in %s is not supported", value, file);
       return;
     }
 

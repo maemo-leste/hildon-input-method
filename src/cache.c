@@ -233,14 +233,21 @@ init_cache ()
 
 			g_free (filename);
 
-			if (result == FALSE)
+			if (!result)
+			{
+			  fclose(f);
 				return NULL;
-
+			}
+			else
+			{
 			return f;
-		} else {
-			g_warning ("Couldn't open %s for reading. Forgot "
-					"to run hildon-im-recache?", filename);
-			g_free (filename);
+			}
+		}
+		else
+		{
+		  g_warning ("Couldn't open %s for reading. Forgot "
+		             "to run hildon-im-recache?", filename);
+		  g_free (filename);
 		}
 	}
 	return NULL;

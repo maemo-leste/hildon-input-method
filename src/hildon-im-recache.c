@@ -310,14 +310,20 @@ generate_cache (void)
 
         g_print ("Number of plugins processed: %d\n", num_plugins);
         retval &= write_byte (f, (gchar) num_plugins);
-
-        fclose (f);
+      }
+      
+      fclose (f);
+      
+      if (retval)
+      {
         target_filename = get_cache_file (CACHE_FILENAME);
 
         if (rename (filename, target_filename) != 0)
           retval = FALSE;
       }
-    } else {
+    }
+    else
+    {
       g_warning ("Unable to open file %s for writing", filename);
       retval = FALSE;
     }
