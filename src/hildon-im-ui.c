@@ -38,7 +38,6 @@
 #include <hildon/hildon-sound.h>
 #include <hildon/hildon-helper.h>
 #include <log-functions.h>
-#include <hildon/hildon-help.h>
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <stdio.h>
@@ -266,8 +265,6 @@ static void hildon_im_ui_input_method_selected(GtkWidget *widget,
        gpointer data);
 static void hildon_im_ui_language_selected(GtkWidget *widget,
        gpointer data);
-
-static void hildon_im_ui_launch_help(GtkWidget *widget, gpointer data);
 
 static void hildon_im_ui_process_button_click(HildonIMUI *self,
                                               HildonIMButton button,
@@ -2486,42 +2483,6 @@ hildon_im_ui_class_init(HildonIMUIClass *klass)
   G_OBJECT_CLASS(klass)->finalize = hildon_im_ui_finalize;
 }
 
-static void
-hildon_im_ui_launch_help(GtkWidget *widget, gpointer data)
-{
-  HildonIMUI *self;
-  PluginData *info;
-  osso_return_t help_ret = OSSO_ERROR;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-  info = CURRENT_PLUGIN (self);
-  if (info->info->ossohelp_id != NULL)
-  {
-    help_ret = hildon_help_show(self->osso, info->info->ossohelp_id, 0);
-  }
-  
-  switch (help_ret)
-  {
-    case OSSO_OK:
-      break;
-    case OSSO_ERROR:
-      g_warning("HELP: ERROR (No help for such topic ID)\n");
-      break;
-    case OSSO_RPC_ERROR:
-      g_warning("HELP: RPC ERROR (RPC failed for HelpApp or Browser)\n");
-      break;
-    case OSSO_INVALID:
-      g_warning("HELP: INVALID (invalid argument)\n");
-      break;
-    default:
-      g_warning("HELP: Unknown error!\n");
-      break;
-  }
-
-}
-
 #ifdef MAEMO_CHANGES
 static void
 hildon_im_ui_menu_selected(GtkWidget *widget, gpointer data)
@@ -2595,27 +2556,6 @@ set_im_menu_sensitivity_for_language (HildonIMUI *self)
 /*   } */
 }
 
-static void
-hildon_im_ui_menu_show(HildonIMUI *self)
-{
-#ifdef MAEMO_CHANGES
-  if (self->priv->input_mode & HILDON_GTK_INPUT_MODE_INVISIBLE)
-  {
-    hildon_helper_set_insensitive_message (self->priv->editmenuitem[EDIT_MENU_ITEM_CUT], 
-        dgettext(HILDON_COMMON_STRING,"ckct_ib_unable_to_cut"));
-    hildon_helper_set_insensitive_message (self->priv->editmenuitem[EDIT_MENU_ITEM_COPY], 
-        dgettext(HILDON_COMMON_STRING, "ckct_ib_unable_to_copy"));
-  }
-  else
-  {
-    hildon_helper_set_insensitive_message (self->priv->editmenuitem[EDIT_MENU_ITEM_CUT], 
-        dgettext(HILDON_COMMON_STRING,"ecoc_ib_edwin_nothing_to_cut"));
-    hildon_helper_set_insensitive_message (self->priv->editmenuitem[EDIT_MENU_ITEM_COPY], 
-        dgettext(HILDON_COMMON_STRING, "ecoc_ib_edwin_nothing_to_copy"));
-  }
-#endif
-}
-
 static GtkWidget *
 hildon_im_ui_create_control_menu(HildonIMUI *self)
 {
@@ -2680,15 +2620,6 @@ hildon_im_ui_create_control_menu(HildonIMUI *self)
     }
   }
   
-  menuitem = gtk_menu_item_new_with_label(_("inpu_nc_common_menu_tools_help"));
-  gtk_menu_shell_append(GTK_MENU_SHELL(submenu), menuitem);
-
-  g_signal_connect(G_OBJECT(menuitem), "activate",
-                   G_CALLBACK(hildon_im_ui_launch_help), self);
-
-  g_signal_connect_swapped(G_OBJECT(menu), "show",
-                           G_CALLBACK(hildon_im_ui_menu_show), self);
-
   return menu;
 }
 

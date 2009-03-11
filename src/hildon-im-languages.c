@@ -163,6 +163,8 @@ hildon_im_populate_available_languages (GSList *list)
   {
     return;
   }
+  
+  /* TODO NB#100853 : Do not write the list if it will have the same values */
 
   client = gconf_client_get_default();
   gconf_client_unset (client, GCONF_AVAILABLE_LANGUAGES, NULL);
