@@ -12,7 +12,6 @@ INCLUDES = \
 	$(LIBOSSO_CFLAGS) \
 	$(ESD_CFLAGS) \
 	$(LIBXML_CFLAGS) \
-	$(LIBHILDONHELP_CFLAGS) \
 	$(HILDON_LGPL_CFLAGS) \
 	$(DBUS_CFLAGS) \
 	$(MAEMO_LAUNCHER_CFLAGS) \
@@ -24,7 +23,7 @@ uilib_LTLIBRARIES = libhildon-im-ui.la
 HIM_SRCS = hildon-im-main.c
 HIM_LIBS = $(GTK_LIBS) $(GCONF_LIBS) $(ESD_LIBS) \
         $(HILDON_LIBS) $(LIBOSSO_LIBS) \
-        $(LIBXML_LIBS) $(LIBHILDONHELP_LIBS) \
+        $(LIBXML_LIBS)  \
         libhildon-im-ui.la
 
 bin_PROGRAMS = hildon-input-method hildon-im-recache
@@ -48,7 +47,7 @@ libhildon_im_ui_la_SOURCES = \
 	hildon-im-settings-plugin.c internal.h
 libhildon_im_ui_la_LIBADD = \
 	$(GTK_LIBS) $(GCONF_LIBS) $(ESD_LIBS) $(HILDON_LIBS) \
-	$(LIBOSSO_LIBS) $(LIBHILDONHELP_LIBS) $(HILDON_IMF_LIBS)\
+	$(LIBOSSO_LIBS) $(HILDON_IMF_LIBS)\
 	$(LIBIMLAYOUTS_LIBS) $(DBUS_LIBS)
 libhildon_im_ui_la_LDFLAGS = -version-info $(LIBVERSION)
 

@@ -2,6 +2,7 @@
 
 	* Version 1:2.1.13-1.
 	* Remove references to libhildonhelp.
+	* configure.ac, src/Makefile.am: remove hildonhelp dependency
 
 2009-02-27  Felipe Erias Morandeira <femorandeira@maemo.org>
 
