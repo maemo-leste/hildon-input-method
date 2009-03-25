@@ -41,7 +41,7 @@
       <applyto>/apps/osso/inputmethod/use_finger_kb</applyto>
       <owner>hildon-input-method</owner>
       <type>bool</type>
-      <default>false</default>
+      <default>true</default>
       <locale name="C">
         <short>Use virtual Finger Keyboard</short>
         <long>This feature enables/disables the use of the Finger Keyboard</long>
