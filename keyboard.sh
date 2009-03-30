@@ -1,6 +1,6 @@
 #! /bin/sh
 # Keyboard startup/shutdown script
-CONFIGURED=/etc/skel/.osso/hildon-input-method/.configured
+CONFIGURED=/etc/hildon-input-method.configured
 
 if [ "x$AF_PIDDIR" = "x" ]; then
   echo "$0: Error, AF_PIDDIR is not defined"
@@ -17,9 +17,8 @@ if [ "x$LAUNCHWRAPPER_NICE_TRYRESTART" = "x" ]; then
 fi
 
 if [ ! -f $CONFIGURED ]; then 
-  mkdir -p $HOME/.osso/hildon-input-method
   if [ -x /usr/bin/hildon-input-method-configurator ]; then
-    /usr/bin/hildon-input-method-configurator && touch $CONFIGURED
+    /usr/bin/hildon-input-method-configurator && sudo /bin/touch $CONFIGURED
   fi
 fi
 

@@ -1,3 +1,10 @@
+2009-03-30  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 1:2.1.15-1~unreleased
+	* /etc/osso-af-init/keyboard.sh does not access /home. Instead of that, it
+	uses /etc/hildon-input-method.configured to know if the HIM has been
+	already configured or not.
+
 2009-03-26  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 1:2.1.14-1.
