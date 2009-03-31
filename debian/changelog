@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.15-2~unreleased) unstable; urgency=low
+
+  * Version 1:2.1.15-2~unreleased
+  * /etc/osso-af-init/keyboard.sh uses fakeroot on scratchbox
+
+ -- Felipe Erias Morandeira <femorandeira@maemo.org>  Tue, 31 Mar 2009 12:00:00 +0200 
+
 hildon-input-method (1:2.1.15-1) unstable; urgency=low
 
   * Version 1:2.1.15-1

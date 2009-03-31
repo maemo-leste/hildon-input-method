@@ -18,7 +18,11 @@ fi
 
 if [ ! -f $CONFIGURED ]; then 
   if [ -x /usr/bin/hildon-input-method-configurator ]; then
-    /usr/bin/hildon-input-method-configurator && sudo /bin/touch $CONFIGURED
+    if test "x$_SBOX_DIR" = "x";then
+      /usr/bin/hildon-input-method-configurator && sudo /bin/touch $CONFIGURED
+    else
+      /usr/bin/hildon-input-method-configurator && fakeroot /bin/touch $CONFIGURED
+    fi
   fi
 fi
 
