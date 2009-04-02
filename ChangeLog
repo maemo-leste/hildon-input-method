@@ -1,6 +1,8 @@
 2009-04-02  Richard Sun  <richard.sun@nokia.com>
-
+	
+	* Version: 2.1.16-1
 	* hildon-input-method-ui3.schemas: Fixes NB#109290
+	* src/hildon-im-ui.c: reverse the fixing from bug NB#100091
 
 2009-03-31  Felipe Erias Morandeira <femorandeira@maemo.org>
 

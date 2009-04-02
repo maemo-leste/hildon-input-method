@@ -1,8 +1,9 @@
-hildon-input-method (1:2.1.15-2~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.16-1) unstable; urgency=low
 
-  * Version 1:2.1.15-2~unreleased
+  * Version 1:2.1.16-1
   * /etc/osso-af-init/keyboard.sh uses fakeroot on scratchbox
   * Fixes: NB#109290 FKB is enabled by defaault.
+  * reverse the fixing from bug 100091, which breaks power management
 
  -- Felipe Erias Morandeira <femorandeira@maemo.org>  Tue, 31 Mar 2009 12:00:00 +0200 
 

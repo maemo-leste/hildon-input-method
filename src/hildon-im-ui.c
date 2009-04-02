@@ -257,6 +257,7 @@ static void hildon_im_ui_button_released(GtkButton *button,
                                                gpointer data);
 static void hildon_im_ui_button_enter(GtkButton *button, gpointer data);
 static void hildon_im_ui_button_leave(GtkButton *button, gpointer data);
+static void hildon_im_ui_get_work_area (HildonIMUI *self);
 
 static GtkWidget *hildon_im_ui_create_control_menu(
         HildonIMUI *ui);
@@ -1996,6 +1997,8 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
   {
     Atom active_window_atom =
             XInternAtom (GDK_DISPLAY(), "_NET_ACTIVE_WINDOW", False);
+    Atom workarea_change_atom = 
+	    XInternAtom (GDK_DISPLAY(), "_NET_WORKAREA", False);
     XPropertyEvent *prop = (XPropertyEvent *) xevent;
 
     if (prop->atom == active_window_atom && prop->window == GDK_ROOT_WINDOW())
@@ -2054,6 +2057,10 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
           flush_plugins(self, NULL, FALSE);
         }
       }
+    }
+    else if (prop->atom == workarea_change_atom && prop->window == GDK_ROOT_WINDOW())
+    {
+	    hildon_im_ui_get_work_area (self);
     }
   }
   return GDK_FILTER_CONTINUE;
@@ -2731,6 +2738,8 @@ hildon_im_ui_new()
                       "border-width", 1, "decorated", FALSE,
                       "accept-focus", FALSE,
                       NULL);
+
+  hildon_im_ui_get_work_area(self);
 
   gtk_widget_realize(GTK_WIDGET(self));
   gtk_window_set_default_size(GTK_WINDOW(self), 
@@ -4204,6 +4213,40 @@ hildon_im_ui_set_visible(HildonIMUI *ui, gboolean visible)
   if (visible == FALSE)
   {
     gtk_widget_hide(GTK_WIDGET(ui));
+  }
+}
+
+
+static void hildon_im_ui_get_work_area (HildonIMUI *self)
+{
+  Display *dpy;
+  Atom act_type;
+  gint status, act_format;
+  gulong nitems, bytes;
+  unsigned char *data = NULL;
+  gulong *data_l;
+
+  dpy = GDK_DISPLAY();
+  status = XGetWindowProperty (dpy, 
+                               GDK_ROOT_WINDOW(),
+                               XInternAtom(dpy, "_NET_WORKAREA", True),
+                               0, (~0L), False,
+                               AnyPropertyType,
+                               &act_type, &act_format, &nitems, &bytes,
+                               (unsigned char**)&data);
+
+  if (status == Success && nitems > 3) 
+  {
+    data_l = (gulong *) data + 2; /* screen width is in the third value */
+    if (*data_l > 0)
+    {
+      self->priv->width = *data_l;
+    }
+  }
+
+  if (data)
+  {
+    XFree(data);
   }
 }
 
