@@ -1634,14 +1634,6 @@ hildon_im_ui_set_client(HildonIMUI *self,
       self->priv->trigger = HILDON_IM_TRIGGER_KEYBOARD;
     }
 
-    if (THUMB_LAUNCHES_FULLSCREEN_PLUGIN &&
-        self->priv->keyboard_available == FALSE &&
-        (self->priv->trigger == HILDON_IM_TRIGGER_FINGER
-            || self->priv->trigger == HILDON_IM_TRIGGER_STYLUS))
-    {
-      hildon_im_ui_play_sound(self, HILDON_IM_FINGER_TRIGGER_SOUND);
-    }
-
     hildon_im_ui_show(self);
   }
 }
