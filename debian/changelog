@@ -1,6 +1,6 @@
-hildon-input-method (1:2.1.17-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.17-1) unstable; urgency=low
 
-  * Version 1:2.1.17-1~unreleased
+  * Version 1:2.1.17-1
 
  -- Felipe Erias Morandeira <femorandeira@maemo.org>  Thu, 16 Apr 2009 12:00:00 +0200 
 

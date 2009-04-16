@@ -1,6 +1,6 @@
 2009-04-16  Felipe Erias Morandeira <femorandeira@maemo.org>
 
-	* Version 1:2.1.17-1~unreleased
+	* Version 1:2.1.17-1
 	* hildon-im-ui.c : don't play a sound when a fullscreen plugin is going to
 	be launched, it will be played by the plugin itself. 
 
