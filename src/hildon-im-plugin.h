@@ -129,6 +129,9 @@ struct _HildonIMPluginIface
   void (*button_activated) (HildonIMPlugin *plugin,
                             HildonIMButton button,
                             gboolean long_press);
+  
+  void (*preedit_committed) (HildonIMPlugin *plugin,
+                             const gchar *committed_preedit);
 };
 
 /**
@@ -310,6 +313,16 @@ void hildon_im_plugin_transition(HildonIMPlugin *plugin, gboolean from);
 void hildon_im_plugin_surrounding_received(HildonIMPlugin *plugin,
                                            const gchar *surrounding,
                                            gint offset);
+
+/**
+ * hildon_im_plugin_preedit_committed:
+ * @plugin: #HildonIMPlugin
+ * @committed_preedit: the preedit that was committed
+ *
+ * Provides the plugin with the preedit text that the IMContext committed.
+ */
+void hildon_im_plugin_preedit_committed (HildonIMPlugin *plugin,
+                                         const gchar *committed_preedit);
 
 /**
  * hildon_im_plugin_duplicate_info:

@@ -682,6 +682,27 @@ hildon_im_plugin_surrounding_received(HildonIMPlugin *plugin,
   }
 }
 
+void
+hildon_im_plugin_preedit_committed (HildonIMPlugin *plugin,
+                                    const gchar *committed_preedit)
+{
+  HildonIMPluginIface *iface=NULL;
+
+  g_return_if_fail(HILDON_IM_IS_PLUGIN(plugin));
+
+  iface = HILDON_IM_PLUGIN_GET_IFACE(plugin);
+
+  if (!iface)
+  {
+    return;
+  }
+
+  if (iface->preedit_committed)
+  {
+    iface->preedit_committed(plugin, committed_preedit);
+  }
+}
+
 HildonIMPluginInfo *
 hildon_im_plugin_duplicate_info(const HildonIMPluginInfo *src)
 {

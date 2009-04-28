@@ -195,6 +195,8 @@ struct _HildonIMUIPrivate
   gchar *surrounding;
   gint surrounding_offset;
   HildonIMCommitMode commit_mode;
+  
+  gchar *committed_preedit;
 
   guint sound_timeout_id;
 
@@ -1906,6 +1908,45 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
     }
 
     if (cme->message_type ==
+      hildon_im_protocol_get_atom( HILDON_IM_PREEDIT_COMMITTED_CONTENT )
+      && cme->format == HILDON_IM_PREEDIT_COMMITTED_CONTENT_FORMAT)
+    {
+      HildonIMPreeditCommittedContentMessage *msg =
+                          (HildonIMPreeditCommittedContentMessage *) &cme->data;
+      gchar *new_committed_preedit;
+
+      if (msg->msg_flag == HILDON_IM_MSG_START && self->priv->committed_preedit)
+      {
+        g_free(self->priv->committed_preedit);
+        self->priv->committed_preedit = g_strdup("");
+      }
+
+      new_committed_preedit = g_strconcat(self->priv->committed_preedit,
+                                          msg->committed_preedit,
+                                          NULL);
+
+      g_free(self->priv->committed_preedit);
+      self->priv->committed_preedit = new_committed_preedit;
+
+      return GDK_FILTER_REMOVE;
+    }
+    
+    if (cme->message_type ==
+        hildon_im_protocol_get_atom( HILDON_IM_PREEDIT_COMMITTED )
+        && cme->format == HILDON_IM_PREEDIT_COMMITTED_FORMAT)
+    {
+      HildonIMPreeditCommittedMessage *msg =
+                                 (HildonIMPreeditCommittedMessage *) &cme->data;
+
+      self->priv->commit_mode = msg->commit_mode;
+
+      hildon_im_plugin_preedit_committed(CURRENT_IM_PLUGIN (self),
+                                         self->priv->committed_preedit);
+
+      return GDK_FILTER_REMOVE;
+    }
+    
+    if (cme->message_type ==
         hildon_im_protocol_get_atom( HILDON_IM_KEY_EVENT )
         && cme->format == HILDON_IM_KEY_EVENT_FORMAT)
     {
@@ -2308,6 +2349,7 @@ hildon_im_ui_init(HildonIMUI *self)
 
   priv->current_plugin = NULL;
   priv->surrounding = g_strdup("");
+  priv->committed_preedit = g_strdup("");
   priv->plugin_buffer = g_string_new(NULL);
 
   /* initialize buttons */

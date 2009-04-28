@@ -1,3 +1,10 @@
+2009-04-28  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* hildon-im-plugin.[hc] : Added the function
+	hildon_im_plugin_preedit_committed to teh plugin API.
+	* hildon-im-ui.c (hildon_im_ui_client_message_filter) : receive
+	"preedit committed" messages and pass them to the plugins.
+
 2009-04-23  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 1:2.1.18-1
