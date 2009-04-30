@@ -965,15 +965,20 @@ hildon_im_ui_show(HildonIMUI *self)
 
   /* IM may not be loaded yet!
    * TODO is hildon_im_plugin_enable called too many times? */
-  activate_plugin (self, self->priv->current_plugin, TRUE);
-  hildon_im_plugin_enable (HILDON_IM_PLUGIN(self->priv->current_plugin->widget), FALSE);
+  if (self->priv->current_plugin != NULL)
+  {
+    activate_plugin (self, self->priv->current_plugin, TRUE);
+    hildon_im_plugin_enable (HILDON_IM_PLUGIN(self->priv->current_plugin->widget), FALSE);
+  }
   /* The plugin draws itself, or it doesn't need a UI */
   if (self->priv->current_plugin != NULL &&
       (self->priv->current_plugin->info->type == HILDON_IM_TYPE_HIDDEN 
           || self->priv->current_plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE))
       return;
-  if (self->priv->ui_is_visible && GTK_WIDGET_VISIBLE (self->priv->current_plugin->widget))
-    gtk_widget_show(GTK_WIDGET(self));
+  /* TODO the HIM doesn't have a UI in Fremantle, this file needs a lot of cleaning
+   * if (self->priv->ui_is_visible && GTK_WIDGET_VISIBLE (self->priv->current_plugin->widget))
+   *   gtk_widget_show(GTK_WIDGET(self));
+   */
 }
 
 static void
