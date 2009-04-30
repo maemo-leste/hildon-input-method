@@ -1,8 +1,9 @@
-hildon-input-method (1:2.1.19-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.19-1) unstable; urgency=low
 
-  * Version 1:2.1.19-1~unreleased
+  * Version 1:2.1.19-1
+  * Fixes: NB#99673 Input methods crashed when we tap on xterm application
 
- -- Felipe Erias Morandeira <femorandeira@maemo.org>  Tue, 28 Apr 2009 12:00:00 +0200 
+ -- Felipe Erias Morandeira <femorandeira@maemo.org>  Thu, 30 Apr 2009 12:00:00 +0200 
 
 hildon-input-method (1:2.1.18-1) unstable; urgency=low
 

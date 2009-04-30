@@ -1,3 +1,8 @@
+2009-04-30  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Fixes: NB#99673
+	* Version 1:2.1.19-1
+
 2009-04-29  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* hildon-im-ui.c : Fixed a crash.
