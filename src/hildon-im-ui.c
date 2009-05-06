@@ -76,6 +76,7 @@
 
 #define PACKAGE_OSSO    "hildon_input_method"
 #define HILDON_COMMON_STRING  "hildon-common-strings"
+#define HILDON_IM_STRING  "hildon-input-method"
 
 /* Hardcoded values for key repeat. */
 #define KEYREPEAT_THRESHOLD     800
@@ -177,6 +178,7 @@ struct _HildonIMUIPrivate
   GtkWidget *menu_language_list;
   GtkWidget *menu_lang[NUM_LANGUAGES];
   GtkWidget *editmenuitem[NUM_EDIT_MENU_ITEMS];
+  GtkWidget *current_banner;
 
   gchar selected_languages[NUM_LANGUAGES][BUFFER_SIZE];
   gint current_language_index;  /* to previous table */ 
@@ -1746,6 +1748,22 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
     case HILDON_IM_SELECT_ALL:
       hildon_im_plugin_select_region(plugin, 0, -1);
       break;
+    case HILDON_IM_SHIFT_LOCKED :
+    self->priv->current_banner = 
+         hildon_banner_show_information (GTK_WIDGET(self), NULL,
+                                         dgettext(HILDON_IM_STRING,
+                                                  "inpu_ib_mode_shift_locked"));
+      break;
+    case HILDON_IM_SHIFT_UNLOCKED :
+      break;
+    case HILDON_IM_MOD_LOCKED :
+      self->priv->current_banner =
+         hildon_banner_show_information (GTK_WIDGET(self), NULL,
+                                         dgettext(HILDON_IM_STRING,
+                                                  "inpu_ib_mode_fn_locked"));
+      break;
+    case HILDON_IM_MOD_UNLOCKED :
+      break;
     default:
       g_warning("Invalid message from im context");
       break;
@@ -1777,6 +1795,12 @@ hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
 
   self->priv->input_window = msg->input_window;
 
+  if (msg->type == GDK_KEY_PRESS && self->priv->current_banner != NULL)
+  {
+    gtk_widget_destroy (self->priv->current_banner);
+    self->priv->current_banner = NULL;
+  }
+  
   /* Typing a printable character forces the plugin to show */
   if (self->priv->keyboard_available &&
       !GTK_WIDGET_VISIBLE(self))
@@ -1966,8 +1990,9 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
         hildon_im_protocol_get_atom( HILDON_IM_CLIPBOARD_COPIED )
         && cme->format == HILDON_IM_CLIPBOARD_FORMAT)
     {
-      hildon_banner_show_information (GTK_WIDGET(self), NULL,
-        dgettext(HILDON_COMMON_STRING, "ecoc_ib_edwin_copied"));
+      self->priv->current_banner = hildon_banner_show_information (GTK_WIDGET(self), NULL,
+                                      dgettext(HILDON_COMMON_STRING,
+                                               "ecoc_ib_edwin_copied"));
 
       return GDK_FILTER_REMOVE;
     }
@@ -2172,6 +2197,11 @@ hildon_im_ui_finalize(GObject *obj)
     gtk_widget_destroy(self->priv->menu);
   }
 
+  if (self->priv->current_banner)
+  {
+    gtk_widget_destroy (self->priv->current_banner);
+  }
+  
   gconf_client_remove_dir(self->client, HILDON_IM_GCONF_DIR, NULL);
   g_object_unref(self->client);
   g_string_free(self->priv->plugin_buffer, TRUE);
@@ -2356,6 +2386,7 @@ hildon_im_ui_init(HildonIMUI *self)
   priv->surrounding = g_strdup("");
   priv->committed_preedit = g_strdup("");
   priv->plugin_buffer = g_string_new(NULL);
+  priv->current_banner = NULL;
 
   /* initialize buttons */
   for (i = 0; i < HILDON_IM_NUM_BUTTONS; i++)
@@ -2540,9 +2571,10 @@ hildon_im_ui_menu_selected(GtkWidget *widget, gpointer data)
   {
     hildon_im_ui_send_communication_message(
             self, HILDON_IM_CONTEXT_CLIPBOARD_COPY);
-    hildon_banner_show_information (GTK_WIDGET (data), NULL,
-      dgettext(HILDON_COMMON_STRING, "ecoc_ib_edwin_copied"));
-
+    self->priv->current_banner =
+      hildon_banner_show_information (GTK_WIDGET (data), NULL,
+                                      dgettext(HILDON_COMMON_STRING,
+                                               "ecoc_ib_edwin_copied"));
   }
   else if (widget == self->priv->editmenuitem[EDIT_MENU_ITEM_PASTE])
   {
