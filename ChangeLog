@@ -1,6 +1,6 @@
 2009-05-06  Felipe Erias Morandeira <femorandeira@maemo.org>
 
-	* Version 1:2.1.20-1~unreleased
+	* Version 1:2.1.20-1
 	* debian/control : remove dependency to
 	hildon-input-method-l10n-mr | hildon-input-method-l10n-mr0
 	* src/hildon-im-ui.c : hide the current banner if the user presses a key

@@ -1,6 +1,6 @@
-hildon-input-method (1:2.1.20-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.20-1) unstable; urgency=low
 
-  * Version 1:2.1.20-1~unreleased
+  * Version 1:2.1.20-1
   * Fixes: NB#114260 Keyboard state banners obscure subsequent input
 
  -- Felipe Erias Morandeira <femorandeira@maemo.org>  Wed, 06 May 2009 12:00:00 +0200 
