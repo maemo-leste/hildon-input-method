@@ -1,6 +1,6 @@
 2009-05-21  Felipe Erias Morandeira <femorandeira@maemo.org>
 
-	* Version 1:2.1.21-1~unreleased
+	* Version 1:2.1.21-1
 	* hildon-im-languages.c : do not write the list of languages again if it
 	would be the same that is already in GConf.
 
