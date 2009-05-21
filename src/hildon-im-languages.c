@@ -154,20 +154,50 @@ hildon_im_get_available_languages (void)
   return retval;
 }
 
+static gint
+compare_languages (gconstpointer language1, gconstpointer language2)
+{
+  return g_strcmp0 ((char *) language1,  (char *) language2);
+}
+
 void
 hildon_im_populate_available_languages (GSList *list)
 {
   GConfClient *client;
+  GSList *current_languages;
+  gboolean populate = FALSE;
 
   if (list == NULL)
   {
     return;
   }
-  
-  /* TODO NB#100853 : Do not write the list if it will have the same values */
 
-  client = gconf_client_get_default();
-  gconf_client_unset (client, GCONF_AVAILABLE_LANGUAGES, NULL);
-  gconf_client_set_list (client, GCONF_AVAILABLE_LANGUAGES, GCONF_VALUE_STRING, list, NULL);
+  current_languages = hildon_im_get_available_languages ();
+  if (g_slist_length (current_languages) == g_slist_length (list))
+  {
+    GSList *item;
+    for (item = current_languages ; item != NULL; item = item->next)
+    {
+      gchar *language = ((HildonIMLanguage *) (item->data))->language_code;
+      if (g_slist_find_custom (list, language, compare_languages) == NULL)
+      {
+        populate = TRUE;
+        break;
+      }
+    }
+  }
+  else 
+  {
+    populate = TRUE;
+  }
+
+  if (populate) 
+  {
+    client = gconf_client_get_default();
+    gconf_client_unset (client, GCONF_AVAILABLE_LANGUAGES, NULL);
+    gconf_client_set_list (client, GCONF_AVAILABLE_LANGUAGES, GCONF_VALUE_STRING, list, NULL);
+  }
+  
+  g_slist_free (current_languages);
 }
 
