@@ -1,3 +1,9 @@
+2009-05-27  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 2.1.22-1~unreleased
+	* hildon-im-ui.c (hildon_im_ui_show) : If the trigger type is UNKNOWN,
+	try to guess the correct trigger using the state of the keyboard.
+
 2009-05-21  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 1:2.1.21-1

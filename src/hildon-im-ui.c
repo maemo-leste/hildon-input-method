@@ -907,6 +907,14 @@ hildon_im_ui_show(HildonIMUI *self)
 {
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
+  if (self->priv->trigger == HILDON_IM_TRIGGER_UNKNOWN)
+  {
+    if (self->priv->keyboard_available)
+      self->priv->trigger = HILDON_IM_TRIGGER_KEYBOARD;
+    else
+      self->priv->trigger = HILDON_IM_TRIGGER_FINGER;
+  }
+  
   if (self->priv->enable_stylus_ui == FALSE &&
       self->priv->trigger == HILDON_IM_TRIGGER_STYLUS &&
       self->priv->keyboard_available == FALSE &&
