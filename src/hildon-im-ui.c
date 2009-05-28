@@ -71,26 +71,9 @@
 #define SOUND_REPEAT_NUMBER_INPUT 0
 #define SOUND_REPEAT_FINGER_TRIGGER 1500
 
-#define HILDON_IM_UI_ICON_SIZE 26
-#define CACHED_BUTTON_PIXMAP_COUNT 3
-
 #define PACKAGE_OSSO    "hildon_input_method"
 #define HILDON_COMMON_STRING  "hildon-common-strings"
 #define HILDON_IM_STRING  "hildon-input-method"
-
-/* Hardcoded values for key repeat. */
-#define KEYREPEAT_THRESHOLD     800
-#define KEYREPEAT_INTERVAL      167
-
-#define IM_DEFAULT_HEIGHT 140
-#define IM_FRAME_HEIGHT 10
-
-#define IM_WINDOW_HEIGHT (IM_DEFAULT_HEIGHT + IM_FRAME_HEIGHT)
-
-#define COMMON_B_WIDTH 78
-#define COMMON_B_HEIGHT 35
-
-#define BUTTON_ID_LEN 8
 
 #define BUFFER_SIZE 128
 
@@ -113,12 +96,6 @@ enum
   NUM_LANGUAGES
 };
 
-enum
-{
-  MENU_TYPE_APPLICATION,
-  MENU_TYPE_CPA
-};
-
 static const gchar *language_gconf [NUM_LANGUAGES] = 
 {
   HILDON_IM_GCONF_PRIMARY_LANGUAGE,
@@ -128,7 +105,6 @@ static const gchar *language_gconf [NUM_LANGUAGES] =
 typedef struct {
   HildonIMPluginInfo  *info;
   GSList              *languages;
-  GtkWidget           *menu;      /* plugin menu item */
   GtkWidget           *widget;    /* actual IM plugin */
 
   gchar               *filename;
@@ -142,42 +118,8 @@ typedef struct {
 typedef GtkWidget *(*im_init_func)(HildonIMUI *);
 typedef const HildonIMPluginInfo *(*im_info_func)(void);
 
-struct button_info {
-  GtkWidget *button;
-  GtkWidget *menu;
-
-  gchar id[BUTTON_ID_LEN];
-
-  gboolean sensitive;
-  gboolean toggle;
-  gboolean repeat;
-  gboolean long_press;
-};
-
-enum {
-  EDIT_MENU_ITEM_CUT = 0,
-  EDIT_MENU_ITEM_COPY,
-  EDIT_MENU_ITEM_PASTE,
-
-  NUM_EDIT_MENU_ITEMS
-};
-
-typedef struct
-{
-  gchar *title;
-  gint  type;
-  gchar *gettext_domain;
-  gchar *command;
-  gchar *dbus_service;
-  gint  priority;
-} HildonIMAdditionalMenuEntry;
-
 struct _HildonIMUIPrivate
 {
-  GtkWidget *controlmenu;
-  GtkWidget *menu_language_list;
-  GtkWidget *menu_lang[NUM_LANGUAGES];
-  GtkWidget *editmenuitem[NUM_EDIT_MENU_ITEMS];
   GtkWidget *current_banner;
 
   gchar selected_languages[NUM_LANGUAGES][BUFFER_SIZE];
@@ -186,8 +128,6 @@ struct _HildonIMUIPrivate
   Window input_window;
   Window app_window;
   Window shown_app_window;
-
-  GtkWidget *vbox;
 
   HildonGtkInputMode input_mode;
   HildonIMOptionMask options;
@@ -205,7 +145,6 @@ struct _HildonIMUIPrivate
   gboolean pressed_ontop;
   gboolean long_press;
   gint pressed_button;
-  gint menu_button;
   gboolean repeat_done;
   guint repeat_timeout_id;
   guint long_press_timeout_id;
@@ -218,15 +157,10 @@ struct _HildonIMUIPrivate
   gboolean return_key_pressed;
   gboolean use_finger_kb;
 
-  GtkWidget *menu;
   GSList *all_methods;
   GtkBox *im_box;
   gboolean has_special;
 
-  gchar *cached_button_pixbuf_name[CACHED_BUTTON_PIXMAP_COUNT];
-  GdkPixbuf *cached_button_pixbuf[CACHED_BUTTON_PIXMAP_COUNT];
-
-  struct button_info buttons[HILDON_IM_NUM_BUTTONS];
   DBusConnection *dbus_connection;
 
   gboolean keyboard_available;
@@ -242,8 +176,6 @@ struct _HildonIMUIPrivate
   gboolean enable_stylus_ui;
   gboolean ui_is_visible;
 
-	gint width;
-
   osso_context_t *osso;
 
 };
@@ -256,77 +188,20 @@ typedef struct
 
 static void hildon_im_ui_init(HildonIMUI *self);
 static void hildon_im_ui_class_init(HildonIMUIClass *klass);
-static void hildon_im_ui_button_pressed(GtkButton *button, gpointer data);
-static void hildon_im_ui_button_released(GtkButton *button,
-                                               gpointer data);
-static void hildon_im_ui_button_enter(GtkButton *button, gpointer data);
-static void hildon_im_ui_button_leave(GtkButton *button, gpointer data);
-static void hildon_im_ui_get_work_area (HildonIMUI *self);
-
-static GtkWidget *hildon_im_ui_create_control_menu(
-        HildonIMUI *ui);
-static void hildon_im_ui_input_method_selected(GtkWidget *widget,
-       gpointer data);
-static void hildon_im_ui_language_selected(GtkWidget *widget,
-       gpointer data);
-
-static void hildon_im_ui_process_button_click(HildonIMUI *self,
-                                              HildonIMButton button,
-                                              gboolean long_press);
-
-static gboolean hildon_im_ui_long_press(gpointer data);
-static gboolean hildon_im_ui_repeat_start(gpointer data);
-static gboolean hildon_im_ui_repeat(gpointer data);
 
 static void hildon_im_ui_send_event(HildonIMUI *self,
                                           Window window, XEvent *event);
-
-static void hildon_im_ui_size_allocate (GtkWidget *widget,
-                                              GtkAllocation *allocation);
-
-static gboolean hildon_im_ui_expose(GtkWidget *self,
-                                          GdkEventExpose *event);
-
-static void hildon_im_ui_resize_window(HildonIMUI *self);
-
-static void hildon_im_ui_button_set_label_real(
-        HildonIMUI *self,
-        HildonIMButton button,
-        const gchar *label,
-        gboolean clear_id);
-static void hildon_im_ui_button_set_id_real(
-        HildonIMUI *self,
-        HildonIMButton button,
-        const gchar *id,
-        gboolean clear_label);
-static void hildon_im_ui_button_set_menu_real(
-        HildonIMUI *self,
-        HildonIMButton button,
-        GtkWidget *menu,
-        gboolean automatic);
-static void hildon_im_ui_button_set_toggle_real(
-        HildonIMUI *self,
-        HildonIMButton button,
-        gboolean toggle,
-        gboolean automatic);
 
 static gboolean hildon_im_ui_restore_previous_mode_real(HildonIMUI *self);
 static void flush_plugins(HildonIMUI *, PluginData *, gboolean);
 static void hildon_im_hw_cb(osso_hw_state_t*, gpointer);
 
-static void set_im_menu_sensitivity_for_language (HildonIMUI *);
 static void detect_first_boot (HildonIMUI *self);
-
-static void populate_additional_menu (HildonIMUI *self);
-static void launch_additional_menu (GtkWidget *widget,
-    gpointer data);
 
 static void activate_plugin (HildonIMUI *s, PluginData *, gboolean);
 
 static void hildon_im_ui_foreach_plugin(HildonIMUI *self,
                                         void (*function) (HildonIMPlugin *));
-
-static void hide_controlmenu (HildonIMUI *self);
 
 G_DEFINE_TYPE(HildonIMUI, hildon_im_ui, GTK_TYPE_WINDOW)
 
@@ -540,160 +415,6 @@ init_persistent_plugins(HildonIMUI *self)
 }
 
 static void
-init_plugin_menu (HildonIMUI *self)
-{
-  PluginData *current_plugin;
-  GtkWidget *menu;
-  GSList *group_menu;
-  GSList *iter;
-  gint group_id = -1;
-  gboolean im_set = FALSE;
-
-  menu = self->priv->menu_plugin_list;
-  if (menu == NULL)
-  {
-    g_warning ("Plugin list menu is missing");
-    return;
-  }
-
-  current_plugin = CURRENT_PLUGIN (self);
-  if (current_plugin != NULL)
-  {
-    group_id = current_plugin->info->group;   
-  }
- 
-  group_menu = NULL;
-  
-  for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
-  {
-    PluginData *plugin = (PluginData *) iter->data;
-    if (plugin->info->visible_in_menu &&
-        plugin->info->menu_title != NULL) 
-    {
-      if (group_id != -1)
-      {
-        if (plugin->info->group != group_id)
-          continue;
-      }
-      plugin->menu = gtk_radio_menu_item_new_with_label(group_menu,
-          dgettext (plugin->info->gettext_domain, plugin->info->menu_title));
-    
-      gtk_menu_shell_append (GTK_MENU_SHELL(menu), plugin->menu);
-      group_menu = gtk_radio_menu_item_get_group (
-          GTK_RADIO_MENU_ITEM (plugin->menu));
-
-      if (plugin == current_plugin)
-      {
-        gtk_check_menu_item_set_active (
-            GTK_CHECK_MENU_ITEM (plugin->menu), TRUE);
-        im_set = TRUE;
-      }
-
-      g_signal_connect (G_OBJECT (plugin->menu), "activate",
-          G_CALLBACK (hildon_im_ui_input_method_selected),
-          self);
-    }
-  }
-}
-
-static void
-init_language_menu (HildonIMUI *self)
-{
-  GSList *group;
-  GtkWidget *menu;
-  GtkWidget *submenu;
-  GtkWidget *menuitem;
-  gchar *language, *converted_label;
-  gint i;
-
-  menu = self->priv->menu_language_list;
-  if (menu == NULL)
-  {
-    g_warning ("Language list menu is missing");
-    return;
-  }
-
-  for (i = 0; i < NUM_LANGUAGES; i++)
-  {
-    menuitem = self->priv->menu_lang [i];
-    if (menuitem != NULL)
-      gtk_widget_destroy (menuitem);
-  }
-
-  submenu = gtk_menu_item_get_submenu (GTK_MENU_ITEM (menu));
-  if (submenu == NULL)
-    submenu = gtk_menu_new();
-  else 
-  {
-    gtk_widget_destroy (submenu);
-    submenu = gtk_menu_new();
-  }
-  group = NULL;
-  gtk_menu_item_set_submenu (GTK_MENU_ITEM(menu), submenu);
-
-  language = gconf_client_get_string (self->client,
-      HILDON_IM_GCONF_PRIMARY_LANGUAGE, NULL);
-
-  if (language == NULL)
-    language = g_strdup ("en");
-
-  converted_label = hildon_im_get_language_description (language);
-  if (converted_label == NULL)
-    converted_label = g_strdup (language);
-
-  g_free(language);
-
-  menuitem = self->priv->menu_lang [PRIMARY_LANGUAGE] =
-    gtk_radio_menu_item_new_with_label(group, converted_label);
-  g_free(converted_label);
-
-  gtk_menu_shell_append (GTK_MENU_SHELL(submenu), menuitem);
-  group = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(menuitem));
-
-  language = gconf_client_get_string (self->client,
-      HILDON_IM_GCONF_SECONDARY_LANGUAGE, NULL);
-  if (language == NULL || *language == '\0')
-  {
-    /* Add a placeholder for secondary language */
-    menuitem = self->priv->menu_lang [SECONDARY_LANGUAGE] =
-        gtk_radio_menu_item_new_with_label (group, "");
-
-    gtk_menu_shell_append (GTK_MENU_SHELL(submenu), menuitem);
-
-    /* no secondary language set. dim the whole language selection menu. */
-    gtk_widget_set_sensitive (menu, FALSE);
-  }
-  else
-  {
-    converted_label = hildon_im_get_language_description(language);    
-    if (converted_label == NULL)
-      converted_label = g_strdup (language);
-    g_free(language);
-
-    menuitem = self->priv->menu_lang [SECONDARY_LANGUAGE] =
-      gtk_radio_menu_item_new_with_label (group, converted_label);
-    g_free(converted_label);
-    gtk_widget_set_sensitive (menu, TRUE);
-
-    gtk_menu_shell_append (GTK_MENU_SHELL(submenu), menuitem);
-  }
-
-  /* Set selected language. */
-  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM(
-          self->priv->menu_lang [self->priv->current_language_index]),
-                                 TRUE);
-  for (i = 0; i < NUM_LANGUAGES; i++)
-  {
-    if (self->priv->menu_lang[i])
-    {
-      g_signal_connect(G_OBJECT(self->priv->menu_lang[i]), "activate",
-                       G_CALLBACK(hildon_im_ui_language_selected),
-                       self);
-    }
-  }
-}
-
-static void
 cleanup_plugins (HildonIMUI *self)
 {
   GSList *iter;
@@ -708,9 +429,6 @@ cleanup_plugins (HildonIMUI *self)
     plugin = (PluginData *) iter->data;
     if (plugin != NULL)
     {
-      if (plugin->menu)
-        gtk_widget_destroy (plugin->menu);
-
       FREE_IF_SET (plugin->filename);
       free_language_list (plugin->languages);
       free_iminfo (plugin->info);
@@ -771,9 +489,6 @@ reload_plugins (HildonIMUI *self)
     g_warning ("No IM will show.");
     return;
   }
-
-  init_plugin_menu (self);
-  init_language_menu (self);
 }
 
 /**
@@ -855,8 +570,6 @@ hildon_im_ui_hide(gpointer data)
 
   gtk_widget_hide(GTK_WIDGET(self));
 
-  hide_controlmenu (self);
-
   if (self->priv->current_plugin != NULL &&
       CURRENT_IM_WIDGET (self) != NULL)
   {
@@ -915,14 +628,6 @@ hildon_im_ui_show(HildonIMUI *self)
       self->priv->trigger = HILDON_IM_TRIGGER_FINGER;
   }
   
-  if (self->priv->enable_stylus_ui == FALSE &&
-      self->priv->trigger == HILDON_IM_TRIGGER_STYLUS &&
-      self->priv->keyboard_available == FALSE &&
-      self->priv->ui_is_visible == TRUE)
-  {
-    return;
-  }
-  
   if ((self->priv->keyboard_available || !self->priv->use_finger_kb) &&
       (self->priv->trigger == HILDON_IM_TRIGGER_FINGER))
   {
@@ -973,8 +678,7 @@ hildon_im_ui_show(HildonIMUI *self)
     }
   }
 
-  /* IM may not be loaded yet!
-   * TODO is hildon_im_plugin_enable called too many times? */
+  /* IM may not be loaded yet? */
   if (self->priv->current_plugin != NULL)
   {
     activate_plugin (self, self->priv->current_plugin, TRUE);
@@ -985,10 +689,6 @@ hildon_im_ui_show(HildonIMUI *self)
       (self->priv->current_plugin->info->type == HILDON_IM_TYPE_HIDDEN 
           || self->priv->current_plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE))
       return;
-  /* TODO the HIM doesn't have a UI in Fremantle, this file needs a lot of cleaning
-   * if (self->priv->ui_is_visible && GTK_WIDGET_VISIBLE (self->priv->current_plugin->widget))
-   *   gtk_widget_show(GTK_WIDGET(self));
-   */
 }
 
 static void
@@ -1007,21 +707,6 @@ hildon_im_ui_activate_current_language(HildonIMUI *self)
   {
     hildon_im_ui_foreach_plugin(self, hildon_im_plugin_language);
   }
-}
-
-static gint
-get_button_enum(HildonIMUIPrivate *priv, GtkWidget *button)
-{
-  gint i;
-
-  for (i = 0; i < HILDON_IM_NUM_BUTTONS; i++)
-  {
-    if (priv->buttons[i].button == button)
-    {
-      return i;
-    }
-  }
-  return -1;
 }
 
 static gboolean
@@ -1050,222 +735,6 @@ hildon_im_ui_restore_previous_mode_real(HildonIMUI *self)
   }
 
   return FALSE;
-}
-
-/* Signal handler for all of the main buttons */
-static void
-hildon_im_ui_process_button_click(HildonIMUI *self,
-                                  HildonIMButton button,
-                                  gboolean long_press)
-{
-  PluginData *info;
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-
-  info = CURRENT_PLUGIN (self);
-
-  if (self->priv->current_plugin == NULL)
-    return;
-
-  hildon_im_plugin_button_activated(CURRENT_IM_PLUGIN (self),
-                                    button, long_press);
-
-  if (self->priv->buttons[button].menu != NULL)
-  {
-    if (hildon_im_ui_button_get_active(self, button) == TRUE)
-    {
-      gtk_menu_popup(GTK_MENU(self->priv->buttons[button].menu),
-                     NULL, NULL, NULL, NULL, 0,
-                     gtk_get_current_event_time());
-      self->priv->menu_button = button;
-    }
-    return;
-  }
-
-  switch (button)
-  {
-    case HILDON_IM_BUTTON_TAB:
-      hildon_im_plugin_tab (CURRENT_IM_PLUGIN (self));
-      break;
-
-    case HILDON_IM_BUTTON_MODE_A:
-      hildon_im_plugin_mode_a (CURRENT_IM_PLUGIN (self));
-      break;
-
-    case HILDON_IM_BUTTON_MODE_B:
-      hildon_im_plugin_mode_b (CURRENT_IM_PLUGIN (self));
-      break;
-
-    case HILDON_IM_BUTTON_BACKSPACE:
-      hildon_im_plugin_backspace (CURRENT_IM_PLUGIN (self));
-      break;
-
-    case HILDON_IM_BUTTON_ENTER:
-      hildon_im_plugin_enter (CURRENT_IM_PLUGIN (self));
-      break;
-
-    case HILDON_IM_BUTTON_SPECIAL_CHAR:
-      if (info->info->special_plugin != NULL)
-      {
-        hildon_im_ui_activate_plugin (self, info->info->special_plugin, TRUE);
-      } else {
-        hildon_im_ui_restore_previous_mode_real(self);
-      }
-      break;
-
-    case HILDON_IM_BUTTON_CLOSE:
-      hildon_im_ui_hide(GTK_WIDGET(self));
-      break;
-
-    default: break;
-  }
-}
-
-static void
-hildon_im_ui_button_pressed(GtkButton *button, gpointer data)
-{
-  HildonIMUI *self;
-  GtkWidget *widget;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-  widget = GTK_WIDGET(button);
-
-  self->priv->repeat_done = FALSE;
-  self->priv->long_press = FALSE;
-  self->priv->pressed_button = get_button_enum(self->priv, GTK_WIDGET(button));
-  if (self->priv->pressed_button == -1)
-  {
-    g_warning("Pressed unmapped button!?");
-    return;
-  }
-
-  if (self->priv->buttons[self->priv->pressed_button].repeat == TRUE)
-  {
-    self->priv->repeat_timeout_id =
-            g_timeout_add(KEYREPEAT_THRESHOLD, hildon_im_ui_repeat_start,
-                          (gpointer) self);
-  }
-
-  if (self->priv->buttons[self->priv->pressed_button].long_press == TRUE)
-  {
-    self->priv->long_press_timeout_id =
-      g_timeout_add(HILDON_WINDOW_LONG_PRESS_TIME, hildon_im_ui_long_press,
-                    (gpointer) self);
-  }
-
-  self->priv->pressed_ontop = TRUE;
-}
-
-static void
-hildon_im_ui_button_released(GtkButton *button, gpointer data)
-{
-  HildonIMUI *self;
-  gint i;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-  if (self->priv->repeat_timeout_id)
-  {
-    g_source_remove(self->priv->repeat_timeout_id);
-    self->priv->repeat_timeout_id = 0;
-  }
-
-  if (self->priv->long_press_timeout_id)
-  {
-    g_source_remove(self->priv->long_press_timeout_id);
-    self->priv->long_press_timeout_id = 0;
-  }
-
-  if (self->priv->long_press)
-  {
-    self->priv->long_press = FALSE;
-    return;
-  }
-
-  i = get_button_enum(self->priv, GTK_WIDGET(button));
-  if (i < 0                           ||
-      self->priv->pressed_button != i ||
-      self->priv->pressed_ontop == FALSE)
-  {
-    return;
-  }
-
-  self->priv->pressed_button = -1;
-  if (self->priv->repeat_done == FALSE ||
-      self->priv->buttons[i].repeat == FALSE)
-  {
-    hildon_im_ui_process_button_click(self, i, FALSE);
-  }
-
-  if (self->priv->buttons[i].toggle == FALSE)
-  {
-    hildon_im_ui_button_set_active(self, i, FALSE);
-  }
-  self->priv->repeat_done = FALSE;
-}
-
-static void
-hildon_im_ui_button_enter(GtkButton *button, gpointer data)
-{
-  HildonIMUI *self;
-  gint i;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-  i = get_button_enum(self->priv, GTK_WIDGET(button));
-  if (self->priv->pressed_button == i)
-  {
-    self->priv->pressed_ontop = TRUE;
-  }
-}
-
-static void
-hildon_im_ui_button_leave(GtkButton *button, gpointer data)
-{
-  HildonIMUI *self;
-  gint i;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-  i = get_button_enum(self->priv, GTK_WIDGET(button));
-  if (self->priv->pressed_button == i)
-  {
-    self->priv->pressed_ontop = FALSE;
-
-    self->priv->repeat_done = TRUE;
-    if (self->priv->repeat_timeout_id)
-    {
-      g_source_remove(self->priv->repeat_timeout_id);
-      self->priv->repeat_timeout_id = 0;
-    }
-
-    if (self->priv->long_press_timeout_id)
-    {
-      g_source_remove(self->priv->long_press_timeout_id);
-      self->priv->long_press_timeout_id = 0;
-    }
-  }
-}
-
-static void
-hildon_im_ui_menu_deactivated(GtkMenuShell *menu, gpointer data)
-{
-  HildonIMUI *self;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-  if (self->priv->menu_button == -1)
-  {
-    return;
-  }
-
-  hildon_im_ui_button_set_active(self,
-                                       self->priv->menu_button,
-                                       FALSE);
-  self->priv->menu_button = -1;
 }
 
 void
@@ -1339,8 +808,6 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
       {
         self->priv->current_language_index = new_value;
         hildon_im_ui_activate_current_language(self);
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-                self->priv->menu_lang[new_value]), TRUE);
       }      
     }
   }
@@ -1358,25 +825,11 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
   {
     if(value->type == GCONF_VALUE_STRING)
     {
-      GtkWidget *label;
       const gchar *language = gconf_value_get_string(value);
-      gchar *converted_label;
       GSList *iter;
 
       strncpy (self->priv->selected_languages [PRIMARY_LANGUAGE], language,
           strlen (language) > BUFFER_SIZE ? BUFFER_SIZE -1: strlen (language));
-
-      label = gtk_bin_get_child(GTK_BIN(
-              self->priv->menu_lang[PRIMARY_LANGUAGE]));
-      if (GTK_IS_LABEL(label))
-      {
-        converted_label = hildon_im_get_language_description (language);
-        if (converted_label == NULL)
-          converted_label = g_strdup (language);
-
-        gtk_label_set_text(GTK_LABEL(label), converted_label);
-        g_free(converted_label);
-      }
 
       for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
       {
@@ -1390,34 +843,19 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
         }
       }
     }
-    set_im_menu_sensitivity_for_language (self);
   }
   else if (strcmp(key, HILDON_IM_GCONF_SECONDARY_LANGUAGE) == 0)
   {
     if (value->type == GCONF_VALUE_STRING)
     {
       gboolean lang_valid;
-      GtkWidget *label;
       const gchar *language = gconf_value_get_string(value);
-      gchar *converted_label;
 
       lang_valid = !(language == NULL || language [0] == 0);
       if (lang_valid)
       {
         strncpy (self->priv->selected_languages [SECONDARY_LANGUAGE], language,
           strlen (language) > BUFFER_SIZE ? BUFFER_SIZE -1: strlen (language));
-
-        label = gtk_bin_get_child(GTK_BIN(
-                self->priv->menu_lang[SECONDARY_LANGUAGE]));
-        if (GTK_IS_LABEL(label))
-        {
-          converted_label = hildon_im_get_language_description(language);
-          if (converted_label == NULL)
-            converted_label = g_strdup (language);
-
-          gtk_label_set_text(GTK_LABEL(label), converted_label);
-          g_free(converted_label);
-        }        
       }
       else
       {
@@ -1431,7 +869,6 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
         }
         self->priv->selected_languages[SECONDARY_LANGUAGE][0] = 0;
       }
-      gtk_widget_set_sensitive(self->priv->menu_language_list, lang_valid);
     }
     for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
     {
@@ -1443,7 +880,6 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
                 SECONDARY_LANGUAGE);
       }
     }
-    set_im_menu_sensitivity_for_language (self);
   }
   else if (strcmp(key, HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT) == 0)
   {
@@ -1697,24 +1133,6 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
       msg->cmd != HILDON_IM_HIDE)
   {
     self->priv->input_mode = msg->input_mode;
-#ifdef MAEMO_CHANGES
-    if ((msg->input_mode & HILDON_GTK_INPUT_MODE_SPECIAL) ||
-         (msg->input_mode & HILDON_GTK_INPUT_MODE_ALPHA) ||
-         (msg->input_mode & HILDON_GTK_INPUT_MODE_TELE)
-         )
-    {
-        hildon_im_ui_button_set_sensitive(self,
-            HILDON_IM_BUTTON_SPECIAL_CHAR,
-            TRUE);
-    }
-    else
-    {
-        hildon_im_ui_button_set_sensitive(self,
-            HILDON_IM_BUTTON_SPECIAL_CHAR,
-            FALSE);
-    }
-#endif
-
     if (plugin != NULL)
     {     
       hildon_im_plugin_input_mode_changed(plugin);      
@@ -1889,16 +1307,6 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
     }
 
     if (cme->message_type ==
-        hildon_im_protocol_get_atom( HILDON_IM_CLIPBOARD_SELECTION_REPLY)
-        && cme->format == HILDON_IM_CLIPBOARD_SELECTION_REPLY_FORMAT)
-    {
-      gtk_widget_set_sensitive(self->priv->editmenuitem[EDIT_MENU_ITEM_CUT],
-                               cme->data.l[0]);
-      gtk_widget_set_sensitive(self->priv->editmenuitem[EDIT_MENU_ITEM_COPY],
-                               cme->data.l[0]);
-    }
-
-    if (cme->message_type ==
         hildon_im_protocol_get_atom( HILDON_IM_SURROUNDING_CONTENT )
         && cme->format == HILDON_IM_SURROUNDING_CONTENT_FORMAT)
     {
@@ -2068,8 +1476,6 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
   {
     Atom active_window_atom =
             XInternAtom (GDK_DISPLAY(), "_NET_ACTIVE_WINDOW", False);
-    Atom workarea_change_atom = 
-	    XInternAtom (GDK_DISPLAY(), "_NET_WORKAREA", False);
     XPropertyEvent *prop = (XPropertyEvent *) xevent;
 
     if (prop->atom == active_window_atom && prop->window == GDK_ROOT_WINDOW())
@@ -2129,10 +1535,6 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
         }
       }
     }
-    else if (prop->atom == workarea_change_atom && prop->window == GDK_ROOT_WINDOW())
-    {
-	    hildon_im_ui_get_work_area (self);
-    }
   }
   return GDK_FILTER_CONTINUE;
 }
@@ -2172,37 +1574,15 @@ hildon_im_ui_finalize(GObject *obj)
 {
   /* I think we never get this far */
   HildonIMUI *self;
-  gint i;
 
   g_return_if_fail(HILDON_IM_IS_UI(obj));
   self = HILDON_IM_UI(obj);
 
   cleanup_plugins (self);
-  for (i = 0; i < CACHED_BUTTON_PIXMAP_COUNT; i++)
-  {
-    if (self->priv->cached_button_pixbuf_name[i] != NULL)
-    {
-      g_free(self->priv->cached_button_pixbuf_name[i]);
-      g_object_unref(self->priv->cached_button_pixbuf[i]);
-    }
-  }
-
-  for (i = 0; i < HILDON_IM_NUM_BUTTONS; i++)
-  {
-    if (self->priv->buttons[i].menu != NULL)
-    {
-      gtk_widget_destroy(self->priv->buttons[i].menu);
-    }
-  }
-
+  
   if (self->osso)
   {
     osso_deinitialize(self->osso);
-  }
-
-  if (self->priv->menu)
-  {
-    gtk_widget_destroy(self->priv->menu);
   }
 
   if (self->priv->current_banner)
@@ -2215,122 +1595,6 @@ hildon_im_ui_finalize(GObject *obj)
   g_string_free(self->priv->plugin_buffer, TRUE);
 
   G_OBJECT_CLASS(hildon_im_ui_parent_class)->finalize(obj);
-}
-
-static void
-hildon_im_ui_targets_received_callback(GtkClipboard *clipboard,
-                                       GdkAtom *targets,
-                                       gint n_targets,
-                                       gpointer data)
-{
-  HildonIMUI *self;
-  gboolean have_text_target = FALSE;
-  gint i;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-  for (i = 0; i < n_targets; i++)
-  {
-    if (targets[i] == gdk_atom_intern("UTF8_STRING", FALSE) ||
-        targets[i] == gdk_atom_intern("COMPOUND_TEXT", FALSE) ||
-        targets[i] == GDK_TARGET_STRING)
-    {
-      have_text_target = TRUE;
-      break;
-    }
-  }
-
-  gtk_widget_set_sensitive(self->priv->editmenuitem[EDIT_MENU_ITEM_PASTE],
-                           have_text_target);
-}
-
-static void
-hildon_im_ui_show_controlmenu(GtkWidget *widget, gpointer data)
-{
-  HildonIMUI *self;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-#ifdef MAEMO_CHANGES
-  if (self->priv->input_mode & HILDON_GTK_INPUT_MODE_INVISIBLE)
-  {
-    /* copy/cut not allowed in invisible entries */
-    gtk_widget_set_sensitive(self->priv->editmenuitem[EDIT_MENU_ITEM_CUT],
-           FALSE);
-    gtk_widget_set_sensitive(self->priv->editmenuitem[EDIT_MENU_ITEM_COPY],
-           FALSE);
-  }
-  else
-  {
-    /* ask from main app if there's any text selected so we can disable
-     cut/copy */
-    hildon_im_ui_send_communication_message(self,
-          HILDON_IM_CONTEXT_CLIPBOARD_SELECTION_QUERY);
-
-  }
-#endif
-
-  /* disable paste if there's no text in clipboard */
-  gtk_clipboard_request_targets(gtk_clipboard_get(GDK_SELECTION_CLIPBOARD),
-                                hildon_im_ui_targets_received_callback,
-                                self);
-}
-
-static void
-set_basic_buttons(HildonIMUI *self)
-{
-  hildon_im_ui_button_set_sensitive(self,
-      HILDON_IM_BUTTON_TAB, TRUE);
-  hildon_im_ui_button_set_toggle(self, 
-      HILDON_IM_BUTTON_TAB, FALSE);
-  hildon_im_ui_button_set_id(self, 
-      HILDON_IM_BUTTON_TAB,
-      "qgn_inpu_common_tab");
-  hildon_im_ui_button_set_repeat(self, 
-      HILDON_IM_BUTTON_TAB, FALSE);
-
-  hildon_im_ui_button_set_sensitive(self,
-      HILDON_IM_BUTTON_BACKSPACE, TRUE);
-  hildon_im_ui_button_set_toggle(self, 
-      HILDON_IM_BUTTON_BACKSPACE, FALSE);
-  hildon_im_ui_button_set_id(self, 
-      HILDON_IM_BUTTON_BACKSPACE,
-      "qgn_inpu_common_backspace");
-  hildon_im_ui_button_set_repeat(self, 
-      HILDON_IM_BUTTON_BACKSPACE, TRUE);
-
-  hildon_im_ui_button_set_sensitive(self, 
-      HILDON_IM_BUTTON_ENTER, TRUE);
-  hildon_im_ui_button_set_toggle(self, 
-      HILDON_IM_BUTTON_ENTER, FALSE);
-  hildon_im_ui_button_set_id(self, 
-      HILDON_IM_BUTTON_ENTER,
-      "qgn_inpu_common_enter");
-  hildon_im_ui_button_set_repeat(self, 
-      HILDON_IM_BUTTON_ENTER, TRUE);
-
-  hildon_im_ui_button_set_sensitive(self, 
-      HILDON_IM_BUTTON_SPECIAL_CHAR,
-      FALSE);
-  hildon_im_ui_button_set_toggle(self,
-      HILDON_IM_BUTTON_SPECIAL_CHAR, TRUE);
-  hildon_im_ui_button_set_id(self,
-      HILDON_IM_BUTTON_SPECIAL_CHAR,
-      "qgn_inpu_common_special");
-  hildon_im_ui_button_set_repeat(self,
-      HILDON_IM_BUTTON_SPECIAL_CHAR, FALSE);
-}
-
-static void
-hildon_im_ui_unlatch_special(GtkWidget *widget, gpointer data)
-{
-  HildonIMUI *self;
-  self = HILDON_IM_UI(data);
-
-  hildon_im_ui_button_set_active(self,
-      HILDON_IM_BUTTON_SPECIAL_CHAR, FALSE);
 }
 
 static void
@@ -2377,11 +1641,6 @@ static void
 hildon_im_ui_init(HildonIMUI *self)
 {
   HildonIMUIPrivate *priv;
-  GtkWidget *vbox_left;
-  GtkWidget *vbox_right;
-  GtkWidget *hbox;
-  gint i;
-  GtkIconTheme *icon_theme;
   osso_return_t status;
 
   g_return_if_fail(HILDON_IM_IS_UI(self));
@@ -2395,36 +1654,6 @@ hildon_im_ui_init(HildonIMUI *self)
   priv->committed_preedit = g_strdup("");
   priv->plugin_buffer = g_string_new(NULL);
   priv->current_banner = NULL;
-
-  /* initialize buttons */
-  for (i = 0; i < HILDON_IM_NUM_BUTTONS; i++)
-  {
-    priv->buttons[i].button = gtk_toggle_button_new();
-    gtk_container_add(GTK_CONTAINER(priv->buttons[i].button), gtk_image_new());
-
-    g_signal_connect(priv->buttons[i].button, "pressed",
-                     G_CALLBACK(hildon_im_ui_button_pressed),
-                     (gpointer) self);
-    g_signal_connect(priv->buttons[i].button, "released",
-                     G_CALLBACK(hildon_im_ui_button_released),
-                     (gpointer) self);
-    g_signal_connect(priv->buttons[i].button, "enter",
-                     G_CALLBACK(hildon_im_ui_button_enter),
-                     (gpointer) self);
-    g_signal_connect(priv->buttons[i].button, "leave",
-                     G_CALLBACK(hildon_im_ui_button_leave),
-                     (gpointer) self);
-     
-    priv->buttons[i].sensitive = TRUE;
-    priv->buttons[i].toggle = FALSE;
-    priv->buttons[i].id[0] = priv->buttons[i].id[BUTTON_ID_LEN - 1] = '\0';
-
-    priv->buttons[i].menu = NULL;
-
-    GTK_WIDGET_UNSET_FLAGS(priv->buttons[i].button, GTK_CAN_FOCUS);
-    gtk_widget_set_size_request(priv->buttons[i].button,
-                                COMMON_B_WIDTH, COMMON_B_HEIGHT);
-  }
 
   /* default */
   priv->options = 0;
@@ -2456,47 +1685,7 @@ hildon_im_ui_init(HildonIMUI *self)
     g_warning("Could not register the osso_hw_set_event_cb");
   }
  
-  priv->vbox = gtk_vbox_new(FALSE, 0);
-
-  hbox = gtk_hbox_new(FALSE, 0);
-  vbox_left = gtk_vbox_new(TRUE, 0);
-  vbox_right = gtk_vbox_new(TRUE, 0);
-
-  icon_theme = gtk_icon_theme_get_default();
-
-  /* The rest. */
-  for (i = HILDON_IM_NUM_BUTTONS - 1; i >= 4; i--)
-  {
-    gtk_box_pack_end(GTK_BOX(vbox_right), priv->buttons[i].button,
-                     FALSE, FALSE, 0);
-  }
-
-  /* BUTTON_TAB ... BUTTON_INPUT_MENU */
-  for (; i >= 0; i--)
-  {
-    gtk_box_pack_end(GTK_BOX(vbox_left), priv->buttons[i].button,
-                     FALSE, FALSE, 0);
-  }
-
-  gtk_box_pack_start(GTK_BOX(hbox), vbox_left, FALSE, FALSE, 0);
-
-
-  priv->im_box = GTK_BOX(hbox);
-  gtk_widget_set_name (GTK_WIDGET (self), 
-      "hildon-input-method-ui");
-
-  gtk_box_pack_end(GTK_BOX(hbox), vbox_right, FALSE, FALSE, 0);
-  gtk_box_pack_end(GTK_BOX(priv->vbox), hbox, FALSE, FALSE, 0);
-  gtk_container_add(GTK_CONTAINER(self), priv->vbox);
-  gtk_widget_show_all(vbox_left);
-  gtk_widget_show_all(vbox_right);
-  gtk_widget_show(hbox);
-  gtk_widget_show(priv->vbox);
- 
-  set_basic_buttons(self);
-
-  populate_additional_menu (self);
-  priv->menu = hildon_im_ui_create_control_menu(self);  
+  gtk_widget_set_name (GTK_WIDGET (self), "hildon-input-method-ui");
 
   self->priv->plugins_available = init_plugins (self);
   hildon_im_ui_load_gconf(self);
@@ -2506,45 +1695,13 @@ hildon_im_ui_init(HildonIMUI *self)
     g_warning ("No IM will show.");
   }
   init_persistent_plugins(self);
-  init_plugin_menu (self);
-  init_language_menu (self);
 
-  g_signal_connect(priv->menu, "show",
-                   G_CALLBACK(hildon_im_ui_show_controlmenu), self);
-
-  /* initialize static buttons */
-  hildon_im_ui_button_set_id(self, 
-      HILDON_IM_BUTTON_INPUT_MENU,
-      "qgn_inpu_common_menu");
-  /* setting menu will set toggle and repeat */
-  hildon_im_ui_button_set_menu(self, 
-      HILDON_IM_BUTTON_INPUT_MENU, priv->menu);
-  hildon_im_ui_button_set_sensitive(self,
-      HILDON_IM_BUTTON_INPUT_MENU, TRUE);
-
-  hildon_im_ui_button_set_id(self, 
-      HILDON_IM_BUTTON_CLOSE,
-      "qgn_inpu_common_minimize");
-  hildon_im_ui_button_set_sensitive(self, 
-      HILDON_IM_BUTTON_CLOSE, TRUE);
-  hildon_im_ui_button_set_toggle(self, 
-      HILDON_IM_BUTTON_CLOSE, FALSE);
-  hildon_im_ui_button_set_repeat(self, 
-      HILDON_IM_BUTTON_CLOSE, FALSE);
-
-  gtk_widget_set_size_request(GTK_WIDGET(self), 500, -1);
-
-  set_im_menu_sensitivity_for_language (self);
-  
 #ifdef MAEMO_CHANGES
   priv->first_boot = TRUE;
 #else
   priv->first_boot = FALSE;
 #endif
   
-  hildon_im_ui_button_set_sensitive(self, 
-      HILDON_IM_BUTTON_INPUT_MENU, FALSE);
-
   if (CURRENT_PLUGIN(self) == NULL && self->priv->enable_stylus_ui)
     set_plugin_to_stylus_im (self);
 
@@ -2556,236 +1713,7 @@ hildon_im_ui_class_init(HildonIMUIClass *klass)
 {
   g_type_class_add_private(klass, sizeof(HildonIMUIPrivate));
 
-  GTK_WIDGET_CLASS(klass)->size_allocate = hildon_im_ui_size_allocate;
-  GTK_WIDGET_CLASS(klass)->expose_event = hildon_im_ui_expose;
   G_OBJECT_CLASS(klass)->finalize = hildon_im_ui_finalize;
-}
-
-#ifdef MAEMO_CHANGES
-static void
-hildon_im_ui_menu_selected(GtkWidget *widget, gpointer data)
-{
-  HildonIMUI *self;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-  if (widget == self->priv->editmenuitem[EDIT_MENU_ITEM_CUT])
-  {
-    hildon_im_ui_send_communication_message(
-            self, HILDON_IM_CONTEXT_CLIPBOARD_CUT);
-  }
-  else if (widget == self->priv->editmenuitem[EDIT_MENU_ITEM_COPY])
-  {
-    hildon_im_ui_send_communication_message(
-            self, HILDON_IM_CONTEXT_CLIPBOARD_COPY);
-    self->priv->current_banner =
-      hildon_banner_show_information (GTK_WIDGET (data), NULL,
-                                      dgettext(HILDON_COMMON_STRING,
-                                               "ecoc_ib_edwin_copied"));
-  }
-  else if (widget == self->priv->editmenuitem[EDIT_MENU_ITEM_PASTE])
-  {
-    hildon_im_ui_send_communication_message(
-            self, HILDON_IM_CONTEXT_CLIPBOARD_PASTE);
-  }
-}
-#endif
-
-static void
-set_im_menu_sensitivity_for_language (HildonIMUI *self)
-{
-  GSList *iter = NULL;
-  PluginData *plugin, *latest_supported = NULL;
-  gboolean supported, supported_by_current = FALSE;
-  const gchar *language = hildon_im_ui_get_active_language (self);
-
-  for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
-  {
-    plugin = (PluginData*) iter->data;
-    if (plugin->languages != NULL)
-    {
-      supported = (g_slist_find_custom (plugin->languages, language,
-          (GCompareFunc) g_ascii_strcasecmp) != NULL);
-
-      if (plugin->menu != NULL)
-      {
-        gtk_widget_set_sensitive (plugin->menu, supported);
-      }
-
-      if (supported == TRUE && 
-          plugin->info->visible_in_menu)
-      {
-        latest_supported = plugin;
-      }
-      if (plugin == self->priv->current_plugin && supported == TRUE)
-      {
-        supported_by_current = TRUE;
-      }
-    } else if (plugin == self->priv->current_plugin)
-    {
-      supported_by_current = TRUE;
-    }
-  }
-
-/*   if (supported_by_current == FALSE && */
-/*       latest_supported != NULL) */
-/*   { */
-/*      activate_plugin (self, latest_supported, TRUE); */
-/*   } */
-}
-
-static GtkWidget *
-hildon_im_ui_create_control_menu(HildonIMUI *self)
-{
-  GtkWidget *menu;
-  GtkWidget *submenu;
-  GtkWidget *menuitem;
-  GSList *iter;
-
-  g_return_val_if_fail(HILDON_IM_IS_UI(self), NULL);
-
-  menu = gtk_menu_new();
-
-#ifdef MAEMO_CHANGES
-  self->priv->editmenuitem[EDIT_MENU_ITEM_CUT] = menuitem =
-          gtk_menu_item_new_with_label(_("inpu_nc_common_menu_edit_cut"));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-  g_signal_connect(G_OBJECT(menuitem), "activate",
-                   G_CALLBACK(hildon_im_ui_menu_selected), self);
-  self->priv->editmenuitem[EDIT_MENU_ITEM_COPY] = menuitem =
-          gtk_menu_item_new_with_label(_("inpu_nc_common_menu_edit_copy"));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-  g_signal_connect(G_OBJECT(menuitem), "activate",
-                   G_CALLBACK(hildon_im_ui_menu_selected), self);
-  self->priv->editmenuitem[EDIT_MENU_ITEM_PASTE] = menuitem =
-          gtk_menu_item_new_with_label(_("inpu_nc_common_menu_edit_paste"));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-  g_signal_connect(G_OBJECT(menuitem), "activate",
-                   G_CALLBACK(hildon_im_ui_menu_selected), self);
-  hildon_helper_set_insensitive_message (menuitem, 
-      dgettext(HILDON_COMMON_STRING,"ecoc_ib_edwin_nothing_to_paste"));
-#endif
-
-  menuitem = gtk_menu_item_new_with_label(_("inpu_nc_common_menu_method"));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-  self->priv->menu_plugin_list = gtk_menu_new();
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), 
-      self->priv->menu_plugin_list);
-
-  self->priv->menu_language_list =
-          gtk_menu_item_new_with_label(_("inpu_nc_common_menu_language"));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu),
-                        self->priv->menu_language_list);
-
-  menuitem = gtk_menu_item_new_with_label(_("inpu_nc_common_menu_tools"));
-  gtk_menu_shell_append(GTK_MENU_SHELL(menu), menuitem);
-
-
-  submenu = gtk_menu_new();
-  gtk_menu_item_set_submenu(GTK_MENU_ITEM(menuitem), submenu);
-
-  for (iter = self->priv->additional_menu; 
-      iter != NULL; iter = iter->next)
-  {
-    HildonIMAdditionalMenuEntry *entry = iter->data;
-
-    if (entry)
-    {
-      menuitem = gtk_menu_item_new_with_label (entry->title);
-      gtk_menu_shell_append (GTK_MENU_SHELL(submenu), menuitem);
-      g_signal_connect (G_OBJECT(menuitem), "activate",
-          G_CALLBACK (launch_additional_menu), self);
-    }
-  }
-  
-  return menu;
-}
-
-static void
-hildon_im_ui_input_method_selected(GtkWidget *widget,
-                                   gpointer data)
-{
-  HildonIMUI *self;
-  GSList *iter;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-  for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
-  {
-    PluginData *info;
-    info = (PluginData *) iter->data;
-    if (info->menu == widget)
-    {
-      if (gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)) == TRUE)
-      {
-        activate_plugin(self, info, TRUE);
-      }
-      return;
-    }
-  }
-
-  g_critical("Invalid input method selected from control menu");
-}
-
-static void
-hildon_im_ui_language_selected(GtkWidget *widget, 
-                               gpointer data)
-{
-  HildonIMUI *self;
-  int i;
-
-  g_return_if_fail(HILDON_IM_IS_UI(data));
-  self = HILDON_IM_UI(data);
-
-  for (i = 0; i < NUM_LANGUAGES; i++)
-  {
-    if (widget == self->priv->menu_lang[i])
-    { 
-      if (i != self->priv->current_language_index &&
-          gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(widget)))
-      {
-        self->priv->current_language_index = i;
-        hildon_im_ui_activate_current_language(self);
-        gtk_check_menu_item_set_active(GTK_CHECK_MENU_ITEM(
-                self->priv->menu_lang[i]), TRUE);
-
-        gconf_client_set_int (self->client, GCONF_CURRENT_LANGUAGE,
-                self->priv->current_language_index,
-                NULL);
-      }
-
-      set_im_menu_sensitivity_for_language (self);
-      
-      return;
-    }
-  }
-
-  g_critical("Invalid language selected from control menu");
-}
-
-static void
-hildon_im_ui_resize_window(HildonIMUI *self)
-{
-  PluginData *info;
-
-  info = CURRENT_PLUGIN (self);
-  if (info != NULL)
-  {
-    gint height;
-
-    if (info->info->height == HILDON_IM_DEFAULT_HEIGHT)
-      height = IM_WINDOW_HEIGHT;
-    else
-      height = info->info->height;
-
-    if (height != GTK_WIDGET(self)->allocation.height)
-    {
-      gtk_window_resize(GTK_WINDOW(self), GTK_WIDGET(self)->allocation.width,
-                        height);
-    }
-  }
 }
 
 /* Public methods **********************************************/
@@ -2818,11 +1746,8 @@ hildon_im_ui_new()
                       "accept-focus", FALSE,
                       NULL);
 
-  hildon_im_ui_get_work_area(self);
-
   gtk_widget_realize(GTK_WIDGET(self));
-  gtk_window_set_default_size(GTK_WINDOW(self), 
-      self->priv->width, -1);
+  gtk_window_set_default_size(GTK_WINDOW(self), -1, -1);
 
   g_object_set_data(G_OBJECT(GTK_WIDGET(self)->window),
                     "_NEW_WM_STATE", (gpointer) PropModeAppend);
@@ -2941,7 +1866,7 @@ flush_plugins(HildonIMUI *self,
 
 static void
 activate_plugin (HildonIMUI *self, PluginData *plugin,
-    gboolean init)
+                 gboolean init)
 {
   gboolean activate_special = FALSE;
   
@@ -2958,7 +1883,6 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
   if (plugin->info->type == HILDON_IM_TYPE_SPECIAL || plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE)
     activate_special = TRUE;
 
-  hide_controlmenu (self);
   flush_plugins(self, plugin, FALSE);
 
   /* Make sure current plugin is created and packed! */
@@ -2970,59 +1894,12 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
       g_warning ("Unable create widget for %s", plugin->info->name);
       return;
     }
-
-    if (activate_special == TRUE)
-    {
-      g_signal_connect(plugin->widget, "hide",
-                       G_CALLBACK (hildon_im_ui_unlatch_special),
-                       self);
-    }
   }
-
-  set_basic_buttons (self);
-
-#ifdef MAEMO_CHANGES
-  if (((self->priv->input_mode & HILDON_GTK_INPUT_MODE_SPECIAL) ||
-      (self->priv->input_mode & HILDON_GTK_INPUT_MODE_ALPHA) ||
-      (self->priv->input_mode & HILDON_GTK_INPUT_MODE_TELE)) && 
-      (activate_special == TRUE || plugin->info->special_plugin != NULL))
-  {
-    hildon_im_ui_button_set_sensitive(self, 
-        HILDON_IM_BUTTON_SPECIAL_CHAR,
-        TRUE);
-  }
-#endif
 
   set_current_plugin (self, plugin);
   
   hildon_im_plugin_enable (CURRENT_IM_PLUGIN (self), init);
   hildon_im_plugin_transition(CURRENT_IM_PLUGIN(self), FALSE);
-
-  if (plugin->info->type == HILDON_IM_TYPE_DEFAULT &&
-      plugin->info->trigger == HILDON_IM_TRIGGER_STYLUS)
-  {
-    gconf_client_set_string (self->client, GCONF_INPUT_METHOD,
-        plugin->info->name, NULL);
-  }
-  hildon_im_ui_set_common_buttons_visibility (self, 
-        (plugin->info->disable_common_buttons == FALSE));
-
-  if (plugin->menu != NULL)  
-  {
-    gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (plugin->menu), TRUE);
-  }
-
-  self->priv->ui_is_visible = GTK_WIDGET_VISIBLE (plugin->widget) &&
-                              plugin->info->type != HILDON_IM_TYPE_HIDDEN;
-  /* needs packing */
-  if (self->priv->ui_is_visible && plugin->info->type != HILDON_IM_TYPE_SPECIAL_STANDALONE)
-    gtk_box_pack_start(self->priv->im_box, plugin->widget, TRUE, TRUE, 0);
-
-  if (plugin->info->type != HILDON_IM_TYPE_HIDDEN)
-    gtk_widget_show_all (plugin->widget);
-
-  if (self->priv->ui_is_visible)
-    hildon_im_ui_resize_window(self);
 }
 
 void 
@@ -3100,109 +1977,6 @@ hildon_im_ui_send_event(HildonIMUI *self, Window window, XEvent *event)
       }
     }
   }
-}
-
-static void
-hildon_im_ui_size_allocate(GtkWidget *widget, GtkAllocation *allocation)
-{
-  HildonIMUI *self;
-  HildonIMUIPrivate *priv;
-  gboolean fullscreen;
-  GtkAllocation alloc = *allocation;
-  GtkWidget *child;
-  GSList *iter;
-  PluginData *info;
-
-  g_return_if_fail(HILDON_IM_IS_UI(widget));
-  self = HILDON_IM_UI(widget);
-  priv = self->priv;
-  info = CURRENT_PLUGIN(self);
-
-  fullscreen = alloc.width > priv->width ||
-               priv->width == gdk_screen_get_width(gdk_screen_get_default());
-
-  /*allocation for IM area*/
-  if (info && info->info->disable_common_buttons == TRUE)
-  {
-    alloc.x = 0;
-    if(fullscreen == FALSE)
-      alloc.width = priv->width;
-  }
-  else if(fullscreen)
-  {
-    alloc.x = 0;
-  }
-  else
-  {
-    alloc.x = 0;
-    alloc.width = allocation->width;
-  }
-  alloc.height -= IM_FRAME_HEIGHT;
-  if (alloc.height < 0)
-    alloc.height = 0;
-  alloc.y = IM_FRAME_HEIGHT ;
-  
-  /*inform plugin about size changes first, then allocate sizes*/
-  for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
-  {
-    PluginData *info;
-    info = (PluginData *) iter->data;
-
-    if (info->widget != NULL)
-    {
-      hildon_im_plugin_fullscreen(HILDON_IM_PLUGIN(info->widget),
-                                  fullscreen);
-    }
-  }
-
-  child = gtk_bin_get_child(GTK_BIN(widget));
-  gtk_widget_size_allocate(child, &alloc);
-}
-
-static gboolean
-hildon_im_ui_expose(GtkWidget *self, GdkEventExpose *event)
-{
-  HildonIMUI *kbd;
-  GtkWidget *child;
-
-  g_return_val_if_fail(HILDON_IM_IS_UI(self), FALSE);
-  kbd = HILDON_IM_UI(self);
-
-#ifdef MAEMO_CHANGES
-  /* enable menu if not first boot */
-  if (!hildon_im_ui_is_first_boot(kbd))
-  {
-    hildon_im_ui_button_set_sensitive(kbd, 
-        HILDON_IM_BUTTON_INPUT_MENU, TRUE);
-  }
-
-  /* FIXME: Plugins without common buttons share a 2px strip at the top
-     with the IM UI */
-  if(self->allocation.width == kbd->priv->width)
-  { 
-    gtk_paint_box(self->style, self->window,
-                  GTK_WIDGET_STATE(self), GTK_SHADOW_NONE,
-                  &event->area, self, "osso-im-frame-top",
-                  0, 0,
-                  self->allocation.width, IM_FRAME_HEIGHT);
-  }
-  else
-  {
-    gtk_paint_box(self->style, self->window, GTK_WIDGET_STATE(self),
-                  GTK_SHADOW_NONE, &event->area, self, "osso-im-frame-top",
-                  0, 0, self->allocation.width, IM_FRAME_HEIGHT);
-  }
-#endif
-
-  child = gtk_bin_get_child(GTK_BIN(self));
-
-  if(child != NULL)
-  {
-    gtk_container_propagate_expose(GTK_CONTAINER(self),
-                                   GTK_WIDGET(child), event);
-  }
-
-  return FALSE;
 }
 
 /**
@@ -3400,429 +2174,10 @@ hildon_im_ui_get_autocase_mode(HildonIMUI *self)
   return self->priv->autocase;
 }
 
-static gboolean
-hildon_im_ui_long_press(gpointer data)
-{
-  HildonIMUI *self;
-  g_return_val_if_fail(HILDON_IM_IS_UI(data), FALSE);
-  self = HILDON_IM_UI(data);
-
-  self->priv->long_press_timeout_id = 0;
-  self->priv->long_press = TRUE;
-
-  hildon_im_ui_process_button_click(self, self->priv->pressed_button, TRUE);
-
-  return FALSE;
-}
-
-static gboolean
-hildon_im_ui_repeat_start(gpointer data)
-{
-  HildonIMUI *self;
-  g_return_val_if_fail(HILDON_IM_IS_UI(data), FALSE);
-  self = HILDON_IM_UI(data);
-  hildon_im_ui_process_button_click(self, self->priv->pressed_button, self->priv->long_press);
-
-  self->priv->repeat_done = TRUE;
-  self->priv->repeat_timeout_id = g_timeout_add(KEYREPEAT_INTERVAL,
-                                                hildon_im_ui_repeat, (gpointer) self);
-  return FALSE;
-}
-
-static gboolean
-hildon_im_ui_repeat(gpointer data)
-{
-  HildonIMUI *self;
-  g_return_val_if_fail(HILDON_IM_IS_UI(data), FALSE);
-  self = HILDON_IM_UI(data);
-  hildon_im_ui_process_button_click(self, self->priv->pressed_button, self->priv->long_press);
-  return TRUE;
-}
-
-static GdkPixbuf *
-cached_pixbuf_lookup(HildonIMUI *self, const gchar *id)
-{
-  GdkPixbuf *pixbuf=NULL;
-  gint i, j;
-
-  g_return_val_if_fail(HILDON_IM_IS_UI(self), NULL);
-
-  for (i = 0; i < CACHED_BUTTON_PIXMAP_COUNT; i++)
-  {
-    gchar *name = self->priv->cached_button_pixbuf_name[i];
-
-    if (name != NULL && strcmp(name, id) == 0)
-    {
-      pixbuf = self->priv->cached_button_pixbuf[i];
-
-      if (i != 0)
-      {
-        /* move to front */
-        for (j = i; j > 0; j--)
-        {
-          self->priv->cached_button_pixbuf_name[j] =
-                  self->priv->cached_button_pixbuf_name[j-1];
-          self->priv->cached_button_pixbuf[j] =
-                  self->priv->cached_button_pixbuf[j-1];
-        }
-        self->priv->cached_button_pixbuf_name[0] = name;
-        self->priv->cached_button_pixbuf[0] = pixbuf;
-      }
-      return pixbuf;
-    }
-  }
-
-  return NULL;
-}
-
-/**
- * hildon_im_ui_button_set_id_real:
- * @self: a #HildonIMUI
- * @button: the index of the button
- * @id: name of the of the image
- *
- * Sets the image with the name @id for the specified button.
- */
-static void
-hildon_im_ui_button_set_id_real(HildonIMUI *self,
-                                HildonIMButton button, const gchar *id,
-                                gboolean clear_label)
-{
-  HildonIMUIPrivate *priv;
-  GtkWidget *widget;
-  GtkImage *image;
-  GtkIconTheme *icon_theme;
-  GdkPixbuf *pixbuf;
-  gint seek, i;
-
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  g_return_if_fail(button >= 0 && button < HILDON_IM_NUM_BUTTONS);
-  priv = self->priv;
-
-  if (clear_label == TRUE)
-  {
-    hildon_im_ui_button_set_label_real(self, button,
-                                       NULL, FALSE);
-  }
-
-  if (id == NULL)
-  {
-    if (priv->buttons[button].id[0] == '\0')
-    {
-      return;
-    }
-    priv->buttons[button].id[0] = '\0';
-  }
-  else
-  {
-    seek = MAX(strlen(id) - BUTTON_ID_LEN + 1, 0);
-    if (strncmp(priv->buttons[button].id, id + seek, BUTTON_ID_LEN) == 0)
-    {
-      return;
-    }
-    g_strlcpy(priv->buttons[button].id, id + seek, BUTTON_ID_LEN);
-  }
-
-  icon_theme = gtk_icon_theme_get_default();
-
-  widget = gtk_bin_get_child(GTK_BIN(priv->buttons[button].button));
-  if (widget == NULL || GTK_IS_IMAGE(widget) == FALSE)
-  {
-    if (widget != NULL && GTK_IS_WIDGET(widget) == TRUE)
-    {
-      gtk_widget_destroy(widget);
-    }
-    widget = gtk_image_new();
-    gtk_widget_show (widget);
-    gtk_container_add(GTK_CONTAINER(priv->buttons[button].button), widget);
-  }
-  image = GTK_IMAGE(widget);
-
-  if (id == NULL)
-  {
-    gtk_image_set_from_pixbuf(image, NULL);
-  }
-  else
-  {
-    /* try to use cached pixbufs. */
-    pixbuf = cached_pixbuf_lookup(self, id);
-    if (pixbuf == NULL)
-    {
-      pixbuf = gtk_icon_theme_load_icon(icon_theme,
-                                        id,
-                                        HILDON_IM_UI_ICON_SIZE,
-                                        GTK_ICON_LOOKUP_NO_SVG,
-                                        NULL);
-
-      /* delete last cached item */
-      i = CACHED_BUTTON_PIXMAP_COUNT - 1;
-      if (priv->cached_button_pixbuf_name[i] != NULL)
-      {
-        g_free(priv->cached_button_pixbuf_name[i]);
-        g_object_unref(priv->cached_button_pixbuf[i]);
-      }
-
-      /* move cached items forward */
-      memmove(priv->cached_button_pixbuf_name + 1,
-              priv->cached_button_pixbuf_name,
-              (CACHED_BUTTON_PIXMAP_COUNT - 1) *
-              sizeof(priv->cached_button_pixbuf_name[0]));
-      memmove(priv->cached_button_pixbuf + 1,
-              priv->cached_button_pixbuf,
-              (CACHED_BUTTON_PIXMAP_COUNT - 1) *
-              sizeof(priv->cached_button_pixbuf[0]));
-
-      /* add to beginning of cache */
-      priv->cached_button_pixbuf_name[0] = g_strdup(id);
-      priv->cached_button_pixbuf[0] = pixbuf;
-    }
-    gtk_image_set_from_pixbuf(image, pixbuf);
-  }
-}
-
-/**
- * hildon_im_ui_button_set_id:
- * @ui: a #HildonIMUI
- * @button: the index of the button
- * @id: name of the of the image
- *
- * Sets the image with the name @id for the specified button.
- */
-void
-hildon_im_ui_button_set_id(HildonIMUI *self,
-                           HildonIMButton button, const gchar *id)
-{
-  hildon_im_ui_button_set_id_real(self, button, id, TRUE);
-}
-
-void
-hildon_im_ui_button_set_label_real(HildonIMUI *self,
-                                   HildonIMButton button,
-                                   const gchar *label,
-                                   gboolean clear_id)
-{
-  HildonIMUIPrivate *priv;
-  GtkWidget *child;
-  const gchar *stuff;
-
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  g_return_if_fail(button >= 0 && button < HILDON_IM_NUM_BUTTONS);
-  priv = self->priv;
-
-  /* clear icon (id) */
-  if (clear_id == TRUE)
-  {
-    hildon_im_ui_button_set_id_real(self, button, NULL, FALSE);
-  }
-
-  child = gtk_bin_get_child(GTK_BIN(priv->buttons[button].button));
-  if (GTK_IS_LABEL(child) == TRUE)
-  {
-    stuff = label != NULL ? label : "";
-  }
-  else
-  {
-    stuff = label;
-  }
-  gtk_button_set_label(GTK_BUTTON(priv->buttons[button].button), stuff);
-}
-
-void
-hildon_im_ui_button_set_label(HildonIMUI *self,
-                              HildonIMButton button,
-                              const gchar *label)
-{
-  hildon_im_ui_button_set_label_real(self, button, label, TRUE);
-}
-
-static void
-hildon_im_ui_button_set_menu_real(HildonIMUI *self,
-                                  HildonIMButton button,
-                                  GtkWidget *menu,
-                                  gboolean automatic)
-{
-  HildonIMUIPrivate *priv;
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  g_return_if_fail(button >= 0 && button < HILDON_IM_NUM_BUTTONS);
-  g_return_if_fail(menu == NULL || GTK_IS_MENU(menu));
-  priv = self->priv;
-
-  if (priv->buttons[button].menu != NULL)
-  {
-    g_object_ref(priv->buttons[button].menu);
-    g_object_ref_sink(GTK_OBJECT(priv->buttons[button].menu));
-    gtk_widget_destroy(priv->buttons[button].menu);
-    g_object_unref(priv->buttons[button].menu);
-  }
-
-  priv->buttons[button].menu = menu;
-
-  if (menu != NULL)
-  {
-    gtk_widget_show_all(menu);
-  }
-
-  if (menu != NULL)
-  {
-    g_signal_connect(menu, "deactivate",
-                     G_CALLBACK(hildon_im_ui_menu_deactivated),
-                     (gpointer) self);
-  }
-
-  if (automatic == TRUE)
-  {
-    hildon_im_ui_button_set_toggle_real(self, button,
-                                              menu != NULL, FALSE);
-    hildon_im_ui_button_set_repeat(self, button,
-                                         menu == NULL);
-  }
-}
-
-void
-hildon_im_ui_button_set_menu(HildonIMUI *self,
-                             HildonIMButton button,
-                             GtkWidget *menu)
-{
-  hildon_im_ui_button_set_menu_real(self, button, menu, TRUE);
-}
-
-void
-hildon_im_ui_button_set_long_press(HildonIMUI *self,
-                                   HildonIMButton button,
-                                   gboolean long_press)
-{
-  HildonIMUIPrivate *priv;
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  g_return_if_fail(button >= 0 && 
-      button < HILDON_IM_NUM_BUTTONS);
-  priv = self->priv;
-
-  priv->buttons[button].long_press = long_press;
-}
-
-void
-hildon_im_ui_button_set_sensitive(HildonIMUI *self,
-                                  HildonIMButton button,
-                                  gboolean sensitive)
-{
-  HildonIMUIPrivate *priv;
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  g_return_if_fail(button >= 0 && 
-      button < HILDON_IM_NUM_BUTTONS);
-  priv = self->priv;
-
-  gtk_widget_set_sensitive(priv->buttons[button].button, sensitive);
-  priv->buttons[button].sensitive = sensitive;
-}
-
-static void
-hildon_im_ui_button_set_toggle_real(HildonIMUI *self,
-                                    HildonIMButton button,
-                                    gboolean toggle,
-                                    gboolean automatic)
-{
-  HildonIMUIPrivate *priv;
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  g_return_if_fail(button >= 0 && 
-      button < HILDON_IM_NUM_BUTTONS);
-  priv = self->priv;
-
-  priv->buttons[button].toggle = toggle;
-
-  if (toggle == TRUE)
-  {
-    gtk_widget_set_name(priv->buttons[button].button,
-                        "OssoIMSideToggleButton");
-  }
-  else
-  {
-    if (button == HILDON_IM_BUTTON_CLOSE)
-    {
-      gtk_widget_set_name(priv->buttons[button].button,
-                          "OssoIMSideCloseButton");
-    } else {
-      gtk_widget_set_name(priv->buttons[button].button,
-                          "OssoIMSideButton");
-    }
-  }
-
-  if (automatic == TRUE)
-  {
-    hildon_im_ui_button_set_menu_real(self, button,
-                                            NULL, FALSE);
-    hildon_im_ui_button_set_repeat(self, button,
-                                         toggle == FALSE);
-    hildon_im_ui_button_set_active(self, button, FALSE);
-  }
-}
-
-void
-hildon_im_ui_button_set_toggle(HildonIMUI *self,
-                               HildonIMButton button,
-                               gboolean toggle)
-{
-  hildon_im_ui_button_set_toggle_real(self, button,
-                                            toggle, TRUE);
-}
-
-void
-hildon_im_ui_button_set_repeat(HildonIMUI *self,
-                               HildonIMButton button,
-                               gboolean repeat)
-{
-  HildonIMUIPrivate *priv;
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  g_return_if_fail(button >= 0 && 
-      button < HILDON_IM_NUM_BUTTONS);
-  priv = self->priv;
-
-  priv->buttons[button].repeat = repeat;
-}
-
-void
-hildon_im_ui_button_set_active(HildonIMUI *self,
-                               HildonIMButton button,
-                               gboolean active)
-{
-  HildonIMUIPrivate *priv;
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  g_return_if_fail(button >= 0 && 
-      button < HILDON_IM_NUM_BUTTONS);
-  priv = self->priv;
-
-  gtk_toggle_button_set_active(
-                               GTK_TOGGLE_BUTTON(priv->buttons[button].button),
-                               active);
-}
-
-gboolean
-hildon_im_ui_button_get_active(HildonIMUI *self,
-                               HildonIMButton button)
-{
-  HildonIMUIPrivate *priv;
-  g_return_val_if_fail(HILDON_IM_IS_UI(self), FALSE);
-  g_return_val_if_fail(button >= 0 && 
-      button < HILDON_IM_NUM_BUTTONS, FALSE);
-  priv = self->priv;
-
-  return gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(
-          priv->buttons[button].button));
-}
-
 gboolean
 hildon_im_ui_get_visibility(HildonIMUI *self)
 {
-#ifdef MAEMO_CHANGES
-  HildonGtkInputMode mode = self->priv->input_mode;
-  gboolean is_secret_mode, is_dictionary_mode;
-
-  is_secret_mode = (mode & HILDON_GTK_INPUT_MODE_INVISIBLE) != 0;
-  is_dictionary_mode = (mode & HILDON_GTK_INPUT_MODE_DICTIONARY) != 0;
-
-  return is_dictionary_mode && !is_secret_mode;
-#else
-  return TRUE;
-#endif
+  return FALSE;
 }
 
 static gboolean
@@ -3902,297 +2257,6 @@ hildon_im_ui_set_context_options (HildonIMUI *self,
   {
     hildon_im_ui_send_communication_message(self, 
                                             HILDON_IM_CONTEXT_OPTION_CHANGED);
-  }
-}
-
-static void
-free_each_additional_menu (gpointer data, gpointer user_data)
-{
-  HildonIMAdditionalMenuEntry *entry = 
-    (HildonIMAdditionalMenuEntry *) data;
-
-  if (entry == NULL)
-    return;
-
-  FREE_IF_SET(entry->title);
-  FREE_IF_SET(entry->gettext_domain);
-  FREE_IF_SET(entry->command);
-  FREE_IF_SET(entry->dbus_service);
-  g_free (entry);
-  entry = NULL;
-}
-
-static void
-free_additional_menu (HildonIMUI *self)
-{
-  HildonIMUIPrivate *priv;
-  
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  priv = self->priv;
-
-  if (priv->additional_menu != NULL)
-  {
-    g_slist_foreach (priv->additional_menu, 
-        free_each_additional_menu, NULL);
-    g_slist_free (priv->additional_menu);
-    priv->additional_menu = NULL;
-  }
-}
-
-static void
-add_additional_menu (HildonIMUI *self, const gchar *file)
-{
-#define GROUP_NAME "Desktop Entry"
-  HildonIMAdditionalMenuEntry *entry;
-  HildonIMUIPrivate *priv;
-  GKeyFile *key_file;
-
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  priv = self->priv;
-
-  if (!g_str_has_suffix (file, ".desktop"))
-  {
-    g_warning ("Skipping non .desktop file: %s", file);
-    return;
-  }
-
-  key_file = g_key_file_new ();
-  if (!key_file)
-    return;
-
-  if (g_key_file_load_from_file (key_file, file,
-        G_KEY_FILE_NONE, NULL))
-  {
-    gchar *value;
-    value = g_key_file_get_value (key_file, GROUP_NAME, "Type", NULL);
-    if (!value)
-    {
-      g_warning ("Type is not found in %s", file);
-      return;
-    }
-    entry = (HildonIMAdditionalMenuEntry*) g_malloc0 (sizeof
-        (HildonIMAdditionalMenuEntry));
-
-    if (g_ascii_strncasecmp (value, "HildonControlPanelPlugin", 24) == 0)
-    {
-      entry->type = MENU_TYPE_CPA;
-    }
-    else if (g_ascii_strncasecmp (value, 
-          "Application", 11) == 0)
-    {
-      entry->type = MENU_TYPE_APPLICATION;
-    }
-    else 
-    {
-      g_warning ("Type %s in %s is not supported", value, file);
-      g_free (entry);
-      g_free (value);
-      return;
-    }
-
-    g_free (value);
-
-    value = g_key_file_get_value (key_file, GROUP_NAME, "X-gettext-domain", NULL);
-    if (value)
-    {      
-      entry->gettext_domain = value;
-    }
-
-    value = g_key_file_get_value (key_file, GROUP_NAME, "Name", NULL);
-    if (!value)
-    {
-      g_warning ("Name is not found in %s", file);
-      free_each_additional_menu (entry, NULL);
-      return;
-    }
-    
-    entry->title = (entry->gettext_domain != NULL) ?
-          dgettext (entry->gettext_domain, value)  :
-          _(value);
-
-    if (entry->title == value)
-      entry->title = g_strdup(value);
-
-    g_free(value);
-    
-    if (entry->type == MENU_TYPE_APPLICATION)
-    {
-      value = g_key_file_get_value (key_file, GROUP_NAME, "Exec", NULL);
-      if (value)
-      {
-        entry->command = value;
-      }
-      
-      value = g_key_file_get_value (key_file, GROUP_NAME, "X-Osso-Service", NULL);
-      if (value)
-      {        
-        if (!strchr (value , '.'))
-        {
-          gchar *tmp = g_strconcat ("com.nokia.", value, NULL);
-          g_free (value);
-          value = tmp;
-        }
-
-        entry->dbus_service = value;
-      } else {
-        if (entry->command == NULL)
-        {
-          free_each_additional_menu (entry, NULL);
-          g_warning ("Type is application but doesn't have Exec or Dbus-service in %s", file);
-          return;
-        }
-      }
-    } else if (entry->type == MENU_TYPE_CPA)
-    {
-      value = g_key_file_get_value (key_file, GROUP_NAME, "X-control-panel-plugin", NULL);
-      if (value)
-      {
-        entry->command = value;
-      } else {
-        free_each_additional_menu (entry, NULL);
-        g_warning ("Type is CPA but doesn't have x-control-panel-plugin in %s", file);
-        return;
-      }
-    }
-
-    priv->additional_menu = g_slist_append (priv->additional_menu, entry);
-    g_key_file_free (key_file);
-  } else
-    g_warning ("File %s couldn't be opened", file);
-
-  return;
-}
-
-static void 
-populate_additional_menu (HildonIMUI *self)
-{
-  HildonIMUIPrivate *priv;  
-  GDir *dir;
-  
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-  priv = self->priv;
-
-  free_additional_menu (self);
-
-  dir = g_dir_open (IM_MENU_DIR, 0, NULL);
-  if (dir) 
-  {
-    const gchar *file_name;
-    gchar *file_name_full;
-    
-    while ((file_name = g_dir_read_name (dir)) != NULL)
-    {
-      file_name_full = g_build_filename (IM_MENU_DIR, file_name, NULL);
-      if (file_name_full)
-      {
-        add_additional_menu (self, file_name_full);
-        g_free (file_name_full);        
-      }
-    }
-    g_dir_close (dir);
-  }
-
-  return;
-}
-
-static void
-run_additional_menu (HildonIMUI *self, 
-    HildonIMAdditionalMenuEntry *entry)
-{
-  if (!self->osso)
-    return;
-
-  if (entry->type == MENU_TYPE_APPLICATION)
-  {
-    if (entry->dbus_service)
-    {
-      gchar *path = g_strdup_printf ("/%s", entry->dbus_service);
-      if (!path)
-        return;
-  
-      path = g_strdelimit (path, ".", '/');
-      
-      osso_rpc_run(self->osso,
-                   entry->dbus_service, path,
-                   entry->dbus_service, "top_application", NULL, 
-                   DBUS_TYPE_INVALID);
-    }
-    else 
-    {
-      g_spawn_command_line_async (entry->command, NULL);
-    }
-  } else if (entry->type == MENU_TYPE_CPA)
-  {
-    osso_return_t ret;
-    ret = osso_cp_plugin_execute(self->osso, entry->command,
-                                 NULL, TRUE);
-    if (ret == OSSO_ERROR)
-    {
-      osso_log(LOG_ERR, "%s: Error with osso_cp_plugin_execute",
-               __FUNCTION__);
-    }
-  } 
-}
-
-static void 
-launch_additional_menu (GtkWidget *widget, gpointer data)
-{
-  HildonIMUI *self = (HildonIMUI *) data;
-  HildonIMUIPrivate *priv;
-  GtkWidget *label;
-  const gchar *title;
-  GSList *iter;
-
-  g_return_if_fail (HILDON_IM_IS_UI (self));
-  priv = self->priv;
-  label = gtk_bin_get_child (GTK_BIN (widget));
-  if (!label) 
-  {
-    g_warning ("Unable to get gtk_label");
-    return;
-  }
-
-  title = gtk_label_get_label (GTK_LABEL (label));
-  if (!title)
-  {
-    g_warning ("Unable to get the title from the gtk_label");
-    return;
-  }
-
-  for (iter = priv->additional_menu; iter != NULL; iter = iter->next)
-  {
-    HildonIMAdditionalMenuEntry *entry = iter->data;
-    if (g_ascii_strcasecmp (entry->title, title) == 0)
-    {
-      run_additional_menu (self, entry);
-      return;
-    }
-  }
-
-  g_warning ("Menu %s is not found. Should not reach here", title);
-
-  return;
-}
-
-void
-hildon_im_ui_set_common_buttons_visibility (
-    HildonIMUI *self, gboolean status)
-{
-  gint i;
-  HildonIMUIPrivate *priv;
-
-  g_return_if_fail (HILDON_IM_IS_UI (self));
-  priv = self->priv;
-
-  for (i = 0; i < HILDON_IM_NUM_BUTTONS; i++)
-  {
-    if (priv->buttons[i].button != NULL)
-    {
-      if (status)
-        gtk_widget_show (priv->buttons[i].button);
-      else
-        gtk_widget_hide (priv->buttons[i].button);
-    }
   }
 }
 
@@ -4292,54 +2356,5 @@ hildon_im_ui_set_visible(HildonIMUI *ui, gboolean visible)
   if (visible == FALSE)
   {
     gtk_widget_hide(GTK_WIDGET(ui));
-  }
-}
-
-
-static void hildon_im_ui_get_work_area (HildonIMUI *self)
-{
-  Display *dpy;
-  Atom act_type;
-  gint status, act_format;
-  gulong nitems, bytes;
-  unsigned char *data = NULL;
-  gulong *data_l;
-
-  dpy = GDK_DISPLAY();
-  status = XGetWindowProperty (dpy, 
-                               GDK_ROOT_WINDOW(),
-                               XInternAtom(dpy, "_NET_WORKAREA", True),
-                               0, (~0L), False,
-                               AnyPropertyType,
-                               &act_type, &act_format, &nitems, &bytes,
-                               (unsigned char**)&data);
-
-  if (status == Success && nitems > 3) 
-  {
-    data_l = (gulong *) data + 2; /* screen width is in the third value */
-    if (*data_l > 0)
-    {
-      self->priv->width = *data_l;
-    }
-  }
-
-  if (data)
-  {
-    XFree(data);
-  }
-}
-
-static void
-hide_controlmenu (HildonIMUI *self)
-{
-  if (GTK_MENU(self->priv->buttons[HILDON_IM_BUTTON_INPUT_MENU].menu) 
-      != NULL &&
-      hildon_im_ui_button_get_active(self,
-        HILDON_IM_BUTTON_INPUT_MENU) == TRUE)
-  {
-    hildon_im_ui_button_set_active(self,
-        HILDON_IM_BUTTON_INPUT_MENU, FALSE);
-    gtk_menu_popdown (GTK_MENU (
-            self->priv->buttons [HILDON_IM_BUTTON_INPUT_MENU].menu));
   }
 }
