@@ -1,6 +1,7 @@
 hildon-input-method (1:2.1.22-1~unreleased) unstable; urgency=low
 
   * Version 1:2.1.22-1~unreleased
+  * Fixes: NB#115420 hildon-input-method received an X Window System error: BadAtom.
 
  -- Felipe Erias Morandeira <femorandeira@maemo.org>  Wed, 27 May 2009 12:00:00 +0200 
 
