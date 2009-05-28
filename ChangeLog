@@ -2,6 +2,7 @@
 
 	* hildon-im-ui.c : Remove all the deprecated UI code.
 	* Fixes: NB#115420
+	* Version 2.1.22-1
 
 2009-05-27  Felipe Erias Morandeira <femorandeira@maemo.org>
 
