@@ -64,7 +64,7 @@ handle_sigterm(gint t)
 static void
 handle_sighup (gint t)
 {
-  reload_plugins (HILDON_IM_UI(keyboard));
+
 }
 
 static DBusHandlerResult

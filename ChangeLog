@@ -1,3 +1,9 @@
+2009-06-02  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 2.1.23-1~unreleased
+	* hildon-im-main.c : just ignore SIGHUP, don't execute dangerous code.
+	* Fixes: NB#119592.
+
 2009-05-28  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* hildon-im-ui.c : Remove all the deprecated UI code.
