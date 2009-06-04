@@ -956,8 +956,13 @@ hildon_im_ui_load_gconf(HildonIMUI *self)
   {    
     self->priv->selected_languages[SECONDARY_LANGUAGE][0] = 0;
     self->priv->current_language_index = 0;
-    gconf_client_set_int (self->client,
-                          GCONF_CURRENT_LANGUAGE, PRIMARY_LANGUAGE, NULL);
+    gint current_value = -1;
+    current_value = gconf_client_get_int (self->client,
+                                          GCONF_CURRENT_LANGUAGE,
+                                          NULL);
+    if (current_value != PRIMARY_LANGUAGE)
+        gconf_client_set_int (self->client,
+                              GCONF_CURRENT_LANGUAGE, PRIMARY_LANGUAGE, NULL);
   }
   g_free(language);  
 

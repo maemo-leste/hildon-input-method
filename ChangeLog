@@ -1,3 +1,8 @@
+2009-06-04 Joaquim Rocha <jrocha@maemo.org>
+	* hildon-im-ui.c : Tests gconf key so it won't assign it if the current
+	  value is equal to the one already set.
+	* Fixes: NB#100853
+
 2009-06-02  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.23-1~unreleased
