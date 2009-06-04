@@ -174,7 +174,6 @@ struct _HildonIMUIPrivate
 
   GString *plugin_buffer;
   gboolean enable_stylus_ui;
-  gboolean ui_is_visible;
 
   osso_context_t *osso;
 
@@ -249,17 +248,20 @@ _plugin_by_name (gconstpointer a, gconstpointer b)
 }
 
 static PluginData *
-find_plugin_by_trigger_type (HildonIMUI *self, HildonIMTrigger trigger,
-    gint type)
+find_plugin_by_trigger_type (HildonIMUI *self,
+                             HildonIMTrigger trigger,
+                             gint type)
 {
   GSList *found;
   TriggerType tt;
+  
+  /* TODO use the default plugins */
 
   tt.trigger = trigger;
   tt.type = type;
   found = g_slist_find_custom (self->priv->all_methods, 
-      &tt,
-      _plugin_by_trigger_type);
+                               &tt,
+                               _plugin_by_trigger_type);
   if (found)
   {
     return found->data;
@@ -269,8 +271,9 @@ find_plugin_by_trigger_type (HildonIMUI *self, HildonIMTrigger trigger,
 }
 
 static PluginData *
-last_plugin_by_trigger_type (HildonIMUI *self, HildonIMTrigger trigger,
-    gint type)
+last_plugin_by_trigger_type (HildonIMUI *self,
+                             HildonIMTrigger trigger,
+                             gint type)
 {
   GSList *found;
   TriggerType tt;
@@ -278,8 +281,8 @@ last_plugin_by_trigger_type (HildonIMUI *self, HildonIMTrigger trigger,
   tt.trigger = trigger;
   tt.type = type;
   found = g_slist_find_custom (self->priv->last_plugins, 
-      &tt,
-      _plugin_by_trigger_type);
+                               &tt,
+                               _plugin_by_trigger_type);
   if (found)
   {
     return found->data;
@@ -981,6 +984,9 @@ hildon_im_ui_load_gconf(HildonIMUI *self)
     self->priv->enable_stylus_ui = gconf_value_get_bool (gvalue);
     gconf_value_free (gvalue);
   }
+  
+  /* Names of the default plugins */
+  
 }
 
 /* Call a plugin function for each loaded plugin.
@@ -2353,13 +2359,5 @@ hildon_im_ui_clear_plugin_buffer(HildonIMUI *ui)
 void
 hildon_im_ui_set_visible(HildonIMUI *ui, gboolean visible)
 {
-  ui->priv->ui_is_visible = visible;
-
-  if(GTK_WIDGET_DRAWABLE(ui) == FALSE)
-    return;
-
-  if (visible == FALSE)
-  {
-    gtk_widget_hide(GTK_WIDGET(ui));
-  }
+  /* always hidden */
 }

@@ -1,6 +1,6 @@
-hildon-input-method (1:2.1.23-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.23-1) unstable; urgency=low
 
-  * Version 1:2.1.23-1~unreleased
+  * Version 1:2.1.23-1
   * Fixes: NB#119592 Memory corruption code in sighup handler
   * Fixes: NB#100853 hildon-input-method rewrites GConf keys on startup
 
