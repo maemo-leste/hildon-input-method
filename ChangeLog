@@ -1,3 +1,10 @@
+2009-06-05 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.24-1~unreleased
+	* hildon-im-ui.c : Removed call to hildon_im_ui_hide to avoid the deletion
+	  of contents from text entries when that block is executed.
+	* Fixes: NB#120399
+
 2009-06-02  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.23-1

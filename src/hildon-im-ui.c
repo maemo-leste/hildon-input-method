@@ -1541,7 +1541,6 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
       {
         if (CURRENT_IM_WIDGET(self) != NULL)
         {
-          hildon_im_ui_hide(self);
           flush_plugins(self, NULL, FALSE);
         }
       }
