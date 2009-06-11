@@ -48,19 +48,6 @@
       </locale>
     </schema>
 
-    <schema>
-      <key>/schemas/apps/osso/inputmethod/launch_finger_kb_on_select</key>
-      <applyto>/apps/osso/inputmethod/launch_finger_kb_on_select</applyto>
-      <owner>hildon-input-method</owner>
-      <type>bool</type>
-      <default>true</default>
-      <locale name="C">
-        <short>Launch finger keyboard on keypad select press</short>
-        <long>When this feature is enabled the finger keyboard can be launched
-	by pressing the select hardware key</long>
-      </locale>
-    </schema>
-
    <schema>
      <key>/schemas/apps/osso/inputmethod/hildon-im-languages/list</key>
      <applyto>/apps/osso/inputmethod/hildon-im-languages/list</applyto>

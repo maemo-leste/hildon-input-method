@@ -66,8 +66,6 @@ typedef struct _HildonIMUIPrivate HildonIMUIPrivate;
 
 #define HILDON_IM_GCONF_DIR "/apps/osso/inputmethod"
 
-#define HILDON_IM_GCONF_ENABLE_STYLUS_IM           HILDON_IM_GCONF_DIR       "/enable-stylus-im"
-#define HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT HILDON_IM_GCONF_DIR       "/launch_finger_kb_on_select"
 #define HILDON_IM_GCONF_LANG_DIR                   HILDON_IM_GCONF_DIR       "/hildon-im-languages"
 #define _HILDON_IM_GCONF_LANGUAGE                  HILDON_IM_GCONF_LANG_DIR  "/language-"
 #define HILDON_IM_GCONF_PRIMARY_LANGUAGE           _HILDON_IM_GCONF_LANGUAGE "0"
@@ -150,6 +148,16 @@ gboolean hildon_im_ui_get_visibility(HildonIMUI *self);
  * Return value: a #HildonGtkInputMode
  */
 HildonGtkInputMode hildon_im_ui_get_current_input_mode(HildonIMUI *self);
+
+/**
+ * hildon_im_ui_get_current_default_input_mode:
+ * @self: #HildonIMUI
+ * 
+ * Gets the current default input mode
+ *
+ * Return value: a #HildonGtkInputMode
+ */
+HildonGtkInputMode hildon_im_ui_get_current_default_input_mode(HildonIMUI *self);
 
 /**
  * hildon_im_ui_get_autocase_mode:

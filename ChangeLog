@@ -1,3 +1,23 @@
+2009-06-11  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* hildon-im-ui.h : remove HILDON_IM_GCONF_ENABLE_STYLUS_IM and
+	HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT.
+	(hildon_im_ui_get_current_default_input_mode) : returns the current default
+	input mode of the client widget (property "hildon-input-mode"), when this
+	feature has been finally implemented.
+	* hildon-im-ui.c : Use the GConf keys
+		- "default-plugins/hw-keyboard",
+		- "default-plugins/stylus"
+		- "default-plugins/finger"
+	to know which plugins should be used for each trigger.
+	Removed unused GConf keys and internal fields.
+	(get_default_plugin_by_trigger) : tries to get the default plugin for the
+	given trigger; if it doesn't exist, it tries to look for another one with
+	that trigger.
+	(hildon_im_ui_show) : Implemented the new logic for selecting the plugin
+	that will be used. This should make this process a bit easier to understand.
+	* Version 1:2.1.24-1
+
 2009-06-05 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.24-1~unreleased

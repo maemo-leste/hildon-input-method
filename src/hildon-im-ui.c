@@ -67,6 +67,11 @@
 #define GCONF_CURRENT_LANGUAGE       HILDON_IM_GCONF_LANG_DIR "/current"
 #define GCONF_INPUT_METHOD           HILDON_IM_GCONF_DIR "/input_method_plugin"
 
+#define GCONF_IM_DEFAULT_PLUGINS     HILDON_IM_GCONF_DIR "/default-plugins"
+#define GCONF_IM_HKB_PLUGIN          GCONF_IM_DEFAULT_PLUGINS "/hw-keyboard"
+#define GCONF_IM_STYLUS_PLUGIN       GCONF_IM_DEFAULT_PLUGINS "/stylus"
+#define GCONF_IM_FINGER_PLUGIN       GCONF_IM_DEFAULT_PLUGINS "/finger"
+
 #define SOUND_REPEAT_ILLEGAL_CHARACTER 800
 #define SOUND_REPEAT_NUMBER_INPUT 0
 #define SOUND_REPEAT_FINGER_TRIGGER 1500
@@ -127,9 +132,10 @@ struct _HildonIMUIPrivate
 
   Window input_window;
   Window app_window;
-  Window shown_app_window;
+  Window transiency;
 
   HildonGtkInputMode input_mode;
+  HildonGtkInputMode default_input_mode;
   HildonIMOptionMask options;
   HildonIMCommand autocase;
   HildonIMTrigger trigger;
@@ -151,9 +157,6 @@ struct _HildonIMUIPrivate
 
   gboolean first_boot;
 
-  Window transiency;
-
-  gboolean select_launches_fullscreen_plugin;
   gboolean return_key_pressed;
   gboolean use_finger_kb;
 
@@ -173,10 +176,17 @@ struct _HildonIMUIPrivate
   GtkWidget *menu_plugin_list;
 
   GString *plugin_buffer;
-  gboolean enable_stylus_ui;
 
   osso_context_t *osso;
 
+  gchar* cached_hkb_plugin_name;
+  gchar* cached_finger_plugin_name;
+  gchar* cached_stylus_plugin_name;
+
+  PluginData *default_hkb_plugin;
+  PluginData *default_finger_plugin;
+  PluginData *default_stylus_plugin;
+  
 };
 
 typedef struct
@@ -305,6 +315,39 @@ find_plugin_by_name (HildonIMUI *self, const gchar *name)
   return NULL;
 }
 
+static PluginData *
+get_default_plugin_by_trigger (HildonIMUI *self,
+                               HildonIMTrigger trigger)
+{
+  PluginData *plugin;
+  gchar *plugin_name;
+  
+  switch (trigger)
+  {
+  case HILDON_IM_TRIGGER_KEYBOARD :
+    plugin_name = self->priv->cached_hkb_plugin_name;
+    break;
+  case HILDON_IM_TRIGGER_FINGER :
+    plugin_name = self->priv->cached_finger_plugin_name;
+    break;
+  case HILDON_IM_TRIGGER_STYLUS :
+    plugin_name = self->priv->cached_stylus_plugin_name;
+    break;
+  case HILDON_IM_TRIGGER_NONE :
+  case HILDON_IM_TRIGGER_UNKNOWN :
+  default :
+    plugin_name = NULL;
+    break;
+  }
+
+  if (plugin_name != NULL)
+    plugin = find_plugin_by_name (self, plugin_name);
+  if (plugin == NULL)
+    plugin = find_plugin_by_trigger_type (self,
+                            trigger, HILDON_IM_TYPE_DEFAULT);
+  return plugin;
+}
+
 static void
 update_last_plugins (HildonIMUI *self, PluginData *plugin)
 {
@@ -342,41 +385,6 @@ set_current_plugin (HildonIMUI *self, PluginData *plugin)
 {
   self->priv->current_plugin = plugin;
   update_last_plugins (self, plugin);
-}
-
-static void
-set_current_plugin_by_name (HildonIMUI *self, const gchar *name)
-{
-  PluginData *plugin;
-
-  if (name == NULL)
-  {
-    g_warning ("No input method plugin specified.");
-    g_warning ("Will try to get the available plugin.");
-    plugin = find_plugin_by_trigger_type (self,
-                            HILDON_IM_TRIGGER_KEYBOARD, HILDON_IM_TYPE_DEFAULT);
-  }
-  else
-  {
-    plugin = find_plugin_by_name (self, name); 
-
-    if (plugin == NULL)
-    {
-      g_warning ("Input method specified in the configuration: %s.",
-                 name);
-      g_warning ("However this IM is not available.");
-      g_warning ("Will try to get the available plugin.");
-      plugin = find_plugin_by_trigger_type (self,
-                            HILDON_IM_TRIGGER_KEYBOARD, HILDON_IM_TYPE_DEFAULT);
-    }
-  }
-
-  if (plugin == NULL)
-  {
-    g_warning ("Unable to set any input method.");
-  } else {
-    activate_plugin (self, plugin, TRUE);
-  }
 }
 
 static GSList *
@@ -601,62 +609,42 @@ hildon_im_ui_get_plugin_info(HildonIMUI *self, gchar *name)
   return NULL;
 }
 
-
-static void
-set_plugin_to_stylus_im (HildonIMUI *self)
-{
-  gchar *plugin_name;
-
-  plugin_name = gconf_client_get_string(self->client,
-                                        GCONF_INPUT_METHOD,
-                                        NULL);
-  if (plugin_name)
-  {
-    set_current_plugin_by_name (self, plugin_name);
-    g_free (plugin_name);
-  }
-}
-
-
 static void
 hildon_im_ui_show(HildonIMUI *self)
 {
+  PluginData *plugin = NULL;
+
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
   if (self->priv->trigger == HILDON_IM_TRIGGER_UNKNOWN)
   {
-    if (self->priv->keyboard_available)
+    if (self->priv->keyboard_available && self->priv->use_finger_kb)
       self->priv->trigger = HILDON_IM_TRIGGER_KEYBOARD;
     else
       self->priv->trigger = HILDON_IM_TRIGGER_FINGER;
   }
-  
-  if ((self->priv->keyboard_available || !self->priv->use_finger_kb) &&
-      (self->priv->trigger == HILDON_IM_TRIGGER_FINGER))
+
+  if (self->priv->trigger == HILDON_IM_TRIGGER_STYLUS && self->priv->use_finger_kb)
   {
-    return;
+    plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_STYLUS);
+
+    if (plugin == NULL)
+      plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_FINGER);
+  }
+  else if (self->priv->trigger == HILDON_IM_TRIGGER_FINGER && self->priv->use_finger_kb)
+  {
+    plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_FINGER);
+
+    if (plugin == NULL)
+      plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_STYLUS);
+  }
+  else if (self->priv->keyboard_available)
+  {
+    plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_KEYBOARD);
   }
 
-  /* Remember the window which caused the IM to be shown, so we can send
-     hide event to the same window when we're hiding */
-  self->priv->shown_app_window = self->priv->app_window;
-
-  if (self->priv->trigger == HILDON_IM_TRIGGER_FINGER)
+  if (plugin != NULL)
   {
-    PluginData *plugin;
-
-    plugin = find_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_FINGER, -1);
-    if (plugin == NULL) 
-    {
-      self->priv->trigger = HILDON_IM_TRIGGER_STYLUS;
-      plugin = find_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_STYLUS, -1);
-      if  (plugin == NULL)
-      {
-        g_warning ("No finger plugin installed");
-        return;
-      }
-    }
-
     /* If the plugin is loaded, but now shown, ask it to reshow itself */
     if (plugin->widget != NULL)
     {
@@ -673,7 +661,8 @@ hildon_im_ui_show(HildonIMUI *self)
     /* Something went wrong, the plugin name, the widget and the kb mode
        are not in sync. The one known case is MCE intercepting the home
        key and the desktop forcing the fullscreen plugin to the background.
-       Restore the previous plugin for a consistent state. */
+       Restore the previous plugin for a consistent state.
+       TODO is this still needed? */
     if (self->priv->current_plugin != NULL  &&
         CURRENT_PLUGIN_IS_FULLSCREEN(self))
     {
@@ -687,11 +676,6 @@ hildon_im_ui_show(HildonIMUI *self)
     activate_plugin (self, self->priv->current_plugin, TRUE);
     hildon_im_plugin_enable (HILDON_IM_PLUGIN(self->priv->current_plugin->widget), FALSE);
   }
-  /* The plugin draws itself, or it doesn't need a UI */
-  if (self->priv->current_plugin != NULL &&
-      (self->priv->current_plugin->info->type == HILDON_IM_TYPE_HIDDEN 
-          || self->priv->current_plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE))
-      return;
 }
 
 static void
@@ -720,13 +704,17 @@ hildon_im_ui_restore_previous_mode_real(HildonIMUI *self)
 
   if (self->priv->keyboard_available)
   {
-    plugin = last_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_KEYBOARD,
-                                          HILDON_IM_TYPE_DEFAULT);
+    plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_KEYBOARD);
+    if (plugin != NULL)
+      plugin = last_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_KEYBOARD,
+                                            HILDON_IM_TYPE_DEFAULT);
   }
   else
   {
-    plugin = last_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_FINGER,
-                                       HILDON_IM_TYPE_DEFAULT);
+    plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_FINGER);
+    if (plugin != NULL)
+      plugin = last_plugin_by_trigger_type (self, HILDON_IM_TRIGGER_FINGER,
+                                            HILDON_IM_TYPE_DEFAULT);
   }
   if (plugin)
   {
@@ -752,8 +740,8 @@ hildon_im_ui_set_keyboard_state(HildonIMUI *self,
 
   if (self->priv->keyboard_available)
   { 
-    plugin = find_plugin_by_trigger_type (self,
-          HILDON_IM_TRIGGER_KEYBOARD, -1);
+    plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_KEYBOARD);
+
     if (plugin)
     {
       self->priv->trigger = HILDON_IM_TRIGGER_KEYBOARD;
@@ -762,19 +750,12 @@ hildon_im_ui_set_keyboard_state(HildonIMUI *self,
   }
   else
   {
-    if (self->priv->enable_stylus_ui)
+    /* TODO if the state changes, we remove the current plugins */
+    if (GTK_WIDGET_VISIBLE(self))
     {
       hildon_im_ui_hide(self);
-      set_plugin_to_stylus_im (self);
     }
-    else 
-    {
-      if (GTK_WIDGET_VISIBLE(self))
-      {
-        hildon_im_ui_hide(self);
-      }
-      flush_plugins(self, NULL, FALSE);
-    }
+    flush_plugins(self, NULL, FALSE);
   }
 
   hildon_im_ui_foreach_plugin(self, hildon_im_plugin_keyboard_state_changed);
@@ -884,33 +865,30 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
       }
     }
   }
-  else if (strcmp(key, HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT) == 0)
-  {
-    if (value->type == GCONF_VALUE_BOOL)
-    {
-      self->priv->select_launches_fullscreen_plugin = gconf_value_get_bool(value);
-    }
-  }
-  else if (strcmp(key, HILDON_IM_GCONF_ENABLE_STYLUS_IM) == 0)
-  {
-    if (value->type == GCONF_VALUE_BOOL)
-    {
-      self->priv->enable_stylus_ui = gconf_value_get_bool(value);
-      if (self->priv->keyboard_available == FALSE &&
-          self->priv->enable_stylus_ui == TRUE)
-      {
-        set_plugin_to_stylus_im(self);
-      }
-      if (self->priv->enable_stylus_ui == FALSE)
-        hildon_im_ui_hide(self);
-    }
-  }
   else if (strcmp(key, HILDON_IM_GCONF_USE_FINGER_KB) == 0)
   {
     if (value->type == GCONF_VALUE_BOOL)
     {
       self->priv->use_finger_kb = gconf_value_get_bool(value);
     }
+  }
+  else if (strcmp(key, GCONF_IM_HKB_PLUGIN) == 0)
+  {
+    g_free(self->priv->cached_hkb_plugin_name);
+    self->priv->cached_hkb_plugin_name =
+      gconf_client_get_string (self->client, GCONF_IM_HKB_PLUGIN, NULL);
+  }
+  else if (strcmp(key, GCONF_IM_FINGER_PLUGIN) == 0)
+  {
+    g_free(self->priv->cached_finger_plugin_name);
+    self->priv->cached_finger_plugin_name =
+      gconf_client_get_string (self->client, GCONF_IM_FINGER_PLUGIN, NULL);
+  }
+  else if (strcmp(key, GCONF_IM_STYLUS_PLUGIN) == 0)
+  {
+    g_free(self->priv->cached_stylus_plugin_name);
+    self->priv->cached_stylus_plugin_name =
+      gconf_client_get_string (self->client, GCONF_IM_STYLUS_PLUGIN, NULL);
   }
 
   for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
@@ -922,6 +900,8 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
                                         key, value);
     }
   }
+  
+  /* TODO default plugins */
 }
 
 static void
@@ -929,7 +909,6 @@ hildon_im_ui_load_gconf(HildonIMUI *self)
 {
   gchar *language;
   gint size;
-  GConfValue *gvalue;
   
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
@@ -967,26 +946,26 @@ hildon_im_ui_load_gconf(HildonIMUI *self)
         gconf_client_set_int (self->client,
                               GCONF_CURRENT_LANGUAGE, PRIMARY_LANGUAGE, NULL);
   }
-  g_free(language);  
+  g_free(language);
 
-  self->priv->select_launches_fullscreen_plugin =
-    gconf_client_get_bool(self->client, HILDON_IM_GCONF_LAUNCH_FINGER_KB_ON_SELECT, NULL);
+  self->priv->use_finger_kb = gconf_client_get_bool(self->client, 
+                                                    HILDON_IM_GCONF_USE_FINGER_KB,
+                                                    NULL);
 
-  self->priv->use_finger_kb =
-    gconf_client_get_bool(self->client, HILDON_IM_GCONF_USE_FINGER_KB, NULL);
+  g_free(self->priv->cached_hkb_plugin_name);
+  self->priv->cached_hkb_plugin_name = gconf_client_get_string (self->client,
+                                                                GCONF_IM_HKB_PLUGIN,
+                                                                NULL);
 
-  gvalue = gconf_client_get (self->client, HILDON_IM_GCONF_ENABLE_STYLUS_IM, NULL);
-  if (gvalue == NULL)
-  {
-    self->priv->enable_stylus_ui = TRUE;
-  } else
-  {
-    self->priv->enable_stylus_ui = gconf_value_get_bool (gvalue);
-    gconf_value_free (gvalue);
-  }
-  
-  /* Names of the default plugins */
-  
+  g_free(self->priv->cached_finger_plugin_name);
+  self->priv->cached_finger_plugin_name = gconf_client_get_string (self->client,
+                                                                   GCONF_IM_FINGER_PLUGIN,
+                                                                   NULL);
+
+  g_free(self->priv->cached_stylus_plugin_name);
+  self->priv->cached_stylus_plugin_name = gconf_client_get_string (self->client,
+                                                                   GCONF_IM_STYLUS_PLUGIN,
+                                                                   NULL);
 }
 
 /* Call a plugin function for each loaded plugin.
@@ -1144,6 +1123,9 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
       msg->cmd != HILDON_IM_HIDE)
   {
     self->priv->input_mode = msg->input_mode;
+    /* TODO This has been removed for now
+     * self->priv->default_input_mode = msg->default_input_mode; */
+    self->priv->default_input_mode = 0;
     if (plugin != NULL)
     {     
       hildon_im_plugin_input_mode_changed(plugin);      
@@ -1260,18 +1242,6 @@ hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
     {
       hildon_im_ui_send_communication_message(self,
           HILDON_IM_CONTEXT_HANDLE_ENTER);
-    }
-    else if (self->priv->select_launches_fullscreen_plugin)
-    {
-      PluginData *plugin;
-
-      plugin = find_plugin_by_trigger_type (self, -1,
-                                            HILDON_IM_TYPE_FULLSCREEN);
-      if (plugin)
-      {
-        set_current_plugin (self, plugin);
-        activate_plugin (self, plugin, TRUE);
-      }
     }
     else /* Toggle the visibility of the IM */
     {
@@ -1603,6 +1573,10 @@ hildon_im_ui_finalize(GObject *obj)
   gconf_client_remove_dir(self->client, HILDON_IM_GCONF_DIR, NULL);
   g_object_unref(self->client);
   g_string_free(self->priv->plugin_buffer, TRUE);
+  
+  g_free(self->priv->cached_hkb_plugin_name);
+  g_free(self->priv->cached_finger_plugin_name);
+  g_free(self->priv->cached_stylus_plugin_name);
 
   G_OBJECT_CLASS(hildon_im_ui_parent_class)->finalize(obj);
 }
@@ -1676,6 +1650,10 @@ hildon_im_ui_init(HildonIMUI *self)
   priv->keyboard_available = FALSE;
   self->client = gconf_client_get_default();
 
+  priv->cached_hkb_plugin_name = NULL;
+  priv->cached_finger_plugin_name = NULL;
+  priv->cached_stylus_plugin_name = NULL;
+
   self->osso = osso_initialize(PACKAGE_OSSO, VERSION, FALSE, NULL);
   if (!self->osso)
   {
@@ -1711,9 +1689,6 @@ hildon_im_ui_init(HildonIMUI *self)
 #else
   priv->first_boot = FALSE;
 #endif
-  
-  if (CURRENT_PLUGIN(self) == NULL && self->priv->enable_stylus_ui)
-    set_plugin_to_stylus_im (self);
 
   g_message("ui up and running");
 }
@@ -2167,6 +2142,21 @@ hildon_im_ui_get_current_input_mode(HildonIMUI *self)
 {
   g_return_val_if_fail(HILDON_IM_IS_UI(self), 0);
   return self->priv->input_mode;
+}
+
+/**
+ * hildon_im_ui_get_current_default_input_mode:
+ *
+ * @self: a #HildonIMUI
+ * @Returns: the current default #HildonIMMode
+ *
+ * Returns the current default input mode
+ */
+HildonGtkInputMode
+hildon_im_ui_get_current_default_input_mode(HildonIMUI *self)
+{
+  g_return_val_if_fail(HILDON_IM_IS_UI(self), 0);
+  return self->priv->default_input_mode;
 }
 
 /**
