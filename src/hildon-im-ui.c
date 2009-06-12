@@ -319,7 +319,7 @@ static PluginData *
 get_default_plugin_by_trigger (HildonIMUI *self,
                                HildonIMTrigger trigger)
 {
-  PluginData *plugin;
+  PluginData *plugin = NULL;
   gchar *plugin_name;
   
   switch (trigger)
