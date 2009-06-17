@@ -61,12 +61,6 @@ handle_sigterm(gint t)
   gtk_main_quit();
 }
 
-static void
-handle_sighup (gint t)
-{
-
-}
-
 static DBusHandlerResult
 dbus_msg_handler (DBusConnection *connection,
                   DBusMessage *msg,
@@ -160,11 +154,8 @@ main(int argc, char *argv[])
   sv.sa_handler = handle_sigterm;
   sigaction(SIGTERM, &sv, NULL);
 
-  /* reload IM plugins at SIGHUP */
-  sigemptyset(&sv.sa_mask);
-  sv.sa_flags = 0;
-  sv.sa_handler = handle_sighup;
-  sigaction(SIGHUP, &sv, NULL);
+  /* ignore SIGHUP */
+  signal(SIGHUP, SIG_IGN);
 
   gtk_main();
 

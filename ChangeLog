@@ -1,3 +1,8 @@
+2009-06-17  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+  * hildon-im-main.c (main) : Ignore SIGHUP.
+  * Fixes: NB#119592.
+
 2009-06-17 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 1:2.1.25-1~unreleased
