@@ -39,6 +39,7 @@
 #include <hildon/hildon-helper.h>
 #include <log-functions.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <dlfcn.h>
 #include <stdio.h>
 #include <langinfo.h>
@@ -1442,6 +1443,39 @@ hildon_im_ui_x_window_want_im_hidden(Window window)
   return ret;
 }
 
+static gint
+get_window_pid (Window window)
+{
+  Atom atom, actual_type;
+  int actual_format;
+  unsigned long nitems;
+  unsigned long bytes_after;
+  unsigned char *prop;
+  gint pid = -1, status = -1;
+
+  atom = XInternAtom(GDK_DISPLAY(), "_NET_WM_PID", True);
+  XGetAtomName (GDK_DISPLAY(), atom);
+  status = XGetWindowProperty (GDK_DISPLAY(),
+                               window,
+                               atom,
+                               0,
+                               1024,
+                               False,
+                               AnyPropertyType,
+                               &actual_type,
+                               &actual_format,
+                               &nitems,
+                               &bytes_after,
+                               &prop);
+  if (status == 0 && prop != NULL)
+  {
+    pid = prop[1] * 256;
+    pid += prop[0];
+  }
+
+  return pid;
+}
+
 static GdkFilterReturn
 hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
                                   gpointer data)
@@ -1479,40 +1513,14 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
       {
         if (nitems > 0 && window_value.window[0] != self->priv->transiency)
         {
-          if (hildon_im_ui_x_window_want_im_hidden(
-                  window_value.window[0]))
+          if (get_window_pid (window_value.window[0]) != getpid() &&
+              hildon_im_ui_x_window_want_im_hidden (window_value.window[0]))
           {
-            /* dialog / normal window,  */
-            if (GTK_WIDGET_DRAWABLE(GTK_WIDGET(self)) && 
-                self->priv->current_plugin != NULL)
-            {
-              /* Do not hide the UI when the window is another IM plugin */
-              if (CURRENT_PLUGIN_IS_FULLSCREEN(self) == FALSE)
-              {
-                hildon_im_ui_hide(self);
-              }
-            }
+            flush_plugins(self, NULL, FALSE);
           }
         }
 
         XFree(window_value.char_value);
-      }
-    }
-    else if (CURRENT_PLUGIN (self) && CURRENT_PLUGIN_IS_FULLSCREEN(self))
-    {
-      Atom current_app_window_atom =
-        XInternAtom (GDK_DISPLAY(), "_MB_CURRENT_APP_WINDOW", False);
-
-      /* A new application was started, but it did not become the
-         topmost window. Close the fullscreen plugin, showing the
-         new window */
-      if (prop->atom == current_app_window_atom &&
-          prop->window == GDK_ROOT_WINDOW())
-      {
-        if (CURRENT_IM_WIDGET(self) != NULL)
-        {
-          flush_plugins(self, NULL, FALSE);
-        }
       }
     }
   }
