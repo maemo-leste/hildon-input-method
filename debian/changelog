@@ -1,12 +1,12 @@
-hildon-input-method (1:2.1.25-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.25-1) unstable; urgency=low
 
-  * Version 1:2.1.25-1~unreleased
+  * Version 1:2.1.25-1
   * Fixes: NB#120399 Entered characters in FKB are not displayed in first name field 
     of a new contact in contacts application when incoming call is received
   * Fixes: NB#121697 FKB interaction with Bluetooth receive file dialog fails
   * Fixes: NB#119592 Memory corruption code in sighup handler.
 
- -- Felipe Erias Morandeira <femorandeira@maemo.org>  Wed, 17 Jun 2009 12:00:00 +0200 
+ -- Felipe Erias Morandeira <femorandeira@maemo.org>  Thu, 18 Jun 2009 12:00:00 +0200 
 
 hildon-input-method (1:2.1.24-1) unstable; urgency=low
 
