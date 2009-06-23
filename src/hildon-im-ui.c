@@ -1093,6 +1093,30 @@ hildon_im_ui_is_first_boot(HildonIMUI *self)
   return self->priv->first_boot;
 }
 
+static void
+hildon_im_ui_process_input_mode_message (HildonIMUI *self,
+                                         HildonIMInputModeMessage *msg)
+{
+  HildonIMPlugin *plugin = NULL;
+
+  g_return_if_fail (HILDON_IM_IS_UI(self));
+
+  if (CURRENT_PLUGIN (self) != NULL)
+  {
+    plugin = CURRENT_IM_PLUGIN (self);
+  }
+
+  if (self->priv->input_mode != msg->input_mode)
+  {
+    self->priv->input_mode = msg->input_mode;
+    self->priv->default_input_mode = msg->default_input_mode;
+    if (plugin != NULL)
+    {     
+      hildon_im_plugin_input_mode_changed(plugin);      
+    }
+  }
+}
+
 /*called when we need to process an activate message.
  *activate messages are sent as ClientMessages by other applications
  *when they need the ui to show/hide itself
@@ -1117,20 +1141,6 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
   if (CURRENT_PLUGIN (self) != NULL)
   {
     plugin = CURRENT_IM_PLUGIN (self);
-  }
-
-  /* update the mode with every message we receive, except hide */
-  if (self->priv->input_mode != msg->input_mode &&
-      msg->cmd != HILDON_IM_HIDE)
-  {
-    self->priv->input_mode = msg->input_mode;
-    /* TODO This has been removed for now
-     * self->priv->default_input_mode = msg->default_input_mode; */
-    self->priv->default_input_mode = 0;
-    if (plugin != NULL)
-    {     
-      hildon_im_plugin_input_mode_changed(plugin);      
-    }
   }
 
   switch(msg->cmd)
@@ -1289,8 +1299,17 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
     }
 
     if (cme->message_type ==
-        hildon_im_protocol_get_atom( HILDON_IM_SURROUNDING_CONTENT )
-        && cme->format == HILDON_IM_SURROUNDING_CONTENT_FORMAT)
+      hildon_im_protocol_get_atom ( HILDON_IM_INPUT_MODE)
+      && cme->format == HILDON_IM_INPUT_MODE_FORMAT)
+    {
+      HildonIMInputModeMessage *msg = (HildonIMInputModeMessage *) &cme->data;
+      hildon_im_ui_process_input_mode_message (self, msg);
+      return GDK_FILTER_REMOVE;
+    }
+
+    if (cme->message_type ==
+      hildon_im_protocol_get_atom( HILDON_IM_SURROUNDING_CONTENT )
+      && cme->format == HILDON_IM_SURROUNDING_CONTENT_FORMAT)
     {
       HildonIMSurroundingContentMessage *msg =
         (HildonIMSurroundingContentMessage *) &cme->data;
