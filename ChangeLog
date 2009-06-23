@@ -2,6 +2,8 @@
 
 	* Version 2.1.26-1~unreleased
 	* hildon-im-ui.c: Process HildonIMInputModeMessage messages.
+	* hildon-im-recache.c : Don't abort the creation of the cache if one of the
+	files can not be cached correctly.
 
 2009-06-18  Felipe Erias Morandeira <femorandeira@maemo.org>
 

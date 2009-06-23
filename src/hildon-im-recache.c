@@ -283,7 +283,6 @@ generate_cache (void)
               {
                 g_warning ("Unable writing file %s when caching %s",
                     filename, entry);
-                retval = FALSE;
                 break;
               } else {
                 retval = TRUE;
