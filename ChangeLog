@@ -1,3 +1,10 @@
+2009-06-24 Joaquim Rocha <jrocha@maemo.org>
+
+	* hildon-im-ui.c : Refactored the hildon_im_ui_show function an prevented
+	  the current plugin to be shown if the trigger is finger or stylus but
+	  the use of the virtual keyboard is disabled.
+	* Fixes: NB#124360
+
 2009-06-23  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.26-1~unreleased

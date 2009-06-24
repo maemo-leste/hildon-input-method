@@ -625,19 +625,21 @@ hildon_im_ui_show(HildonIMUI *self)
       self->priv->trigger = HILDON_IM_TRIGGER_FINGER;
   }
 
-  if (self->priv->trigger == HILDON_IM_TRIGGER_STYLUS && self->priv->use_finger_kb)
+  if (self->priv->trigger == HILDON_IM_TRIGGER_STYLUS ||
+      self->priv->trigger == HILDON_IM_TRIGGER_FINGER)
   {
-    plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_STYLUS);
+    if (!self->priv->use_finger_kb)
+      self->priv->current_plugin = NULL;
+    else
+    {
+      HildonIMTrigger fallback = self->priv->trigger == HILDON_IM_TRIGGER_FINGER ?
+                                  HILDON_IM_TRIGGER_STYLUS : HILDON_IM_TRIGGER_FINGER;
 
-    if (plugin == NULL)
-      plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_FINGER);
-  }
-  else if (self->priv->trigger == HILDON_IM_TRIGGER_FINGER && self->priv->use_finger_kb)
-  {
-    plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_FINGER);
+      plugin = get_default_plugin_by_trigger (self, self->priv->trigger);
 
-    if (plugin == NULL)
-      plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_STYLUS);
+      if (plugin == NULL)
+        plugin = get_default_plugin_by_trigger (self, fallback);
+    }
   }
   else if (self->priv->keyboard_available)
   {
