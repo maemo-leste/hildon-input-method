@@ -10,7 +10,11 @@ if [ ! -w $AF_PIDDIR ]; then
   echo "$0: Error, directory $AF_PIDDIR is not writable"
   exit 2
 fi
+
 # Small hack to have it working NOW
+if [ "x$LAUNCHWRAPPER" = "x" ]; then
+  LAUNCHWRAPPER=/etc/osso-af-init/launch-wrapper.sh
+fi
 if [ "x$LAUNCHWRAPPER_NICE_TRYRESTART" = "x" ]; then
   echo "$0: LAUNCHWRAPPER_NICE_TRYRESTART is not defined - starting with LAUNCHWRAPPER"
   LAUNCHWRAPPER_NICE_TRYRESTART=$LAUNCHWRAPPER
@@ -45,7 +49,7 @@ if [ $START = TRUE ]; then
     echo "$0: Error, DISPLAY is not defined"
     exit 2
   fi
-   source $LAUNCHWRAPPER_NICE_TRYRESTART start "$SVC" "$PROG"
+  source $LAUNCHWRAPPER_NICE_TRYRESTART start "$SVC" "$PROG"
 else
-	 source $LAUNCHWRAPPER_NICE_TRYRESTART stop "$SVC" "$PROG"
+  source $LAUNCHWRAPPER_NICE_TRYRESTART stop "$SVC" "$PROG"
 fi

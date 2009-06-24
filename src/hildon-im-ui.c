@@ -112,6 +112,7 @@ typedef struct {
   HildonIMPluginInfo  *info;
   GSList              *languages;
   GtkWidget           *widget;    /* actual IM plugin */
+  gboolean            enabled;
 
   gchar               *filename;
 } PluginData;
@@ -422,6 +423,7 @@ init_persistent_plugins(HildonIMUI *self)
       plugin->widget =
         GTK_WIDGET(hildon_im_plugin_create(self, plugin->filename));
       hildon_im_plugin_enable(HILDON_IM_PLUGIN(plugin->widget), TRUE);
+      plugin->enabled = TRUE;
     }
   }
 }
@@ -473,6 +475,7 @@ init_plugins (HildonIMUI *self)
       plugin = (PluginData *) g_malloc0 (sizeof (PluginData));
       plugin->filename = cache_get_soname (f);      
       plugin->languages = cache_get_languages (f);
+      plugin->enabled = FALSE;
       merged_languages = merge_languages (merged_languages,
           plugin->languages);
       info     = cache_get_iminfo (f);
@@ -586,6 +589,7 @@ hildon_im_ui_hide(gpointer data)
       CURRENT_IM_WIDGET (self) != NULL)
   {
     hildon_im_plugin_disable (CURRENT_IM_PLUGIN (self));
+    self->priv->current_plugin->enabled = FALSE;
   }
   return FALSE;
 }
@@ -652,7 +656,11 @@ hildon_im_ui_show(HildonIMUI *self)
     if (plugin->widget != NULL)
     {
       set_current_plugin (self, plugin);
-      hildon_im_plugin_enable (HILDON_IM_PLUGIN(plugin->widget), FALSE);
+      if (!plugin->enabled)
+      {
+        hildon_im_plugin_enable (HILDON_IM_PLUGIN(plugin->widget), FALSE);
+        plugin->enabled = TRUE;
+      }
       return;
     } 
 
@@ -678,6 +686,7 @@ hildon_im_ui_show(HildonIMUI *self)
   {
     activate_plugin (self, self->priv->current_plugin, TRUE);
     hildon_im_plugin_enable (HILDON_IM_PLUGIN(self->priv->current_plugin->widget), FALSE);
+    self->priv->current_plugin->enabled = TRUE;
   }
 }
 
@@ -1867,6 +1876,7 @@ flush_plugins(HildonIMUI *self,
       if (flush == TRUE)
       {
         hildon_im_plugin_disable(HILDON_IM_PLUGIN(i->widget));
+        i->enabled = FALSE;
 
         gtk_widget_destroy(i->widget);
         i->widget = NULL;
@@ -1913,6 +1923,7 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
   set_current_plugin (self, plugin);
   
   hildon_im_plugin_enable (CURRENT_IM_PLUGIN (self), init);
+  self->priv->current_plugin->enabled = TRUE;
   hildon_im_plugin_transition(CURRENT_IM_PLUGIN(self), FALSE);
 }
 
