@@ -1485,6 +1485,8 @@ get_window_pid (Window window)
 
   atom = XInternAtom(GDK_DISPLAY(), "_NET_WM_PID", True);
   XGetAtomName (GDK_DISPLAY(), atom);
+  
+  gdk_error_trap_push();
   status = XGetWindowProperty (GDK_DISPLAY(),
                                window,
                                atom,
@@ -1497,7 +1499,12 @@ get_window_pid (Window window)
                                &nitems,
                                &bytes_after,
                                &prop);
-  if (status == 0 && prop != NULL)
+  if (gdk_error_trap_pop())
+  {
+    /* an error in X happened :-( */
+    pid = -1;
+  }
+  else if (status == 0 && prop != NULL)
   {
     pid = prop[1] * 256;
     pid += prop[0];

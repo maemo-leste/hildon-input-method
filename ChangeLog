@@ -1,3 +1,8 @@
+2009-06-25  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* hildon-im-ui.c (get_window_pid) : Use gdk_error_trap_push and
+	gdk_error_trap_pop to avoid crashes because of X.
+
 2009-06-24  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* hildon-im-ui.c : Don't do so many extra calls to hildon_im_plugin_enable.
