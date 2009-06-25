@@ -2,6 +2,7 @@
 
 	* hildon-im-ui.c (get_window_pid) : Use gdk_error_trap_push and
 	gdk_error_trap_pop to avoid crashes because of X.
+	* Version 2.1.26-1
 
 2009-06-24  Felipe Erias Morandeira <femorandeira@maemo.org>
 

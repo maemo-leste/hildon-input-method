@@ -1,6 +1,6 @@
-hildon-input-method (1:2.1.26-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.26-1) unstable; urgency=low
 
-  * Version 1:2.1.26-1~unreleased
+  * Version 1:2.1.26-1
   * Fixes: NB#124360 FKB is coming up even when the FKB is not enabled.
 
  -- Felipe Erias Morandeira <femorandeira@maemo.org>  Thu, 24 Jun 2009 12:00:00 +0200 
