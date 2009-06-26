@@ -1,3 +1,8 @@
+2009-06-26  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 2.1.27-1~unreleased
+	* hildon-im-settings-plugin.h : Removed a trailing comma to avoid a warning.
+
 2009-06-25  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* hildon-im-ui.c (get_window_pid) : Use gdk_error_trap_push and
