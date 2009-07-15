@@ -26,6 +26,19 @@
 
 #include <gtk/gtkwidget.h>
 
+/**
+ * hildon_im_widget_load:
+ * @library_name: name of the library that contains the widget.
+ * @widget_name: name of the widget.
+ * @first_property_new: propertires to create the widget.
+ * 
+ * Loads the specified widget, with the given properties, from the specified
+ * library (which should be located with the rest of the HIM plugin libraries).
+ * The library should be a #GModule with the functions dyn_WIDGETNAME_init, 
+ * dyn_WIDGETNAME_exit and dyn_WIDGETNAME_create in it.
+ * 
+ * Returns: the loaded widget.
+ */
 GtkWidget* hildon_im_widget_load(const gchar *library_name,
                                  const gchar *widget_name,
                                  const gchar *first_property_new, 

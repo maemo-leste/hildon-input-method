@@ -32,9 +32,39 @@ struct _HildonIMLanguage
   gchar *description;
 };
 
+/**
+ * hildon_im_get_language_description:
+ * @lang: a language code
+ * 
+ * Gets the language name for the given language code.
+ * 
+ * Returns: the language's name
+ */
 gchar *hildon_im_get_language_description (const char *lang);
+
+/**
+ * hildon_im_populate_available_languages:
+ * @list: list of available languages
+ * 
+ * Sets the list of available languages in GConf.
+ */
 void hildon_im_populate_available_languages (GSList *list);
+
+/**
+ * hildon_im_get_available_languages:
+ * 
+ * Gets the list of available languages from GConf.
+ * 
+ * Returns: the #GSList of available languages
+ */
 GSList *hildon_im_get_available_languages (void);
+
+/**
+ * hildon_im_free_available_languages:
+ * @list: #GSList to be freed
+ * 
+ * Convenience function to free a #GSList with language codes. 
+ */
 void hildon_im_free_available_languages (GSList *list);
 
 #endif

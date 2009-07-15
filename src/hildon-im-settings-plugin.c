@@ -191,18 +191,6 @@ hildon_im_settings_plugin_get_type(void)
   return type;
 }
 
-/**
- * hildon_im_settings_plugin_create_widget:
- * @plugin: #HildonIMSettingsPlugin
- * @where: #HildonIMSettingsCategory, where to put the widget
- * @size_group: #GtkSizeGroup
- * @weight: #gint specifies the 'weight' or the position of the widget, 
- * negative numbers yields more top position.
- *
- * Creates the widget and gives the estimation of the weight of the widget
- * so the application can easily determine the order of the widgets created
- * by separate plugins.
- */
 GtkWidget *
 hildon_im_settings_plugin_create_widget (HildonIMSettingsPlugin *plugin,
     HildonIMSettingsCategory where, GtkSizeGroup *size_group,
@@ -227,13 +215,6 @@ hildon_im_settings_plugin_create_widget (HildonIMSettingsPlugin *plugin,
   return NULL;
 }
 
-/**
- * hildon_im_settings_plugin_value_changed:
- * @plugin: #HildonIMSettingsPlugin
- *
- * Called when a value in the settings changed. The plugin might want to do something when
- * other plugin change it's settings.
- */
 void
 hildon_im_settings_plugin_value_changed (HildonIMSettingsPlugin *plugin, 
 		const gchar *key,
@@ -256,17 +237,6 @@ hildon_im_settings_plugin_value_changed (HildonIMSettingsPlugin *plugin,
   }
 }
 
-/**
- * hildon_im_settings_plugin_save_data:
- * @plugin: #HildonIMSettingsPlugin
- * @where: #gint where the saving occured.
- *
- * If @where is 0 then it occured in the applet main UI, and 
- * if it is 1 then it occured in the languages dialog.
- * Some plugins which don't have settings in the language dialog
- * may want to skip the saving if the changes made in the language
- * dialog, and vice versa.
- */
 void
 hildon_im_settings_plugin_save_data (HildonIMSettingsPlugin *plugin, HildonIMSettingsCategory where)
 {
@@ -287,15 +257,9 @@ hildon_im_settings_plugin_save_data (HildonIMSettingsPlugin *plugin, HildonIMSet
   }
 }
 
-/**
- * hildon_im_settings_plugin_set_manager:
- * @plugin: #HildonIMSettingsPlugin
- * @m: #HildonIMSettingsPluginManager
- *
- * Sets a manager to the plugin
- */
 static void
-set_manager (HildonIMSettingsPlugin *plugin, HildonIMSettingsPluginManager *m)
+hildon_im_settings_plugin_set_manager (HildonIMSettingsPlugin *plugin,
+                                       HildonIMSettingsPluginManager *m)
 {
   HildonIMSettingsPluginIface *iface=NULL;
 
@@ -398,7 +362,7 @@ load_module (HildonIMSettingsPluginManager *m, const gchar *filename)
       plugin = module->create ();
       g_type_module_unuse (G_TYPE_MODULE (module));
 
-			set_manager (plugin, m);
+      hildon_im_settings_plugin_set_manager (plugin, m);
       info->plugin = plugin;
       info->name = g_strdup (filename);
       m->plugin_list = g_slist_prepend (m->plugin_list, info);
@@ -416,13 +380,8 @@ load_module (HildonIMSettingsPluginManager *m, const gchar *filename)
   return FALSE;
 }
 
-/**
- * hildon_im_settings_plugin_unload_plugins:
- *
- * Unloads all plugins loaded
- */
-static void
-unload_plugins (HildonIMSettingsPluginManager *m)
+void
+hildon_im_settings_plugin_manager_unload_plugins (HildonIMSettingsPluginManager *m)
 {
   GSList *iter;
 
@@ -441,11 +400,6 @@ unload_plugins (HildonIMSettingsPluginManager *m)
   }
 }
 
-/**
- * hildon_im_settings_plugin_load_plugins:
- *
- * Loads all available plugins
- */
 gboolean
 hildon_im_settings_plugin_manager_load_plugins (HildonIMSettingsPluginManager *m)
 {
@@ -476,11 +430,6 @@ hildon_im_settings_plugin_manager_load_plugins (HildonIMSettingsPluginManager *m
   return TRUE;
 }
 
-/**
- * hildon_im_settings_plugin_manager_new:
- *
- * Creates a Settings Plugin Manager
- */
 HildonIMSettingsPluginManager *
 hildon_im_settings_plugin_manager_new (void)
 {
@@ -495,16 +444,11 @@ hildon_im_settings_plugin_manager_new (void)
   return manager;
 }
 
-/**
- * hildon_im_settings_plugin_manager_destroy:
- *
- * Destroy a Settings Plugin Manager
- */
 void
 hildon_im_settings_plugin_manager_destroy (HildonIMSettingsPluginManager *m)
 {
   g_return_if_fail (m != NULL);
-  unload_plugins (m);  
+  hildon_im_settings_plugin_manager_unload_plugins (m);  
   cleanup_hash (m);
   g_slist_free (m->plugin_list);
   g_free (m);
@@ -512,11 +456,6 @@ hildon_im_settings_plugin_manager_destroy (HildonIMSettingsPluginManager *m)
   manager = NULL;
 }
 
-/**
- * hildon_im_settings_plugin_get_plugins:
- *
- * Gets the plugin list
- */
 GSList *
 hildon_im_settings_plugin_manager_get_plugins (HildonIMSettingsPluginManager *m)
 {
@@ -543,22 +482,6 @@ plugin_data_changed (HildonIMSettingsPluginManager *m,
   }
 }
 
-/**
- * hildon_im_settings_plugin_set_internal_value:
- * @key: const #gchar, the key
- * @value: #gpointer the value
- *
- * Sets an internal value.
- *
- * Some plugins may want to know the value of other plugin's value
- * or even the value set in the application. With this value
- * registration system, any plugins can peek what's the settings
- * of other plugin so it can modify the state of it's widget 
- * based on the information. For example, the dual dictionary
- * setting in word completion plugg_in needs to know whether the
- * secondary language is set or not. If it is set then it can
- * enable the check box, and dim it otherwise
- */
 void
 hildon_im_settings_plugin_manager_set_internal_value (HildonIMSettingsPluginManager *m, 
     GType type, 
@@ -575,13 +498,6 @@ hildon_im_settings_plugin_manager_set_internal_value (HildonIMSettingsPluginMana
   plugin_data_changed (m, key, type, value);
 }
 
-/**
- * hildon_im_settings_plugin_unset_internal_value:
- * @key: const #gchar, the key
- * @value: #gpointer the value
- *
- * Unsets/removes the internal value
- */
 void
 hildon_im_settings_plugin_manager_unset_internal_value (HildonIMSettingsPluginManager *m, 
     const gchar *key)
@@ -591,12 +507,6 @@ hildon_im_settings_plugin_manager_unset_internal_value (HildonIMSettingsPluginMa
   plugin_data_changed (m, key, G_TYPE_NONE, NULL);
 }
 
-/** 
- * hildon_im_settings_plugin_get_internal_value:
- * @key: the key
- *
- * Gets the internal value for the specified key.
- */
 gpointer
 hildon_im_settings_plugin_manager_get_internal_value (HildonIMSettingsPluginManager *m, 
     const gchar *key, GType *type)

@@ -47,6 +47,26 @@ typedef struct _HildonIMPluginIface HildonIMPluginIface;
         (G_TYPE_INSTANCE_GET_INTERFACE((inst), HILDON_IM_TYPE_PLUGIN, \
                                        HildonIMPluginIface))
 
+/**
+ * HildonIMPluginInfo:
+ * 
+ * Common information that all plugins should provide.
+ * 
+ * @description: the plugin's description
+ * @name: the plugin's name
+ * @menu_title: the name given to the plugin in a menu. Deprecated: not used in Fremantle
+ * @gettext_domain: the #gettext domain for the plugin
+ * @visible_in_menu: if the plugin is visible in the HIM menu. Deprecated: not used in Fremantle
+ * @cached: if the plugin can be cached
+ * @type: the plugin's #HildonIMPluginType
+ * @group: the plugin's #HildonIMPluginGroup
+ * @priority: the plugin's priority; it's better to use the "default-plugins" GConf keys
+ * @special_plugin
+ * @ossohelp_id
+ * @disable_common_buttons
+ * @height
+ * @trigger: the #HildonIMTrigger that the plugin is intended to work with
+ */
 typedef struct
 {
   gchar      *description;
@@ -70,29 +90,44 @@ typedef struct
 
 #define HILDON_IM_DEFAULT_PLUGIN_PRIORITY 0
 
-enum
+/**
+ * HildonIMPluginGroup:
+ * 
+ * The plugins can be intended for Latin, CJK or other languages.
+ * 
+ * @HILDON_IM_GROUP_LATIN: Lating languajes
+ * @HILDON_IM_GROUP_CJK: Chinese, Japanese and Korean
+ * @HILDON_IM_GROUP_CUSTOM: Other languages
+ */
+typedef enum
 {
   HILDON_IM_GROUP_LATIN,
   HILDON_IM_GROUP_CJK,
   HILDON_IM_GROUP_CUSTOM = 0x1000
-};
+} HildonIMPluginGroup;
 
+/**
+ * HildonIMPluginType:
+ * 
+ * The different kinds of plugins. Note that some of them aren't supported in
+ * Framentle because the HIM UI has been removed.
+ * 
+ * @HILDON_IM_TYPE_DEFAULT: The plugin uses default UI. Deprecated: Not used in Fremantle.
+ * @HILDON_IM_TYPE_SPECIAL: The plugin is called by another plugin. Deprecated: Not used in Fremantle.
+ * @HILDON_IM_TYPE_FULLSCREEN: The plugin is fullscreen
+ * @HILDON_IM_TYPE_PERSISTENT: The plugin is loaded at startup and never removed.
+ * @HILDON_IM_TYPE_OTHERS: The plugin doesn't fall into any of categories above.
+ * @HILDON_IM_TYPE_HIDDEN: The plugin doesn't have a graphical UI.
+ * @HILDON_IM_TYPE_SPECIAL_STANDALONE: A special plugin that has its own window
+ */
 typedef enum
 {
-  /* The plugin uses default UI */
   HILDON_IM_TYPE_DEFAULT,
-  /* The plugin is called by another plugin */
   HILDON_IM_TYPE_SPECIAL,
-  /* The plugin is fullscreen */
   HILDON_IM_TYPE_FULLSCREEN,
-  /* The plugin is loaded at startup and never removed */
   HILDON_IM_TYPE_PERSISTENT,
-  /* The plugin doesn't fall into any of categories above */
   HILDON_IM_TYPE_OTHERS,
-  /* TODO New in Fremantle:
-   * The plugin doesn't have a graphical UI */
   HILDON_IM_TYPE_HIDDEN,
-  /* A special plugin that has its own window */
   HILDON_IM_TYPE_SPECIAL_STANDALONE
 } HildonIMPluginType;
 

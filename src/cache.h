@@ -27,9 +27,13 @@
 #include <glib.h>
 #include <stdio.h>
 #include "hildon-im-plugin.h"
-/*
 
+/**
+ * hildon-input-method cache file
+ * 
+<programlisting>
 Cache file format:
+
 Offset  Size  Description
 0       3     'HIM'   Signature
 4       1     0       Version
@@ -53,7 +57,7 @@ String:
 
 NULL values in string are not stored (only the length which is = 0).
 Enums values are stored as integer.
-  
+</programlisting>
 */
 
 #define CACHE_SIGNATURE   "HIM"
@@ -67,12 +71,78 @@ enum {
   CACHE_DIRECTORY
 };
 
-gchar *get_cache_file (gint);
-gint   cache_get_number_of_plugins (FILE *f);
+/**
+ * get_cache_file:
+ * @mode: One of %CACHE_FILENAME, %CACHE_FILENAME_TMP or %CACHE_DIRECTORY.
+ * 
+ * Gets the location of the desired file/folder.
+ * 
+ * Returns: a newly allocated string with the desired location.
+ */
+gchar *get_cache_file (gint mode);
+
+/**
+ * cache_get_number_of_plugins:
+ * @f: the cache file
+ * 
+ * Gets the number of plugins stored in the cache file.
+ * 
+ * Returns: the number of plugins.
+ */
+gint cache_get_number_of_plugins (FILE *f);
+
+/**
+ * cache_get_iminfo:
+ * @f: the cache file
+ * 
+ * 
+ * 
+ * Returns:
+ */
 HildonIMPluginInfo *cache_get_iminfo (FILE *f);
+
+/**
+ * cache_get_languages:
+ * @f: the cache file
+ * 
+ * Gets the languages from a cache file.
+ * 
+ * Returns: list with the language codes.
+ */
 GSList *cache_get_languages (FILE *f);
+
+/**
+ * init_cache:
+ * 
+ * Gets the cache file.
+ * 
+ * Returns: the cache file.
+ */
 FILE  *init_cache (void);
+
+/**
+ * free_language_list:
+ * @list: the list to be freed
+ * 
+ * Convenience function to free a list of #gchar*.
+ */
 void free_language_list (GSList *list);
+
+/**
+ * cache_get_soname:
+ * @f: the cache file
+ * 
+ * Gets the name of the .so file associated with the cache.
+ * 
+ * Returns: the name of the .so file.
+ */
 gchar *cache_get_soname (FILE *f);
-void free_iminfo (HildonIMPluginInfo *);
+
+/**
+ * free_iminfo:
+ * @info: struct of type #HildonIMPluginInfo to be freed.
+ * 
+ * Frees a #HildonIMPluginInfo.
+ */
+void free_iminfo (HildonIMPluginInfo *info);
 #endif

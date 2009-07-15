@@ -30,6 +30,12 @@
 
 #define GCONF_AVAILABLE_LANGUAGES           HILDON_IM_GCONF_DIR "/available_languages"
 
-/* comes from Hildon IM UI */
-void reload_plugins (HildonIMUI *self);
+/**
+ * hildon_im_reload_plugins:
+ * @self: a #HildonIMUI
+ * 
+ * This function comes from #HildonIMUI, but it has been placed here because
+ * it is intended that it will not be available to the external world, and
+ * this file will not be included in the development package. */
+void hildon_im_reload_plugins (HildonIMUI *self);
 #endif

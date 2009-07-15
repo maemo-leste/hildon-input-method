@@ -495,7 +495,7 @@ init_plugins (HildonIMUI *self)
 }
 
 void
-reload_plugins (HildonIMUI *self)
+hildon_im_reload_plugins (HildonIMUI *self)
 {
   self->priv->plugins_available = init_plugins (self);
   if (self->priv->plugins_available == FALSE)
@@ -506,7 +506,7 @@ reload_plugins (HildonIMUI *self)
   }
 }
 
-/**
+/*
  * hildon_im_hw_cb:
  * @state: device HW state structure
  * @data: user defined data (self)
@@ -1748,15 +1748,6 @@ hildon_im_ui_class_init(HildonIMUIClass *klass)
 
 /* Public methods **********************************************/
 
-
-/**
- * hildon_im_ui_new:
- * @dir: the name od the directory where ui layouts are located
- *
- * @Returns: a newly allocated #HildonIMUI
- *
- * Creates and returns a #HildonIMUI
- */
 GtkWidget *
 hildon_im_ui_new()
 {
@@ -1792,54 +1783,24 @@ hildon_im_ui_new()
   return GTK_WIDGET(self);
 }
 
-/**
- * hildon_im_ui_get_surrounding:
- * @self: a #HildonIMUI
- *
- * @Returns: the surrounding text
- *
- * Returns the context around the cursor
- */
 const gchar *
 hildon_im_ui_get_surrounding(HildonIMUI *self)
 {
   return self->priv->surrounding;
 }
 
-/**
- * hildon_im_ui_get_surrounding_offest:
- * @self: a #HildonIMUI
- *
- * @Returns: the offset
- *
- * Returns the character offset of the cursor in the surrounding content
- */
 gint
 hildon_im_ui_get_surrounding_offset(HildonIMUI *self)
 {
   return self->priv->surrounding_offset;
 }
 
-/**
- * hildon_im_ui_get_commit_mode:
- * @self: a #HildonIMUI
- *
- * @Returns: the commit mode
- *
- * Returns the mode by which insertions can be made into the surrounding
- */
 HildonIMCommitMode
 hildon_im_ui_get_commit_mode(HildonIMUI *self)
 {
   return self->priv->commit_mode;
 }
 
-/**
- *hildon_im_ui_restore_previous_mode:
- * @self: a #HildonIMUI
- *
- * Restores the previous mode.
- */
 void
 hildon_im_ui_restore_previous_mode(HildonIMUI *self)
 {
@@ -2011,14 +1972,6 @@ hildon_im_ui_send_event(HildonIMUI *self, Window window, XEvent *event)
   }
 }
 
-/**
- * hildon_im_ui_send_utf8:
- * @self: a #HildonIMUI
- * @utf8: string to send
- *
- * Sends the utf8 string as an XEvent via XServer
- *
- */
 void
 hildon_im_ui_send_utf8(HildonIMUI *self, const gchar *utf8)
 {
@@ -2062,13 +2015,6 @@ hildon_im_ui_send_utf8(HildonIMUI *self, const gchar *utf8)
   } while (*utf8);
 }
 
-/**
- * hildon_im_ui_send_communication_message:
- * @self: a #HildonIMUI
- * @message: the type of #HildonIMComMessage to send
- *
- * Sends a #HildonIMComMessage of type @message with a XEvent
- */
 void
 hildon_im_ui_send_communication_message(HildonIMUI *self,
                                         gint message)
@@ -2089,13 +2035,6 @@ hildon_im_ui_send_communication_message(HildonIMUI *self,
   hildon_im_ui_send_event(self, self->priv->input_window, &event);
 }
 
-/**
- * hildon_im_ui_send_surrounding_content:
- * @self: a #HildonIMUI
- * @surrounding: the surrounding context
- *
- * Sends the surrounding context around the insertion point
- */
 void
 hildon_im_ui_send_surrounding_content(HildonIMUI *self,
                                       const gchar *surrounding)
@@ -2148,13 +2087,6 @@ hildon_im_ui_send_surrounding_content(HildonIMUI *self,
   hildon_im_ui_send_event(self, self->priv->input_window, &event);
 }
 
-/**
- * hildon_im_ui_send_surrounding_offset:
- * @self: a #HildonIMUI
- * @offset: the character offset of the insertion point
- *
- * Sends the character offset of the cursor location in the surrounding content
- */
 void
 hildon_im_ui_send_surrounding_offset(HildonIMUI *self,
                                      gboolean is_relative,
@@ -2175,15 +2107,6 @@ hildon_im_ui_send_surrounding_offset(HildonIMUI *self,
   hildon_im_ui_send_event(self, self->priv->input_window, &event);
 }
 
-/**
- * hildon_im_ui_get_current_input_mode:
- *
- * @self: a #HildonIMUI
- * @Returns: the current #HildonIMMode of the ui
- *
- * Returns the current input mode of the ui or #HILDON_IM_HIDE if
- * @self is not a valid #HildonIMUI
- */
 HildonGtkInputMode
 hildon_im_ui_get_current_input_mode(HildonIMUI *self)
 {
@@ -2191,14 +2114,6 @@ hildon_im_ui_get_current_input_mode(HildonIMUI *self)
   return self->priv->input_mode;
 }
 
-/**
- * hildon_im_ui_get_current_default_input_mode:
- *
- * @self: a #HildonIMUI
- * @Returns: the current default #HildonIMMode
- *
- * Returns the current default input mode
- */
 HildonGtkInputMode
 hildon_im_ui_get_current_default_input_mode(HildonIMUI *self)
 {
@@ -2206,14 +2121,6 @@ hildon_im_ui_get_current_default_input_mode(HildonIMUI *self)
   return self->priv->default_input_mode;
 }
 
-/**
- * hildon_im_ui_get_autocase_mode:
- * @self: a #HildonIMUI
- * @Returns: the autocase mode of the ui
- *
- * Returns the autocase mode of the ui or #HILDON_IM_LOW if
- * @self is not a valid #HildonIMUI
- */
 HildonIMCommand
 hildon_im_ui_get_autocase_mode(HildonIMUI *self)
 {
