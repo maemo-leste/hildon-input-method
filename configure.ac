@@ -36,6 +36,9 @@ PKG_PROG_PKG_CONFIG
 
 AC_HEADER_STDC
 
+# check for gtk-doc
+GTK_DOC_CHECK(1.9)
+
 AC_ARG_ENABLE([maemo-launcher],
 	[AS_HELP_STRING([--enable-maemo-launcher],
 		[build with maemo-launcher support])],
@@ -129,4 +132,5 @@ AM_GLIB_GNU_GETTEXT
 AC_OUTPUT([Makefile \
 	hildon-input-method-ui-3.0.pc \
 	debian/libhildon-im-ui3.postinst \
-	src/Makefile])
+	src/Makefile \
+	docs/Makefile])

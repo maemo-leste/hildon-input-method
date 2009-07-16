@@ -5,7 +5,7 @@
 # Contact: Mohammad Anwari <Mohammad.Anwari@nokia.com>
 #
 
-SUBDIRS = src
+SUBDIRS = src docs
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = hildon-input-method-ui-3.0.pc 
