@@ -130,9 +130,12 @@ void hildon_im_settings_plugin_save_data (HildonIMSettingsPlugin *, HildonIMSett
  *
  * Sets a manager to the plugin
  */
+
+/** XXX do not define static function in head file
 static void
 hildon_im_settings_plugin_set_manager (HildonIMSettingsPlugin *plugin,
                                        HildonIMSettingsPluginManager *m);
+				       **/
 
 /* TODO split the APIs of HildonIMSettingsPlugin and 
  * HildonIMSettingsPluginManager in two sets of source files 
