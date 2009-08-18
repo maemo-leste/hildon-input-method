@@ -1357,9 +1357,12 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
       self->priv->commit_mode = msg->commit_mode;
       self->priv->surrounding_offset = msg->cursor_offset;
 
-      hildon_im_plugin_surrounding_received(CURRENT_IM_PLUGIN (self),
-                                            self->priv->surrounding,
-                                            self->priv->surrounding_offset);
+      if (CURRENT_PLUGIN(self) != NULL && CURRENT_IM_WIDGET(self) != NULL)
+      {
+        hildon_im_plugin_surrounding_received(CURRENT_IM_PLUGIN (self),
+                                              self->priv->surrounding,
+                                              self->priv->surrounding_offset);
+      }
       
       return GDK_FILTER_REMOVE;
     }
