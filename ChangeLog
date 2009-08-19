@@ -1,3 +1,8 @@
+2009-08-19 Joaquim Rocha <jrocha@maemo.org>
+
+	* hildon-im-ui.c : Set the correct the X Window atom used to get the current
+	  application's window in order to flush the plugins.
+
 2009-08-18  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.29-1~unreleased

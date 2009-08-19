@@ -1530,7 +1530,7 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
   if ( ((XEvent *) xevent)->type == PropertyNotify )
   {
     Atom active_window_atom =
-            XInternAtom (GDK_DISPLAY(), "_NET_ACTIVE_WINDOW", False);
+            XInternAtom (GDK_DISPLAY(), "_MB_CURRENT_APP_WINDOW", False);
     XPropertyEvent *prop = (XPropertyEvent *) xevent;
 
     if (prop->atom == active_window_atom && prop->window == GDK_ROOT_WINDOW())
