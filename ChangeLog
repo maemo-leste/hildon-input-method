@@ -1,3 +1,8 @@
+2009-08-21  Felipe Erias Morandeira <femorandeira@maemo.org>
+
+	* Version 2.1.30-1
+	* hildon-im-ui.c (hildon_im_ui_send_utf8) : Use the message tags correctly
+
 2009-08-20  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.29-1

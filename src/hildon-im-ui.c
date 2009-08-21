@@ -2001,6 +2001,9 @@ hildon_im_ui_send_utf8(HildonIMUI *self, const gchar *utf8)
     len = next_start - utf8;
     g_return_if_fail (0 <= len && len < HILDON_IM_CLIENT_MESSAGE_BUFFER_SIZE);
 
+    if (*next_start == '\0')
+      flag = HILDON_IM_MSG_END;
+
     /*this call will take care of adding the null terminator*/
     memset( &event, 0, sizeof(XEvent) );
     event.xclient.message_type =
