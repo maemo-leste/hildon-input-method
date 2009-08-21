@@ -31,7 +31,6 @@
 
 #include <gtk/gtksizegroup.h>
 #include <gtk/gtkwidget.h>
-#include <libosso.h>
 #include "hildon-im-ui.h"
 
 G_BEGIN_DECLS
