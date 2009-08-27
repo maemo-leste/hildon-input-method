@@ -1118,7 +1118,8 @@ hildon_im_ui_process_input_mode_message (HildonIMUI *self,
     plugin = CURRENT_IM_PLUGIN (self);
   }
 
-  if (self->priv->input_mode != msg->input_mode)
+  if (self->priv->input_mode != msg->input_mode ||
+      self->priv->default_input_mode != msg->default_input_mode)
   {
     self->priv->input_mode = msg->input_mode;
     self->priv->default_input_mode = msg->default_input_mode;
