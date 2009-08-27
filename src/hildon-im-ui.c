@@ -1063,7 +1063,8 @@ hildon_im_ui_set_client(HildonIMUI *self,
   /* Try to avoid unneededly calling client_widget_changed(), because we
      can get here if popup menu closes and we get another focus_in event.
      We don't want word completion list to clear because of it. */
-  if (self->priv->input_window != msg->input_window)
+  if ((self->priv->input_window != msg->input_window) ||
+      (msg->cmd == HILDON_IM_SETCLIENT))
   {
     PluginData *info = NULL;
     self->priv->input_window = msg->input_window;

@@ -2,7 +2,9 @@
 
 	* Version 2.1.31-1~unreleased
 	* hildon-im-ui.c: When receiving X events now we check for the
-	  last window in the list given by _NET_CLIENT_LIST_STACKING X Atom name.
+	  last window in the list given by _NET_CLIENT_LIST_STACKING X Atom name;
+	  The client widget is now reset every time the HILDON_IM_SETCLIENT command
+	  is received.
 
 2009-08-21  Felipe Erias Morandeira <femorandeira@maemo.org>
 
