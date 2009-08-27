@@ -1,3 +1,9 @@
+2009-08-27 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.31-1~unreleased
+	* hildon-im-ui.c: When receiving X events now we check for the
+	  last window in the list given by _NET_CLIENT_LIST_STACKING X Atom name.
+
 2009-08-21  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.30-1

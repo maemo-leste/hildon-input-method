@@ -1529,11 +1529,18 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
 
   if ( ((XEvent *) xevent)->type == PropertyNotify )
   {
+    /* We check the _NET_CLIENT_LIST because we need to get the last window
+     * within the list. Before, we were checking the _MB_CURRNET_APP_WINDOW
+     * but it wouldn't always point to the last application called, this way,
+     * applications called when a fullscreen and modal plugin was running,
+     * would be shown behind that plugin. */
     Atom active_window_atom =
-            XInternAtom (GDK_DISPLAY(), "_MB_CURRENT_APP_WINDOW", False);
+            XInternAtom (GDK_DISPLAY(), "_NET_CLIENT_LIST_STACKING", False);
     XPropertyEvent *prop = (XPropertyEvent *) xevent;
 
-    if (prop->atom == active_window_atom && prop->window == GDK_ROOT_WINDOW())
+    gboolean is_fullscreen = CURRENT_PLUGIN (self) != NULL && CURRENT_PLUGIN_IS_FULLSCREEN (self);
+
+    if ((prop->atom == active_window_atom || is_fullscreen) && prop->window == GDK_ROOT_WINDOW())
     {
       /* Focused window changed, if it's a dialog or normal window hide IM. */
       Atom actual_type;
@@ -1551,10 +1558,12 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
                          &window_value.char_value);
       if (gdk_error_trap_pop() == 0)
       {
-        if (nitems > 0 && window_value.window[0] != self->priv->transiency)
+        /* We need the last window from the list as it represents the last window to be shown */
+        gint last_window_index = nitems - 1;
+        if (nitems > 0 && window_value.window[last_window_index] != self->priv->transiency)
         {
-          if (get_window_pid (window_value.window[0]) != getpid() &&
-              hildon_im_ui_x_window_want_im_hidden (window_value.window[0]))
+          if (get_window_pid (window_value.window[last_window_index]) != getpid() &&
+              hildon_im_ui_x_window_want_im_hidden (window_value.window[last_window_index]))
           {
             flush_plugins(self, NULL, FALSE);
           }
