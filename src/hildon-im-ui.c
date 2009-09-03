@@ -1048,6 +1048,7 @@ hildon_im_ui_set_client(HildonIMUI *self,
                         HildonIMActivateMessage *msg,
                         gboolean show)
 {
+  gboolean input_window_changed;
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
   /* Workaround for matchbox feature. */
@@ -1063,16 +1064,19 @@ hildon_im_ui_set_client(HildonIMUI *self,
   /* Try to avoid unneededly calling client_widget_changed(), because we
      can get here if popup menu closes and we get another focus_in event.
      We don't want word completion list to clear because of it. */
-  if ((self->priv->input_window != msg->input_window) ||
-      (msg->cmd == HILDON_IM_SETCLIENT))
+  input_window_changed = self->priv->input_window != msg->input_window;
+  if (input_window_changed || msg->cmd == HILDON_IM_SETCLIENT)
   {
     PluginData *info = NULL;
     self->priv->input_window = msg->input_window;
 
     info = CURRENT_PLUGIN (self);
 
-    hildon_im_ui_send_communication_message(self,
-          HILDON_IM_CONTEXT_WIDGET_CHANGED);
+    if (input_window_changed)
+    {
+      hildon_im_ui_send_communication_message(self,
+                                              HILDON_IM_CONTEXT_WIDGET_CHANGED);
+    }
 
     if (info != NULL && info->widget != NULL)
     {
