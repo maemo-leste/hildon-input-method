@@ -1559,7 +1559,7 @@ hildon_im_ui_focus_message_filter(GdkXEvent *xevent, GdkEvent *event,
 
       gdk_error_trap_push();
       XGetWindowProperty(GDK_DISPLAY(), GDK_ROOT_WINDOW(), active_window_atom,
-                         0, 32, False, XA_WINDOW, &actual_type,
+                         0, G_MAXLONG, False, XA_WINDOW, &actual_type,
                          &actual_format, &nitems, &bytes_after,
                          &window_value.char_value);
       if (gdk_error_trap_pop() == 0)

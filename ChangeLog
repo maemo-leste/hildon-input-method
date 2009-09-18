@@ -1,3 +1,10 @@
+2009-09-18 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.33-1~unreleased
+	* hildon-im-ui.c (hildon_im_ui_focus_message_filter): Changed the maximum
+	  length of the data to be retrieved when getting the list of stacked windows
+	* Fixes: NB#138852
+
 2009-09-03  Felipe Erias Morandeira <femorandeira@maemo.org>
 
 	* Version 2.1.32-1
