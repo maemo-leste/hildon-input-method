@@ -2,7 +2,10 @@
 
 	* Version 2.1.33-1~unreleased
 	* hildon-im-ui.c (hildon_im_ui_focus_message_filter): Changed the maximum
-	  length of the data to be retrieved when getting the list of stacked windows
+	  length of the data to be retrieved when getting the list of stacked windows.
+	* hildon-im-ui.c (hildon_im_ui_toggle_special_plugin): Removed checking for
+	  the current plugin's widget in order to avoid SCV not being shown when called
+	  after it was hidden due to another application being shown of screen timeout.
 	* Fixes: NB#138852
 
 2009-09-03  Felipe Erias Morandeira <femorandeira@maemo.org>

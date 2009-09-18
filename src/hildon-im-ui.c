@@ -1237,9 +1237,6 @@ hildon_im_ui_toggle_special_plugin(HildonIMUI *self)
 static void
 hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
 {
-  if (CURRENT_PLUGIN (self) && CURRENT_IM_WIDGET (self) == NULL)
-    return;
-
   self->priv->input_window = msg->input_window;
 
   if (msg->type == GDK_KEY_PRESS && self->priv->current_banner != NULL)
