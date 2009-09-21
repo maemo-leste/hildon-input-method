@@ -1,9 +1,9 @@
-hildon-input-method (1:2.1.33-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.33-1) unstable; urgency=low
 
-  * Version 1:2.1.33-1~unreleased
+  * Version 1:2.1.33-1
   * Fixes: NB#138852 virtual keyboard not working in case too many widgets, shortcuts and bookmarks installed
 
- -- Felipe Erias Morandeira <femorandeira@maemo.org>  Fri, 18 Sep 2009 12:00:00 +0200 
+ -- Felipe Erias Morandeira <femorandeira@maemo.org>  Mon, 21 Sep 2009 12:00:00 +0200 
 
 hildon-input-method (1:2.1.32-1) unstable; urgency=low
 
