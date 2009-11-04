@@ -1486,11 +1486,10 @@ get_window_pid (Window window)
   int actual_format;
   unsigned long nitems;
   unsigned long bytes_after;
-  unsigned char *prop;
+  unsigned char *prop = NULL;
   gint pid = -1, status = -1;
 
   atom = XInternAtom(GDK_DISPLAY(), "_NET_WM_PID", True);
-  XGetAtomName (GDK_DISPLAY(), atom);
   
   gdk_error_trap_push();
   status = XGetWindowProperty (GDK_DISPLAY(),
@@ -1514,6 +1513,8 @@ get_window_pid (Window window)
   {
     pid = prop[1] * 256;
     pid += prop[0];
+
+    XFree (prop);
   }
 
   return pid;
