@@ -1,6 +1,6 @@
-hildon-input-method (1:2.1.35-1~unreleased) unstable; urgency=low
+hildon-input-method (1:2.1.35-1) unstable; urgency=low
 
-  * Version 1:2.1.35-1~unreleased
+  * Version 1:2.1.35-1
   * Fixes: NB#144300 Observed GLIB CRITICAL ** Gtk - gtk_widget_destroy: assertion `GTK_IS_WIDGET (widget)' failed.
 
  -- Joaquim Rocha <jrocha@maemo.org>  Fri, 06 Nov 2009 12:00:00 +0200
