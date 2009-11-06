@@ -1200,6 +1200,10 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
          hildon_banner_show_information (GTK_WIDGET(self), NULL,
                                          dgettext(HILDON_IM_STRING,
                                                   "inpu_ib_mode_shift_locked"));
+    g_signal_connect (self->priv->current_banner,
+                      "destroy",
+                      G_CALLBACK (gtk_widget_destroyed),
+                      &self->priv->current_banner);
       break;
     case HILDON_IM_SHIFT_UNLOCKED :
       break;
@@ -1208,6 +1212,10 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
          hildon_banner_show_information (GTK_WIDGET(self), NULL,
                                          dgettext(HILDON_IM_STRING,
                                                   "inpu_ib_mode_fn_locked"));
+      g_signal_connect (self->priv->current_banner,
+                        "destroy",
+                        G_CALLBACK (gtk_widget_destroyed),
+                        &self->priv->current_banner);
       break;
     case HILDON_IM_MOD_UNLOCKED :
       break;
@@ -1427,6 +1435,11 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
       self->priv->current_banner = hildon_banner_show_information (GTK_WIDGET(self), NULL,
                                       dgettext(HILDON_COMMON_STRING,
                                                "ecoc_ib_edwin_copied"));
+
+      g_signal_connect (self->priv->current_banner,
+                        "destroy",
+                        G_CALLBACK (gtk_widget_destroyed),
+                        &self->priv->current_banner);
 
       return GDK_FILTER_REMOVE;
     }

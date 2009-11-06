@@ -1,3 +1,11 @@
+2009-11-06 Eduardo Lima Mitev <e-lima@maemo.org>
+
+	* Version 2.1.35-1~unreleased
+	* hildon-im-ui.c: Detects when an information banner that is being shown is
+	  to be destroyed and nulls the private reference to it avoiding to
+	  re-destroy it during a key-press or clean-up.
+	* Fixes: NB#144300
+
 2009-11-05 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.34-1
