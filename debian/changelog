@@ -8,7 +8,7 @@ hildon-input-method (1:2.1.35-1) unstable; urgency=low
 hildon-input-method (1:2.1.34-1) unstable; urgency=low
 
   * Version 1:2.1.34-1
-  * Fixes: NB#145075 Increase in memory usage of hildon-input-method while invoking fkb.
+  * Fixes NB#145075 Increase in memory usage of hildon-input-method while invoking fkb.
 
  -- Joaquim Rocha <jrocha@maemo.org>  Wed, 04 Nov 2009 12:00:00 +0200 
 
