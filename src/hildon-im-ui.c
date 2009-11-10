@@ -650,6 +650,13 @@ hildon_im_ui_show(HildonIMUI *self)
     plugin = get_default_plugin_by_trigger (self, HILDON_IM_TRIGGER_KEYBOARD);
   }
 
+  /* Check if the widget does not want fullscreen plugins */
+  if (plugin->info->type == HILDON_IM_TYPE_FULLSCREEN &&
+      (self->priv->input_mode & HILDON_GTK_INPUT_MODE_NO_SCREEN_PLUGINS) != 0)
+  {
+    self->priv->current_plugin = plugin = NULL;
+  }
+
   if (plugin != NULL)
   {
     /* If the plugin is loaded, but now shown, ask it to reshow itself */

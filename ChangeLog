@@ -1,3 +1,13 @@
+2009-11-10 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.36-1~unreleased
+	* src/hildon-im-ui.c (hildon_im_ui_show) : Checks the
+	  HILDON_GTK_INPUT_MODE_NO_SCREEN_PLUGINS to determine if a fullscreen plugin
+	  should be shown or not.
+	* configure.ac : Changed the gtk+-2.0 module dependecy to 2.14.7
+	* debian/control : Changed the libgtk2.0-dev to greater than or equal to 2.14.7-1maemo15
+	* Fixes: NB#146049
+
 2009-11-06 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.35-1
