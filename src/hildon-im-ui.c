@@ -651,7 +651,7 @@ hildon_im_ui_show(HildonIMUI *self)
   }
 
   /* Check if the widget does not want fullscreen plugins */
-  if (plugin->info->type == HILDON_IM_TYPE_FULLSCREEN &&
+  if (plugin != NULL && plugin->info->type == HILDON_IM_TYPE_FULLSCREEN &&
       (self->priv->input_mode & HILDON_GTK_INPUT_MODE_NO_SCREEN_PLUGINS) != 0)
   {
     self->priv->current_plugin = plugin = NULL;

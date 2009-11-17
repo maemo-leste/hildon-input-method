@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.37-1) unstable; urgency=low
+
+  * Version 1:2.1.37-1
+  * Fixes a regression from the previous tags.
+
+ -- Joaquim Rocha <jrocha@maemo.org>  Tue, 17 Nov 2009 12:00:00 +0200
+
 hildon-input-method (1:2.1.36-1) unstable; urgency=low
 
   * Version 1:2.1.36-1

@@ -1,3 +1,9 @@
+2009-11-17 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.37-1
+	* src/hildon-im-ui.c (hildon_im_ui_show) : Fixes a regression by checking if a variable
+	  is NULL before accessing its members.
+
 2009-11-13 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.36-1
