@@ -1510,6 +1510,42 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
 }
 
 static gboolean
+hildon_im_ui_x_window_should_be_ignored (Window window)
+{
+  XClassHint class_hint;
+  Status ret_status;
+  gboolean should_ignore = FALSE;
+
+  memset (&class_hint, 0, sizeof (XClassHint));
+  gdk_error_trap_push();
+  ret_status = XGetClassHint (GDK_DISPLAY(), window, &class_hint);
+
+  if (gdk_error_trap_pop() != 0)
+  {
+    return FALSE;
+  }
+
+  if (ret_status && class_hint.res_class)
+  {
+    if (g_strcmp0 (class_hint.res_class, "Systemui") == 0)
+    {
+      should_ignore = TRUE;
+    }
+  }
+
+  if (class_hint.res_class)
+  {
+    XFree (class_hint.res_class);
+  }
+  if (class_hint.res_name)
+  {
+    XFree (class_hint.res_name);
+  }
+
+  return should_ignore;
+}
+
+static gboolean
 hildon_im_ui_x_window_want_im_hidden(Window window)
 {
   Atom wm_type = XInternAtom(GDK_DISPLAY(), "_NET_WM_WINDOW_TYPE", False);
@@ -1531,21 +1567,28 @@ hildon_im_ui_x_window_want_im_hidden(Window window)
     return FALSE;
   }
 
-  for (i = 0; i < nitems && !ret; i++)
+  if (hildon_im_ui_x_window_should_be_ignored (window))
   {
-    char *type_str = XGetAtomName(GDK_DISPLAY(), wm_type_value.atom[i]);
+    ret = FALSE;
+  }
+  else
+  {
+    for (i = 0; i < nitems && !ret; i++)
+    {
+      char *type_str = XGetAtomName(GDK_DISPLAY(), wm_type_value.atom[i]);
 
-    /* IM needs to be hidden when changing to another window or dialog.
-       desktop case happens when all windows are closed, we want to hide IM
-       then as well of course.. */
-    ret = strcmp(type_str, "_NET_WM_WINDOW_TYPE_NORMAL") == 0 ||
-          strcmp(type_str, "_NET_WM_WINDOW_TYPE_DIALOG") == 0 ||
-          strcmp(type_str, "_NET_WM_WINDOW_TYPE_DESKTOP") == 0 ||
-          strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_HOME_APPLET") == 0 ||
-          strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_STACKABLE") == 0 ||
-          strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_APP_MENU") == 0;
-    /* Not: _NET_WM_WINDOW_TYPE_NOTIFICATION _NET_WM_WINDOW_TYPE_INPUT */
-    XFree(type_str);
+      /* IM needs to be hidden when changing to another window or dialog.
+         desktop case happens when all windows are closed, we want to hide IM
+         then as well of course.. */
+      ret = strcmp(type_str, "_NET_WM_WINDOW_TYPE_NORMAL") == 0 ||
+            strcmp(type_str, "_NET_WM_WINDOW_TYPE_DIALOG") == 0 ||
+            strcmp(type_str, "_NET_WM_WINDOW_TYPE_DESKTOP") == 0 ||
+            strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_HOME_APPLET") == 0 ||
+            strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_STACKABLE") == 0 ||
+            strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_APP_MENU") == 0;
+      /* Not: _NET_WM_WINDOW_TYPE_NOTIFICATION _NET_WM_WINDOW_TYPE_INPUT */
+      XFree(type_str);
+    }
   }
 
   XFree(wm_type_value.char_value);
