@@ -142,7 +142,6 @@ struct _HildonIMUIPrivate
   HildonGtkInputMode input_mode;
   HildonGtkInputMode default_input_mode;
   HildonIMOptionMask options;
-  HildonIMCommand autocase;
   HildonIMTrigger trigger;
 
   gchar *surrounding;
@@ -196,6 +195,8 @@ struct _HildonIMUIPrivate
   guint16  ext_kb_long_press_timeout;
 
   GList *parsed_rc_files;
+
+  HildonIMInternalModifierMask mask;
 };
 
 typedef struct
@@ -222,6 +223,8 @@ static void hildon_im_ui_foreach_plugin(HildonIMUI *self,
                                         void (*function) (HildonIMPlugin *));
 
 static void hildon_im_ui_send_long_press_settings (HildonIMUI *self);
+
+static gint get_window_pid (Window window);
 
 G_DEFINE_TYPE(HildonIMUI, hildon_im_ui, GTK_TYPE_WINDOW)
 
@@ -1206,6 +1209,11 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
 
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
+  /* Ignores messages coming from any of the plugins (from a window whose
+     process is the same as this one) */
+  if (get_window_pid (msg->app_window) == getpid ())
+    return;
+
   /* Check if a request comes from a different main window. Don't change it
      for HIDE events since with browser when opening IM popup menu it sends
      HIDE from app_window 0.. */
@@ -1238,14 +1246,6 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
     case HILDON_IM_HIDE:
       hildon_im_ui_hide(self);
       break;
-    case HILDON_IM_LOW:
-    case HILDON_IM_UPP:
-      self->priv->autocase = msg->cmd;
-      if (plugin != NULL)
-      {
-        hildon_im_plugin_character_autocase(plugin);
-      }
-      break;
     case HILDON_IM_CLEAR:
       if (plugin != NULL)
       {
@@ -1264,8 +1264,15 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
                       "destroy",
                       G_CALLBACK (gtk_widget_destroyed),
                       &self->priv->current_banner);
+    self->priv->mask |= HILDON_IM_SHIFT_LOCK_MASK;
+      break;
+    case HILDON_IM_SHIFT_STICKY :
+      self->priv->mask |= HILDON_IM_SHIFT_STICKY_MASK;
       break;
     case HILDON_IM_SHIFT_UNLOCKED :
+      self->priv->mask &= ~HILDON_IM_SHIFT_LOCK_MASK;
+    case HILDON_IM_SHIFT_UNSTICKY :
+      self->priv->mask &= ~HILDON_IM_SHIFT_STICKY_MASK;
       break;
     case HILDON_IM_MOD_LOCKED :
       self->priv->current_banner =
@@ -1276,9 +1283,17 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
                         "destroy",
                         G_CALLBACK (gtk_widget_destroyed),
                         &self->priv->current_banner);
+      self->priv->mask |= HILDON_IM_LEVEL_LOCK_MASK;
+      break;
+    case HILDON_IM_MOD_STICKY :
+      self->priv->mask |= HILDON_IM_LEVEL_STICKY_MASK;
       break;
     case HILDON_IM_MOD_UNLOCKED :
+      self->priv->mask &= ~HILDON_IM_LEVEL_LOCK_MASK;
+    case HILDON_IM_MOD_UNSTICKY :
+      self->priv->mask &= ~HILDON_IM_LEVEL_STICKY_MASK;
       break;
+
     default:
       g_warning("Invalid message from im context");
       break;
@@ -1842,6 +1857,8 @@ hildon_im_ui_init(HildonIMUI *self)
 
   priv->parsed_rc_files = NULL;
 
+  priv->mask = 0;
+
   self->osso = osso_initialize(PACKAGE_OSSO, VERSION, FALSE, NULL);
   if (!self->osso)
   {
@@ -2267,13 +2284,6 @@ hildon_im_ui_get_current_default_input_mode(HildonIMUI *self)
   return self->priv->default_input_mode;
 }
 
-HildonIMCommand
-hildon_im_ui_get_autocase_mode(HildonIMUI *self)
-{
-  g_return_val_if_fail(HILDON_IM_IS_UI(self), HILDON_IM_LOW);
-  return self->priv->autocase;
-}
-
 gboolean
 hildon_im_ui_get_visibility(HildonIMUI *self)
 {
@@ -2486,4 +2496,96 @@ hildon_im_ui_parse_rc_file (HildonIMUI *ui, gchar *rc_file)
     gtk_rc_parse (rc_file);
     ui->priv->parsed_rc_files = g_list_prepend (ui->priv->parsed_rc_files, rc_file);
   }
+}
+
+HildonIMInternalModifierMask
+hildon_im_ui_get_mask (HildonIMUI *self)
+{
+  return self->priv->mask;
+}
+
+void
+hildon_im_ui_set_mask (HildonIMUI *self, HildonIMInternalModifierMask mask)
+{
+  self->priv->mask = mask;
+}
+
+gboolean
+hildon_im_ui_get_shift_locked (HildonIMUI *self)
+{
+  return self->priv->mask & HILDON_IM_SHIFT_LOCK_MASK;
+}
+
+void
+hildon_im_ui_set_shift_locked (HildonIMUI *self, gboolean locked)
+{
+  HildonIMInternalModifierMask mask;
+
+  mask = self->priv->mask;
+  if (locked)
+    mask |= HILDON_IM_SHIFT_LOCK_MASK;
+  else
+    mask &= ~HILDON_IM_SHIFT_LOCK_MASK;
+
+  hildon_im_ui_set_mask (self, mask);
+}
+
+gboolean
+hildon_im_ui_get_level_locked (HildonIMUI *self)
+{
+  return self->priv->mask & HILDON_IM_LEVEL_LOCK_MASK;
+}
+
+void
+hildon_im_ui_set_level_locked (HildonIMUI *self, gboolean locked)
+{
+  HildonIMInternalModifierMask mask;
+
+  mask = self->priv->mask;
+  if (locked)
+    mask |= HILDON_IM_LEVEL_LOCK_MASK;
+  else
+    mask &= ~HILDON_IM_LEVEL_LOCK_MASK;
+
+  hildon_im_ui_set_mask (self, mask);
+}
+
+gboolean
+hildon_im_ui_get_shift_sticky (HildonIMUI *self)
+{
+  return self->priv->mask & HILDON_IM_SHIFT_STICKY_MASK;
+}
+
+void
+hildon_im_ui_set_shift_sticky (HildonIMUI *self, gboolean sticky)
+{
+  HildonIMInternalModifierMask mask;
+
+  mask = self->priv->mask;
+  if (sticky)
+    mask |= HILDON_IM_SHIFT_STICKY_MASK;
+  else
+    mask &= ~HILDON_IM_SHIFT_STICKY_MASK;
+
+  hildon_im_ui_set_mask (self, mask);
+}
+
+gboolean
+hildon_im_ui_get_level_sticky (HildonIMUI *self)
+{
+  return self->priv->mask & HILDON_IM_LEVEL_STICKY_MASK;
+}
+
+void
+hildon_im_ui_set_level_sticky (HildonIMUI *self, gboolean sticky)
+{
+  HildonIMInternalModifierMask mask;
+
+  mask = self->priv->mask;
+  if (sticky)
+    mask |= HILDON_IM_LEVEL_STICKY_MASK;
+  else
+    mask &= ~HILDON_IM_LEVEL_STICKY_MASK;
+
+  hildon_im_ui_set_mask (self, mask);
 }

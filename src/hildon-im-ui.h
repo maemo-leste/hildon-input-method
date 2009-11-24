@@ -434,5 +434,38 @@ void hildon_im_ui_parse_rc_file (HildonIMUI *ui, gchar *rc_file);
  */
 Window hildon_im_ui_get_input_window (HildonIMUI *ui);
 
+/**
+ * hildon_im_ui_get_mask:
+ * @self: #HildonIMUI
+ *
+ * Returns: The mask representing shift and level states as in client context
+ */
+HildonIMInternalModifierMask hildon_im_ui_get_mask (HildonIMUI *self);
+
+/**
+ * hildon_im_ui_set_mask:
+ * @self: #HildonIMUI
+ * @mask: a #HildonIMInternalModifierMask representing the new mask
+ *
+ * Sets the new states of shift and level to be sent to the client context
+ */
+void hildon_im_ui_set_mask (HildonIMUI *self, HildonIMInternalModifierMask mask);
+
+gboolean hildon_im_ui_get_shift_locked (HildonIMUI *self);
+
+void hildon_im_ui_set_shift_locked (HildonIMUI *self, gboolean locked);
+
+gboolean hildon_im_ui_get_level_locked (HildonIMUI *self);
+
+void hildon_im_ui_set_level_locked (HildonIMUI *self, gboolean locked);
+
+gboolean hildon_im_ui_get_shift_sticky (HildonIMUI *self);
+
+void hildon_im_ui_set_shift_sticky (HildonIMUI *self, gboolean sticky);
+
+gboolean hildon_im_ui_get_level_sticky (HildonIMUI *self);
+
+void hildon_im_ui_set_level_sticky (HildonIMUI *self, gboolean sticky);
+
 G_END_DECLS
 #endif

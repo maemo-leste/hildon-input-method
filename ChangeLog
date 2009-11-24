@@ -1,3 +1,10 @@
+2010-01-18 Eduardo Lima Mitev <e-lima@maemo.org>
+
+	* Version 2.1.42-1~unreleased
+	* src/hildon-im-ui.c : Re-implements shift and level state management. Keeps a synchronized
+	  copy of context's mask and add API to get/set states.
+	* Fixes: NB#143933
+
 2010-01-14 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.41-1
