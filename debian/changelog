@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.38-1~unreleased) unstable; urgency=low
+
+  * Version 1:2.1.38-1~unreleased
+  * Fixes: NBNB#147244 onscreen keyboard layout changes to be implemented
+
+ -- Joaquim Rocha <jrocha@maemo.org>  Fri, 04 Dec 2009 12:00:00 +0200
+
 hildon-input-method (1:2.1.37-1) unstable; urgency=low
 
   * Version 1:2.1.37-1

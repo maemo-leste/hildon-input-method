@@ -189,6 +189,7 @@ struct _HildonIMUIPrivate
   PluginData *default_finger_plugin;
   PluginData *default_stylus_plugin;
   
+  GList *parsed_rc_files;
 };
 
 typedef struct
@@ -1659,6 +1660,13 @@ hildon_im_ui_finalize(GObject *obj)
   g_free(self->priv->cached_finger_plugin_name);
   g_free(self->priv->cached_stylus_plugin_name);
 
+  GList *parsed_rc_files = self->priv->parsed_rc_files;
+  for (; parsed_rc_files != NULL; parsed_rc_files = g_list_next (parsed_rc_files))
+  {
+    g_free ((gchar *) parsed_rc_files->data);
+  }
+  g_list_free (self->priv->parsed_rc_files);
+
   G_OBJECT_CLASS(hildon_im_ui_parent_class)->finalize(obj);
 }
 
@@ -1734,6 +1742,8 @@ hildon_im_ui_init(HildonIMUI *self)
   priv->cached_hkb_plugin_name = NULL;
   priv->cached_finger_plugin_name = NULL;
   priv->cached_stylus_plugin_name = NULL;
+
+  priv->parsed_rc_files = NULL;
 
   self->osso = osso_initialize(PACKAGE_OSSO, VERSION, FALSE, NULL);
   if (!self->osso)
@@ -2342,4 +2352,35 @@ void
 hildon_im_ui_set_visible(HildonIMUI *ui, gboolean visible)
 {
   /* always hidden */
+}
+
+static gboolean
+hildon_im_ui_rc_file_is_parsed (HildonIMUI *ui, gchar *rc_file)
+{
+  if (!ui->priv->parsed_rc_files)
+  {
+    return FALSE;
+  }
+
+  GList *parsed_rc_files = g_list_first (ui->priv->parsed_rc_files);
+  for (; parsed_rc_files != NULL; parsed_rc_files = g_list_next(parsed_rc_files))
+  {
+    gchar *current_rc_file = (gchar *) parsed_rc_files->data;
+    if (g_strcmp0 (current_rc_file, rc_file) == 0)
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+void
+hildon_im_ui_parse_rc_file (HildonIMUI *ui, gchar *rc_file)
+{
+  if (!hildon_im_ui_rc_file_is_parsed (ui, rc_file))
+  {
+    gtk_rc_parse (rc_file);
+    ui->priv->parsed_rc_files = g_list_prepend (ui->priv->parsed_rc_files, rc_file);
+  }
 }

@@ -417,5 +417,14 @@ void hildon_im_ui_erase_plugin_buffer(HildonIMUI *ui, gint len);
  */
 void hildon_im_ui_clear_plugin_buffer(HildonIMUI *ui);
 
+/**
+ * hildon_im_ui_parse_rc_file:
+ * @self: #HildonIMUI
+ * @rc_file: the gtkrc file to parse
+ *
+ * Parses the given rc_file only if it has not been parsed before.
+ */
+void hildon_im_ui_parse_rc_file (HildonIMUI *ui, gchar *rc_file);
+
 G_END_DECLS
 #endif

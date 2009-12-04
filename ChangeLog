@@ -1,3 +1,10 @@
+2009-12-04 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.38-1~unreleased
+	* src/hildon-im-ui.[ch] : Introduces the function hildon_im_ui_parse_rc_file that parses
+	  a theme file if it has not been parsed before.
+	* Fixes: NB#147244 
+
 2009-11-17 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.37-1
