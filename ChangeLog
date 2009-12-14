@@ -1,3 +1,10 @@
+2009-12-14 Eduardo Lima Mitev <e-lima@maemo.org>
+
+	* Version 2.1.39-1~unreleased
+	* src/hildon-im-ui.c : Adds new X message to notify context about changes in gconf
+	  settings of the long-press feature.
+	* Fixes: NB#146069
+
 2009-12-04 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.38-1

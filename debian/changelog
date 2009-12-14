@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.39-1~unreleased) unstable; urgency=low
+
+  * Version 1:2.1.39-1~unreleased
+  * Fixes: NB#146069 Long-pressing a key on the hardware keyboard should invert the layout.
+
+ -- Joaquim Rocha <jrocha@maemo.org>  Mon, 14 Dec 2009 12:00:00 +0200
+
 hildon-input-method (1:2.1.38-1) unstable; urgency=low
 
   * Version 1:2.1.38-1

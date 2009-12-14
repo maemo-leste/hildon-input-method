@@ -73,6 +73,9 @@
 #define GCONF_IM_STYLUS_PLUGIN       GCONF_IM_DEFAULT_PLUGINS "/stylus"
 #define GCONF_IM_FINGER_PLUGIN       GCONF_IM_DEFAULT_PLUGINS "/finger"
 
+#define GCONF_EXT_KB_LONG_PRESS_DISABLED HILDON_IM_GCONF_DIR "/ext_kb_repeat_enabled"
+#define GCONF_EXT_KB_LONG_PRESS_TIMEOUT  HILDON_IM_GCONF_DIR "/ext_kb_long_press_timeout"
+
 #define SOUND_REPEAT_ILLEGAL_CHARACTER 800
 #define SOUND_REPEAT_NUMBER_INPUT 0
 #define SOUND_REPEAT_FINGER_TRIGGER 1500
@@ -188,7 +191,10 @@ struct _HildonIMUIPrivate
   PluginData *default_hkb_plugin;
   PluginData *default_finger_plugin;
   PluginData *default_stylus_plugin;
-  
+
+  gboolean ext_kb_long_press_disabled;
+  guint16  ext_kb_long_press_timeout;
+
   GList *parsed_rc_files;
 };
 
@@ -214,6 +220,8 @@ static void activate_plugin (HildonIMUI *s, PluginData *, gboolean);
 
 static void hildon_im_ui_foreach_plugin(HildonIMUI *self,
                                         void (*function) (HildonIMPlugin *));
+
+static void hildon_im_ui_send_long_press_settings (HildonIMUI *self);
 
 G_DEFINE_TYPE(HildonIMUI, hildon_im_ui, GTK_TYPE_WINDOW)
 
@@ -910,6 +918,16 @@ hildon_im_ui_gconf_change_callback(GConfClient* client,
     self->priv->cached_stylus_plugin_name =
       gconf_client_get_string (self->client, GCONF_IM_STYLUS_PLUGIN, NULL);
   }
+  else if (strcmp (key, GCONF_EXT_KB_LONG_PRESS_DISABLED) == 0)
+  {
+    self->priv->ext_kb_long_press_disabled = gconf_value_get_bool (value);
+    hildon_im_ui_send_long_press_settings (self);
+  }
+  else if (strcmp (key, GCONF_EXT_KB_LONG_PRESS_TIMEOUT) == 0)
+  {
+    self->priv->ext_kb_long_press_timeout = gconf_value_get_int (value);
+    hildon_im_ui_send_long_press_settings (self);
+  }
 
   for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
   {
@@ -986,6 +1004,15 @@ hildon_im_ui_load_gconf(HildonIMUI *self)
   self->priv->cached_stylus_plugin_name = gconf_client_get_string (self->client,
                                                                    GCONF_IM_STYLUS_PLUGIN,
                                                                    NULL);
+
+  self->priv->ext_kb_long_press_disabled =
+    gconf_client_get_bool (self->client,
+                           GCONF_EXT_KB_LONG_PRESS_DISABLED,
+                           NULL);
+  self->priv->ext_kb_long_press_timeout =
+    gconf_client_get_int (self->client,
+                          GCONF_EXT_KB_LONG_PRESS_TIMEOUT,
+                          NULL);
 }
 
 /* Call a plugin function for each loaded plugin.
@@ -1052,6 +1079,24 @@ hildon_im_ui_foreach_plugin_va(HildonIMUI *self,
 }
 
 static void
+hildon_im_ui_send_long_press_settings (HildonIMUI *self)
+{
+  XEvent event;
+  HildonIMLongPressSettingsMessage *msg;
+
+  memset(&event, 0, sizeof(XEvent));
+  event.xclient.message_type =
+          hildon_im_protocol_get_atom (HILDON_IM_LONG_PRESS_SETTINGS);
+  event.xclient.format = HILDON_IM_LONG_PRESS_SETTINGS_FORMAT;
+
+  msg = (HildonIMLongPressSettingsMessage *) &event.xclient.data;
+  msg->enable_long_press = ! self->priv->ext_kb_long_press_disabled;
+  msg->long_press_timeout = self->priv->ext_kb_long_press_timeout;
+
+  hildon_im_ui_send_event (self, self->priv->input_window, &event);
+}
+
+static void
 hildon_im_ui_set_client(HildonIMUI *self,
                         HildonIMActivateMessage *msg,
                         gboolean show)
@@ -1093,6 +1138,8 @@ hildon_im_ui_set_client(HildonIMUI *self,
       hildon_im_plugin_clear(plugin);
     }
   }
+
+  hildon_im_ui_send_long_press_settings (self);
 
   if (show)
   {
