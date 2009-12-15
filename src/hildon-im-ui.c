@@ -671,6 +671,12 @@ hildon_im_ui_show(HildonIMUI *self)
     /* If the plugin is loaded, but now shown, ask it to reshow itself */
     if (plugin->widget != NULL)
     {
+      if (self->priv->current_plugin != NULL &&
+          self->priv->current_plugin->filename != plugin->filename)
+      {
+        flush_plugins (self, NULL, FALSE);
+      }
+
       set_current_plugin (self, plugin);
       if (!plugin->enabled)
       {

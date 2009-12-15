@@ -1,3 +1,9 @@
+2009-12-15 Joaquim Rocha <jrocha@maemo.org>
+
+	* src/hildon-im-ui.c (hildon_im_ui_show) : Flushes plugins before setting the current
+	  plugin if the new one is different
+	* Fixes: NB#140547
+
 2009-12-14 Eduardo Lima Mitev <e-lima@maemo.org>
 
 	* Version 2.1.39-1~unreleased
