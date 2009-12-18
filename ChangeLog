@@ -1,3 +1,7 @@
+2009-12-18 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.39-1
+
 2009-12-15 Joaquim Rocha <jrocha@maemo.org>
 
 	* src/hildon-im-ui.c (hildon_im_ui_show) : Flushes plugins before setting the current
