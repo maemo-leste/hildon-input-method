@@ -574,8 +574,7 @@ hildon_im_ui_hide(gpointer data)
   HildonIMUI *self = HILDON_IM_UI(data);
   g_return_val_if_fail(HILDON_IM_IS_UI(self), FALSE);
 
-  /* Window IDs may be reused. Forget our old input_window when hiding. */
-  if (CURRENT_PLUGIN (self) && CURRENT_PLUGIN_IS_FULLSCREEN(self) == FALSE)
+  if (CURRENT_PLUGIN (self))
   {
     self->priv->input_window = 0;
   }
@@ -2360,6 +2359,12 @@ hildon_im_ui_set_active_language_index (HildonIMUI *ui, gint index)
     return FALSE;
 
   return gconf_client_set_int (ui->client, GCONF_CURRENT_LANGUAGE, index, NULL); 
+}
+
+Window
+hildon_im_ui_get_input_window (HildonIMUI *ui)
+{
+  return ui->priv->input_window;
 }
 
 const gchar *

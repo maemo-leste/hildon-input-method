@@ -426,5 +426,13 @@ void hildon_im_ui_clear_plugin_buffer(HildonIMUI *ui);
  */
 void hildon_im_ui_parse_rc_file (HildonIMUI *ui, gchar *rc_file);
 
+/**
+ * hildon_im_ui_get_input_window:
+ * @ui: #HildonIMUI
+ *
+ * Returns: The client application's X window
+ */
+Window hildon_im_ui_get_input_window (HildonIMUI *ui);
+
 G_END_DECLS
 #endif

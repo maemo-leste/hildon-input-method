@@ -1,3 +1,9 @@
+2010-01-04 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.40-1~unreleased
+	* src/hildon-im-ui.c : Provides a public method to retrieve the current input window
+	* Fixes: NB#141282
+
 2009-12-18 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.39-1
