@@ -1,13 +1,14 @@
+2010-01-07 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.40-1
+
 2010-01-04 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.40-1~unreleased
 	* src/hildon-im-ui.c/h (hildon_im_ui_get_input_window) : Provides a public method to
 	  retrieve the current input window
-	* src/hildon-im-ui.c (hildon_im_ui_x_window_should_be_ignored) : Introduces function that
-	  tells if a X window should be ignored when deciding to flush HIM's plugins
-	* src/hildon-im-ui.c (hildon_im_ui_x_window_want_im_hidden) : Uses the function
-	  hildon_im_ui_x_window_should_be_ignored to decide whether the plugins should be flushed
-	  or not.
+	* src/hildon-im-ui.c (hildon_im_ui_x_window_should_be_ignored,
+	  hildon_im_ui_x_window_want_im_hidden) : Prevents FKB from closing whent he screen is idle
 	* Fixes: NB#141282
 	* Fixes: NB#140987
 
