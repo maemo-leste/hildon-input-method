@@ -38,6 +38,8 @@
 #include <hildon/hildon-sound.h>
 #include <hildon/hildon-helper.h>
 #include <log-functions.h>
+#include <mce/dbus-names.h>
+#include <mce/mode-names.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <dlfcn.h>
@@ -84,6 +86,10 @@
 #define HILDON_COMMON_STRING  "hildon-common-strings"
 #define HILDON_IM_STRING  "hildon-input-method"
 
+#define MCE_ORIENTATION_RULE "type='signal', interface='" MCE_SIGNAL_IF "', member='" MCE_DEVICE_ORIENTATION_SIG "'"
+#define PORTRAIT_SCREEN_MODE_NAME   "portrait"
+#define LANDSCAPE_SCREEN_MODE_NAME  "landscape"
+
 #define BUFFER_SIZE 128
 
 #define THUMB_LAUNCHES_FULLSCREEN_PLUGIN TRUE
@@ -96,6 +102,12 @@
 #define CURRENT_IM_PLUGIN(self) HILDON_IM_PLUGIN (CURRENT_IM_WIDGET (self))
 
 #define CURRENT_PLUGIN_IS_FULLSCREEN(self) (CURRENT_PLUGIN (self)->info->type == HILDON_IM_TYPE_FULLSCREEN)
+
+enum {
+  ORIENTATION_CHANGED,
+
+  LAST_SIGNAL
+};
 
 enum
 {
@@ -127,6 +139,7 @@ typedef struct {
 
 typedef GtkWidget *(*im_init_func)(HildonIMUI *);
 typedef const HildonIMPluginInfo *(*im_info_func)(void);
+static guint HildonIMUI_signals[LAST_SIGNAL] = {0};
 
 struct _HildonIMUIPrivate
 {
@@ -190,6 +203,8 @@ struct _HildonIMUIPrivate
   PluginData *default_hkb_plugin;
   PluginData *default_finger_plugin;
   PluginData *default_stylus_plugin;
+
+  HildonIMUIScreenMode screen_mode;
 
   gboolean ext_kb_long_press_disabled;
   guint16  ext_kb_long_press_timeout;
@@ -1824,12 +1839,109 @@ detect_first_boot (HildonIMUI *self)
   }
 }
 
+static DBusHandlerResult
+screen_mode_dbus_handler (DBusConnection *connection,
+                          DBusMessage *message,
+                          gpointer data)
+{
+  HildonIMUI *self;
+  HildonIMUIPrivate *priv;
+  DBusMessageIter iter;
+  const gchar *mode = NULL;
+
+  self = HILDON_IM_UI (data);
+  priv = self->priv;
+
+  if (dbus_message_is_signal (message, MCE_SIGNAL_IF, MCE_DEVICE_ORIENTATION_SIG) &&
+      dbus_message_iter_init (message, &iter))
+  {
+    dbus_message_iter_get_basic(&iter, &mode);
+    if (mode != NULL)
+    {
+      if (g_strcmp0 (mode, PORTRAIT_SCREEN_MODE_NAME) == 0)
+      {
+        priv->screen_mode = HILDON_IM_SCREEN_MODE_PORTRAIT;
+      }
+      else if (g_strcmp0 (mode, LANDSCAPE_SCREEN_MODE_NAME) == 0)
+      {
+        priv->screen_mode = HILDON_IM_SCREEN_MODE_LANDSCAPE;
+      }
+
+      g_signal_emit (self, HildonIMUI_signals[ORIENTATION_CHANGED],
+                     0,
+                     priv->screen_mode,
+                     NULL);
+    }
+  }
+
+  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
+static HildonIMUIScreenMode
+hildon_im_ui_get_screen_mode_status (HildonIMUI *self)
+{
+  HildonIMUIScreenMode mode = HILDON_IM_SCREEN_MODE_LANDSCAPE;
+  osso_return_t ret;
+  osso_rpc_t return_value;
+
+  ret = osso_rpc_run_system (self->osso,
+                             MCE_SERVICE, MCE_REQUEST_PATH,
+                             MCE_REQUEST_IF,
+                             MCE_DEVICE_ORIENTATION_GET,
+                             &return_value,
+                             DBUS_TYPE_INVALID);
+  if (ret == OSSO_OK)
+  {
+    if (g_strcmp0 (return_value.value.s, PORTRAIT_SCREEN_MODE_NAME) == 0)
+    {
+      mode = HILDON_IM_SCREEN_MODE_PORTRAIT;
+    }
+
+    osso_rpc_free_val(&return_value);
+  }
+
+  return mode;
+}
+
+static gboolean
+hildon_im_ui_activate_accelerometer (void)
+{
+  DBusConnection *conn = dbus_bus_get (DBUS_BUS_SYSTEM, NULL);
+  DBusMessage *msg = NULL;
+
+  msg = dbus_message_new_method_call (MCE_SERVICE,
+                                      MCE_REQUEST_PATH,
+                                      MCE_REQUEST_IF,
+                                      MCE_ACCELEROMETER_ENABLE_REQ);
+  if (msg == NULL)
+  {
+    return FALSE;
+  }
+
+  dbus_message_set_auto_start (msg, TRUE);
+  dbus_message_set_no_reply (msg, TRUE);
+
+  if (!dbus_connection_send (conn, msg, NULL))
+  {
+      return FALSE;
+  }
+  else
+  {
+    dbus_connection_flush (conn);
+  }
+
+  dbus_message_unref (msg);
+
+  return TRUE;
+}
+
 
 static void
 hildon_im_ui_init(HildonIMUI *self)
 {
   HildonIMUIPrivate *priv;
   osso_return_t status;
+  DBusConnection *connection = NULL;
 
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
@@ -1878,8 +1990,20 @@ hildon_im_ui_init(HildonIMUI *self)
   status = osso_hw_set_event_cb(self->osso, NULL, hildon_im_hw_cb, self);
   if (status != OSSO_OK)
   {
-    g_warning("Could not register the osso_hw_set_event_cb");
+    g_warning("Could not register the osso_hw_set_event_cb %s", MCE_ORIENTATION_PORTRAIT);
+
+    priv->screen_mode = HILDON_IM_SCREEN_MODE_LANDSCAPE;
   }
+  else
+  {
+    priv->screen_mode = hildon_im_ui_get_screen_mode_status (self);
+  }
+
+  hildon_im_ui_activate_accelerometer ();
+
+  connection = dbus_bus_get (DBUS_BUS_SYSTEM, NULL);
+  dbus_bus_add_match (connection, MCE_ORIENTATION_RULE, NULL);
+  dbus_connection_add_filter (connection, screen_mode_dbus_handler, self, NULL);
  
   gtk_widget_set_name (GTK_WIDGET (self), "hildon-input-method-ui");
 
@@ -1907,6 +2031,13 @@ hildon_im_ui_class_init(HildonIMUIClass *klass)
   g_type_class_add_private(klass, sizeof(HildonIMUIPrivate));
 
   G_OBJECT_CLASS(klass)->finalize = hildon_im_ui_finalize;
+
+  HildonIMUI_signals[ORIENTATION_CHANGED] = g_signal_new ("screen_orientation_changed",
+                                                          HILDON_IM_TYPE_UI,
+                                                          G_SIGNAL_RUN_LAST,
+                                                          G_STRUCT_OFFSET (HildonIMUIClass, orientation_changed),
+                                                          NULL, NULL, g_cclosure_marshal_VOID__INT,
+                                                          G_TYPE_NONE, 1, G_TYPE_INT);
 }
 
 /* Public methods **********************************************/
@@ -1944,6 +2075,12 @@ hildon_im_ui_new()
 
   hildon_im_ui_init_root_window_properties(self);
   return GTK_WIDGET(self);
+}
+
+HildonIMUIScreenMode
+hildon_im_ui_get_screen_mode (HildonIMUI *self)
+{
+  return self->priv->screen_mode;
 }
 
 const gchar *

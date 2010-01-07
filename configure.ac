@@ -94,6 +94,10 @@ PKG_CHECK_MODULES(DBUS, dbus-1 >= 0.60)
 AC_SUBST(DBUS_LIBS)
 AC_SUBST(DBUS_CFLAGS)
 
+PKG_CHECK_MODULES(MCE, mce >= 1.8.15)
+AC_SUBST(MCE_LIBS)
+AC_SUBST(MCE_CFLAGS)
+
 localedir=${datadir}/locale
 
 etcdir=$sysconfdir

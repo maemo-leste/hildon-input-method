@@ -101,6 +101,12 @@ typedef enum
 
 typedef enum
 {
+  HILDON_IM_SCREEN_MODE_LANDSCAPE = 0,
+  HILDON_IM_SCREEN_MODE_PORTRAIT,
+} HildonIMUIScreenMode;
+
+typedef enum
+{
   HILDON_IM_ILLEGAL_INPUT_SOUND,
   HILDON_IM_NUMBER_INPUT_SOUND,
   HILDON_IM_FINGER_TRIGGER_SOUND
@@ -118,6 +124,8 @@ struct _HildonIMUI
 struct _HildonIMUIClass
 {
   GtkWindowClass parent_class;
+
+  void (*orientation_changed)(HildonIMUI *instance, HildonIMUIScreenMode new_screen_mode);
 };
 
 GType hildon_im_ui_get_type(void);
@@ -450,6 +458,16 @@ HildonIMInternalModifierMask hildon_im_ui_get_mask (HildonIMUI *self);
  * Sets the new states of shift and level to be sent to the client context
  */
 void hildon_im_ui_set_mask (HildonIMUI *self, HildonIMInternalModifierMask mask);
+
+/**
+ * hildon_im_ui_get_screen_mode:
+ * @ui: #HildonIMUI
+ *
+ * Gets the current screen mode that represents the device's orientation.
+ *
+ * Returns: The current screen mode.
+ */
+HildonIMUIScreenMode hildon_im_ui_get_screen_mode (HildonIMUI *ui);
 
 gboolean hildon_im_ui_get_shift_locked (HildonIMUI *self);
 
