@@ -1,3 +1,10 @@
+2010-01-12 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.41-1~unreleased
+	* src/hildon-im-ui.c : Fixes a regression (incoming dialogs from Hildon desktop with the 
+	  name as "SystemUI", such as the power menu, were all being ignored and HIM plugins like
+	  the FKB would not be closed)
+
 2010-01-07 Joaquim Rocha <jrocha@maemo.org>
 
 	* Version 2.1.40-1

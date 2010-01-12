@@ -1510,7 +1510,8 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
 }
 
 static gboolean
-hildon_im_ui_x_window_should_be_ignored (Window window)
+hildon_im_ui_x_window_should_be_ignored (Window window,
+                                         gchar *window_type)
 {
   XClassHint class_hint;
   Status ret_status;
@@ -1527,7 +1528,8 @@ hildon_im_ui_x_window_should_be_ignored (Window window)
 
   if (ret_status && class_hint.res_class)
   {
-    if (g_strcmp0 (class_hint.res_class, "Systemui") == 0)
+    if (g_strcmp0 (class_hint.res_class, "Systemui") == 0 &&
+        g_strcmp0 (window_type, "_NET_WM_WINDOW_TYPE_NORMAL") == 0)
     {
       should_ignore = TRUE;
     }
@@ -1567,16 +1569,16 @@ hildon_im_ui_x_window_want_im_hidden(Window window)
     return FALSE;
   }
 
-  if (hildon_im_ui_x_window_should_be_ignored (window))
+  for (i = 0; i < nitems && !ret; i++)
   {
-    ret = FALSE;
-  }
-  else
-  {
-    for (i = 0; i < nitems && !ret; i++)
-    {
-      char *type_str = XGetAtomName(GDK_DISPLAY(), wm_type_value.atom[i]);
+    char *type_str = XGetAtomName(GDK_DISPLAY(), wm_type_value.atom[i]);
 
+    if (hildon_im_ui_x_window_should_be_ignored (window, type_str))
+    {
+      ret = FALSE;
+    }
+    else
+    {
       /* IM needs to be hidden when changing to another window or dialog.
          desktop case happens when all windows are closed, we want to hide IM
          then as well of course.. */
@@ -1587,8 +1589,8 @@ hildon_im_ui_x_window_want_im_hidden(Window window)
             strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_STACKABLE") == 0 ||
             strcmp(type_str, "_HILDON_WM_WINDOW_TYPE_APP_MENU") == 0;
       /* Not: _NET_WM_WINDOW_TYPE_NOTIFICATION _NET_WM_WINDOW_TYPE_INPUT */
-      XFree(type_str);
     }
+    XFree(type_str);
   }
 
   XFree(wm_type_value.char_value);
