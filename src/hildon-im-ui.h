@@ -67,6 +67,7 @@ typedef struct _HildonIMUIPrivate HildonIMUIPrivate;
 #define HILDON_IM_GCONF_DIR "/apps/osso/inputmethod"
 
 #define HILDON_IM_GCONF_LANG_DIR                   HILDON_IM_GCONF_DIR       "/hildon-im-languages"
+#define HILDON_IM_GCONF_AVAILABLE_DICTIONARIES     HILDON_IM_GCONF_DIR       "/hildon-im-dictionaries"
 #define _HILDON_IM_GCONF_LANGUAGE                  HILDON_IM_GCONF_LANG_DIR  "/language-"
 #define HILDON_IM_GCONF_PRIMARY_LANGUAGE           _HILDON_IM_GCONF_LANGUAGE "0"
 #define HILDON_IM_GCONF_SECONDARY_LANGUAGE         _HILDON_IM_GCONF_LANGUAGE "1"

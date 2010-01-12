@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.44-1~unreleased) unstable; urgency=low
+
+  * Version 1:2.1.44-1~unreleased
+  * Fixes: NB#154576 Hardware keyboard layout should be implemented by language.
+
+ -- Eduardo Lima Mitev <e-lima@maemo.org>  Fri, 12 Feb 2010 12:00:00 +0200
+
 hildon-input-method (1:2.1.43-1) unstable; urgency=low
 
   * Version 1:2.1.43-1

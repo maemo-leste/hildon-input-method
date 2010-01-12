@@ -1,3 +1,10 @@
+2010-02-12 Joaquim Rocha <jrocha@maemo.org>
+
+	* Version 2.1.44-1~unreleased
+	* src/hildon-im-languages.h,
+	* src/hildon-im-languages.c : Added function to get the available dictionaries.
+	* Fixes: NB#154576
+
 2010-02-04 Eduardo Lima Mitev <e-lima@maemo.org>
 
 	* Version 2.1.43-1
