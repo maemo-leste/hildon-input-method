@@ -201,3 +201,14 @@ hildon_im_populate_available_languages (GSList *list)
   g_slist_free (current_languages);
 }
 
+GSList *
+hildon_im_get_available_dictionaries (void)
+{
+  GConfClient *client;
+  GSList *list;
+
+  client = gconf_client_get_default();
+  list = gconf_client_get_list (client, HILDON_IM_GCONF_AVAILABLE_DICTIONARIES, GCONF_VALUE_STRING, NULL);
+
+  return list;
+}

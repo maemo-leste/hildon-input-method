@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.43-1~unreleased) unstable; urgency=low
+
+  * Version 1:2.1.43-1~unreleased
+  * Drop the HKB picker from TI settigs
+
+ -- Joaquim Rocha <jrocha@maemo.org>  Wed, 27 Jan 2010 12:00:00 +0200
+
 hildon-input-method (1:2.1.42-1) unstable; urgency=low
 
   * Version 1:2.1.42-1
