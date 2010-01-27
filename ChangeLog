@@ -1,3 +1,13 @@
+2010-01-29 Eduardo Lima Mitev <e-lima@maemo.org>
+
+	* debian/rules: Replaces CDBS by normal debian build rules and avoid installing
+	  documentation.
+	* debian/hildon-input-method.install:
+	* debian/libhildon-im-ui3-dbg.install:
+	* debian/libhildon-im-ui3.install:
+	* debian/libhildon-im-ui-dev.install: Removes unecessary path prefix.
+	* Fixes: NB#149136
+
 2010-01-28 Eduardo Lima Mitev <e-lima@maemo.org>
 
 	* Version 2.1.43-1~unreleased

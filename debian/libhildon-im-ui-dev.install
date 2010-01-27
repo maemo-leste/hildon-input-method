@@ -1,7 +1,7 @@
-debian/tmp/usr/include/hildon-input-method/hildon-im-ui.h
-debian/tmp/usr/include/hildon-input-method/hildon-im-plugin.h
-debian/tmp/usr/include/hildon-input-method/hildon-im-settings-plugin.h
-debian/tmp/usr/include/hildon-input-method/hildon-im-widget-loader.h
-debian/tmp/usr/include/hildon-input-method/hildon-im-languages.h
-debian/tmp/usr/lib/pkgconfig/hildon-input-method-ui-3.0.pc
-debian/tmp/usr/lib/*.so
+usr/include/hildon-input-method/hildon-im-ui.h
+usr/include/hildon-input-method/hildon-im-plugin.h
+usr/include/hildon-input-method/hildon-im-settings-plugin.h
+usr/include/hildon-input-method/hildon-im-widget-loader.h
+usr/include/hildon-input-method/hildon-im-languages.h
+usr/lib/pkgconfig/hildon-input-method-ui-3.0.pc
+usr/lib/*.so
