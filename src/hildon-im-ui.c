@@ -1137,6 +1137,9 @@ hildon_im_ui_set_client(HildonIMUI *self,
     {
       hildon_im_ui_send_communication_message(self,
                                               HILDON_IM_CONTEXT_WIDGET_CHANGED);
+
+      /* reset shift and level states */
+      self->priv->mask = 0;
     }
 
     if (info != NULL && info->widget != NULL)

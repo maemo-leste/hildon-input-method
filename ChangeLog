@@ -1,6 +1,12 @@
+2010-01-28 Eduardo Lima Mitev <e-lima@maemo.org>
+
+	* Version 2.1.43-1~unreleased
+	* src/hildon-im-ui.c Resets shift and level states in HIM upon focused widget change.
+	* Fixes NB#154731
+
 2010-01-25 Joaquim Rocha <jrocha@maemo.org>
 
-	* Version 2.1.42-1~unreleased
+	* Version 2.1.42-1
 
 2010-01-18 Eduardo Lima Mitev <e-lima@maemo.org>
 
