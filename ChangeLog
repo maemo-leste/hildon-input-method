@@ -1,3 +1,7 @@
+2010-02-04 Eduardo Lima Mitev <e-lima@maemo.org>
+
+	* Version 2.1.43-1
+
 2010-01-29 Eduardo Lima Mitev <e-lima@maemo.org>
 
 	* debian/rules: Replaces CDBS by normal debian build rules and avoid installing
