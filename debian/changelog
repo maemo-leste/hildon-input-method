@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.45-1) unstable; urgency=low
+
+  * Version 1:2.1.45-1
+  * Updated for ABI changes in dependent module hildon-input-method-framework.
+
+ -- Eduardo Lima Mitev <e-lima@maemo.org>  Mon, 22 Feb 2010 12:00:00 +0200
+
 hildon-input-method (1:2.1.44-1) unstable; urgency=low
 
   * Version 1:2.1.44-1
