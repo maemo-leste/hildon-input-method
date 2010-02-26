@@ -1,3 +1,10 @@
+2010-02-26 Eduardo Lima Mitev <e-lima@maemo.org>
+
+	* Version 2.1.46-1~unreleased
+	* src/hildon-im-languages.h,
+	* src/hildon-im-languages.c : Removes function to get the available dictionaries.
+	* Fixes : NB#157749
+
 2010-02-22 Eduardo Lima Mitev <e-lima@maemo.org>
 
 	* Version 2.1.45-1

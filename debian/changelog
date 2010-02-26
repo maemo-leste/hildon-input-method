@@ -1,3 +1,10 @@
+hildon-input-method (1:2.1.46-1~unreleased) unstable; urgency=low
+
+  * Version 1:2.1.46-1~unreleased
+  * Fixes: NB#157749 Wrong HW keyboard layout when selecting Russian/English combination.
+
+ -- Eduardo Lima Mitev <e-lima@maemo.org>  Fri, 26 Feb 2010 12:00:00 +0200
+
 hildon-input-method (1:2.1.45-1) unstable; urgency=low
 
   * Version 1:2.1.45-1

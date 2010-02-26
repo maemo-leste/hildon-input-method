@@ -67,13 +67,4 @@ GSList *hildon_im_get_available_languages (void);
  */
 void hildon_im_free_available_languages (GSList *list);
 
-/**
- * hildon_im_get_available_dictionaries:
- *
- * Gets the list of available dictionaries from GConf.
- *
- * Returns: the #GSList of available dictionaries
- */
-GSList *hildon_im_get_available_dictionaries (void);
-
 #endif
