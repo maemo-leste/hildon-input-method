@@ -1,7 +1,3 @@
-/**
-   @file: hildon-im-plugin.c
-
-*/
 /*
  * This file is part of hildon-input-method
  *
@@ -24,6 +20,12 @@
  * 02110-1301 USA
  *
  */
+
+/**
+ * SECTION:hildon-im-plugin
+ * @short_description: Plugin interface for Hildon Input Method
+ *
+ **/
 
 #include <string.h>
 

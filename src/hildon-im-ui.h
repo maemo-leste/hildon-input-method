@@ -1,7 +1,3 @@
-/**
-   @file: hildon-im-ui.h
-
- */
 /*
  * This file is part of hildon-input-method
  *
@@ -23,6 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  */
+
 #ifndef __HILDON_IM_UI_H__
 #define __HILDON_IM_UI_H__
 
@@ -124,11 +121,10 @@ GType hildon_im_ui_get_type(void);
 
 /**
  * hildon_im_ui_new:
- * @dir: the name od the directory where ui layouts are located
- *
- * @Returns: a newly allocated #HildonIMUI
  *
  * Creates and returns a #HildonIMUI
+ *
+ * Returns: a newly allocated #HildonIMUI
  */
 GtkWidget *hildon_im_ui_new(void);
 
@@ -236,7 +232,7 @@ void hildon_im_ui_restore_previous_mode(HildonIMUI *self);
  *
  * Activates the specified input method plugin
  */
-void hildon_im_ui_activate_plugin (HildonIMUI *self, gchar *,
+void hildon_im_ui_activate_plugin (HildonIMUI *self, gchar *name,
         gboolean init);
 
 /**
@@ -292,28 +288,28 @@ void hildon_im_ui_send_surrounding_offset(HildonIMUI *self,
                                           gint offset);
 /**
  * hildon_im_ui_get_surrounding:
- * @self: a #HildonIMUI
+ * @ui: a #HildonIMUI
  *
  * @Returns: the surrounding text
  *
- * Returns the context around the cursor
+ * Returns: the context around the cursor
  */
-const gchar *hildon_im_ui_get_surrounding(HildonIMUI *keyboard);
+const gchar *hildon_im_ui_get_surrounding(HildonIMUI *ui);
 
 /**
  * hildon_im_ui_get_surrounding_offest:
  * @self: a #HildonIMUI
  *
  * Returns the character offset of the cursor in the surrounding content.
- * 
- * @Returns: the offset
+ *
+ * Returns: the offset
  */
 gint hildon_im_ui_get_surrounding_offset(HildonIMUI *keyboard);
 
 /**
  * hildon_im_ui_set_context_options:
- * @self: #HildonIMUI
- * @option: #HildonIMOptionMask
+ * @ui: #HildonIMUI
+ * @options: #HildonIMOptionMask
  * @enable: the option is enabled?
  */
 void
@@ -327,12 +323,12 @@ hildon_im_ui_set_context_options(HildonIMUI *ui,
  */ 
 /**
  * hildon_im_ui_play_sound:
- * @self: #HildonIMUI
+ * @ui: #HildonIMUI
  * @sound: the #HildonIMUISound
  *
  * Play a sound
  */
-void hildon_im_ui_play_sound(HildonIMUI *, HildonIMUISound);
+void hildon_im_ui_play_sound(HildonIMUI *ui, HildonIMUISound sound);
 
 /**
  * hildon_im_ui_get_language_setting:
@@ -375,7 +371,8 @@ gint hildon_im_ui_get_active_language_index(HildonIMUI *self);
 
 /**
  * hildon_im_ui_set_active_language_index:
- * @self: #HildonIMUI
+ * @ui: #HildonIMUI
+ * @index: the index to set
  *
  * Sets the index of the active language.
  *
@@ -405,7 +402,7 @@ void hildon_im_ui_append_plugin_buffer(HildonIMUI *ui, const gchar *val);
  * @ui: #HildonIMUI
  * @len: number of characters to erase
  *
- * Erase a number of characters from the end of the shared plugin buffer
+ * Erases a number of characters from the end of the shared plugin buffer
  */
 void hildon_im_ui_erase_plugin_buffer(HildonIMUI *ui, gint len);
 
@@ -413,13 +410,13 @@ void hildon_im_ui_erase_plugin_buffer(HildonIMUI *ui, gint len);
  * hildon_im_ui_clear_plugin_buffer:
  * @ui: #HildonIMUI
  *
- * Clear the shared plugin buffer
+ * Clears the shared plugin buffer
  */
 void hildon_im_ui_clear_plugin_buffer(HildonIMUI *ui);
 
 /**
  * hildon_im_ui_parse_rc_file:
- * @self: #HildonIMUI
+ * @ui: #HildonIMUI
  * @rc_file: the gtkrc file to parse
  *
  * Parses the given rc_file only if it has not been parsed before.
@@ -451,20 +448,72 @@ HildonIMInternalModifierMask hildon_im_ui_get_mask (HildonIMUI *self);
  */
 void hildon_im_ui_set_mask (HildonIMUI *self, HildonIMInternalModifierMask mask);
 
+/**
+ * hildon_im_ui_get_shift_locked:
+ * @self: #HildonIMUI
+ *
+ * Returns: TRUE if shift is currently locked, FALSE otherwise.
+ */
 gboolean hildon_im_ui_get_shift_locked (HildonIMUI *self);
 
+/**
+ * hildon_im_ui_set_shift_locked:
+ * @self: #HildonIMUI
+ * @locked: boolean value to set/remove shift lock state.
+ *
+ * Activate/deactivates shift lock.
+ */
 void hildon_im_ui_set_shift_locked (HildonIMUI *self, gboolean locked);
 
+/**
+ * hildon_im_ui_get_level_locked:
+ * @self: #HildonIMUI
+ *
+ * Returns: TRUE if level is currently locked, FALSE otherwise.
+ */
 gboolean hildon_im_ui_get_level_locked (HildonIMUI *self);
 
+/**
+ * hildon_im_ui_set_level_locked:
+ * @self: #HildonIMUI
+ * @locked: boolean value to set/remove level lock state.
+ *
+ * Activate/deactivates level lock.
+ */
 void hildon_im_ui_set_level_locked (HildonIMUI *self, gboolean locked);
 
+/**
+ * hildon_im_ui_get_shift_sticky:
+ * @self: #HildonIMUI
+ *
+ * Returns: TRUE if shift is currently sticky, FALSE otherwise.
+ */
 gboolean hildon_im_ui_get_shift_sticky (HildonIMUI *self);
 
+/**
+ * hildon_im_ui_set_shift_sticky:
+ * @self: #HildonIMUI
+ * @sticky: boolean value to set/remove shift sticky mask.
+ *
+ * Activate/deactivates shift sticky.
+ */
 void hildon_im_ui_set_shift_sticky (HildonIMUI *self, gboolean sticky);
 
+/**
+ * hildon_im_ui_get_level_sticky:
+ * @self: #HildonIMUI
+ *
+ * Returns: TRUE if level is currently sticky, FALSE otherwise.
+ */
 gboolean hildon_im_ui_get_level_sticky (HildonIMUI *self);
 
+/**
+ * hildon_im_ui_set_level_sticky:
+ * @self: #HildonIMUI
+ * @sticky: boolean value to set/remove level sticky mask.
+ *
+ * Activate/deactivates level sticky.
+ */
 void hildon_im_ui_set_level_sticky (HildonIMUI *self, gboolean sticky);
 
 G_END_DECLS

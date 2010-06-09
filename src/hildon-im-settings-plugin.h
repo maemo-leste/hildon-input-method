@@ -1,7 +1,3 @@
-/**
-   @file: hildon-im-settings-plugin.h
-
- */
 /*
  * This file is part of hildon-input-method
  *
@@ -24,7 +20,6 @@
  * 02110-1301 USA
  *
  */
-
 
 #ifndef __HILDON_IM_SETTINGS_PLUGIN_H__
 #define __HILDON_IM_SETTINGS_PLUGIN_H__
@@ -96,9 +91,9 @@ GType hildon_im_settings_plugin_get_type(void);
  * so the application can easily determine the order of the widgets created
  * by separate plugins.
  */
-GtkWidget *hildon_im_settings_plugin_create_widget (HildonIMSettingsPlugin *,
-                                                    HildonIMSettingsCategory,
-                                                    GtkSizeGroup *, gint *);
+GtkWidget *hildon_im_settings_plugin_create_widget (HildonIMSettingsPlugin *plugin,
+                                                    HildonIMSettingsCategory where,
+                                                    GtkSizeGroup *size_group, gint *weight);
 
 /**
  * hildon_im_settings_plugin_value_changed:
@@ -120,7 +115,7 @@ void hildon_im_settings_plugin_value_changed (HildonIMSettingsPlugin *plugin, co
  * may want to skip the saving if the changes made in the language
  * dialog, and vice versa.
  */
-void hildon_im_settings_plugin_save_data (HildonIMSettingsPlugin *, HildonIMSettingsCategory);
+void hildon_im_settings_plugin_save_data (HildonIMSettingsPlugin *plugin, HildonIMSettingsCategory where);
 
 /**
  * hildon_im_settings_plugin_set_manager:
@@ -129,12 +124,6 @@ void hildon_im_settings_plugin_save_data (HildonIMSettingsPlugin *, HildonIMSett
  *
  * Sets a manager to the plugin
  */
-
-/** XXX do not define static function in head file
-static void
-hildon_im_settings_plugin_set_manager (HildonIMSettingsPlugin *plugin,
-                                       HildonIMSettingsPluginManager *m);
-				       **/
 
 /* TODO split the APIs of HildonIMSettingsPlugin and 
  * HildonIMSettingsPluginManager in two sets of source files 

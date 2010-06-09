@@ -1,7 +1,3 @@
-/**
-   @file: hildon-im-ui.c
-
- */
 /*
  * This file is part of hildon-input-method
  *
@@ -24,6 +20,12 @@
  * 02110-1301 USA
  *
  */
+
+/**
+ * SECTION:hildon-im-ui
+ * @short_description: Hildon Input Method user interface class
+ *
+ **/
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>

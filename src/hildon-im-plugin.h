@@ -1,7 +1,3 @@
-/**
-   @file: hildon-im-plugin.h
-
- */
 /*
  * This file is part of hildon-input-method
  *
@@ -92,12 +88,12 @@ typedef struct
 
 /**
  * HildonIMPluginGroup:
- * 
- * The plugins can be intended for Latin, CJK or other languages.
- * 
  * @HILDON_IM_GROUP_LATIN: Lating languajes
  * @HILDON_IM_GROUP_CJK: Chinese, Japanese and Korean
  * @HILDON_IM_GROUP_CUSTOM: Other languages
+ *
+ * The plugins can be intended for Latin, CJK or other languages.
+ *
  */
 typedef enum
 {
@@ -108,10 +104,6 @@ typedef enum
 
 /**
  * HildonIMPluginType:
- * 
- * The different kinds of plugins. Note that some of them aren't supported in
- * Framentle because the HIM UI has been removed.
- * 
  * @HILDON_IM_TYPE_DEFAULT: The plugin uses default UI. Deprecated: Not used in Fremantle.
  * @HILDON_IM_TYPE_SPECIAL: The plugin is called by another plugin. Deprecated: Not used in Fremantle.
  * @HILDON_IM_TYPE_FULLSCREEN: The plugin is fullscreen
@@ -119,6 +111,10 @@ typedef enum
  * @HILDON_IM_TYPE_OTHERS: The plugin doesn't fall into any of categories above.
  * @HILDON_IM_TYPE_HIDDEN: The plugin doesn't have a graphical UI.
  * @HILDON_IM_TYPE_SPECIAL_STANDALONE: A special plugin that has its own window
+ *
+ * The different kinds of plugins. Note that some of them aren't supported in
+ * Framentle because the HIM UI has been removed.
+ *
  */
 typedef enum
 {
@@ -199,7 +195,6 @@ void hildon_im_plugin_settings_changed(HildonIMPlugin *plugin,
  * hildon_im_plugin_language_settings_changed:
  * @plugin: #HildonIMPlugin
  * @index: 0 = primary, 1 = secondary
- * @value: the language id
  *
  * The language settings has been changed
  */
@@ -308,8 +303,6 @@ void hildon_im_plugin_tab(HildonIMPlugin *plugin);
  * @fullscreen: whether it is a fullscreen or not
  *
  * Called when it is needed to change the screen size
- *
- * Return value:
  */
 void hildon_im_plugin_fullscreen(HildonIMPlugin *plugin, gboolean fullscreen);
 /**
@@ -361,7 +354,6 @@ void hildon_im_plugin_preedit_committed (HildonIMPlugin *plugin,
 
 /**
  * hildon_im_plugin_duplicate_info:
- * @plugin: #HildonIMPlugin
  * @src: source
  *
  * Make a copy of a HildonIMPluginInfo
@@ -370,9 +362,10 @@ void hildon_im_plugin_preedit_committed (HildonIMPlugin *plugin,
  */
 HildonIMPluginInfo *hildon_im_plugin_duplicate_info(
         const HildonIMPluginInfo *src);
+
 /**
  * hildon_im_plugin_create:
- * @plugin: #HildonIMPlugin
+ * @keyboard: #HildonIMUI
  * @plugin_name: the name
  *
  * Creates a plugin

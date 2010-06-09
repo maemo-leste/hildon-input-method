@@ -1,7 +1,3 @@
-/**
-   @file: hildon-im-main.c
-
-*/
 /*
  * This file is part of hildon-input-method
  * 

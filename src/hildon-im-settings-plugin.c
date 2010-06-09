@@ -1,7 +1,3 @@
-/**
-   @file: hildon-im-settings-plugin.c
-
-*/
 /*
  * This file is part of hildon-input-method
  *
@@ -25,6 +21,11 @@
  *
  */
 
+/**
+ * SECTION:hildon-im-settings-plugin
+ * @short_description: Settings Plugin interface for Hildon Input Method
+ *
+ **/
 
 #include <glib.h>
 #include <stdlib.h>
