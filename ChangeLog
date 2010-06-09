@@ -1,6 +1,6 @@
 2010-06-09 Eduardo Lima Mitev <e-lima@maemo.org>
 
-	* Version 2.1.47-1~unreleased
+	* Version 2.1.47-1
 	* docs/hildon-input-method-docs.sgml: (new file) Main docbook file containing basic
 	  structure of libhildon-im-ui library documentation.
 	* src/hildon-im-main.c,
