@@ -10,6 +10,11 @@
 	  src/hildon-im-settings-plugin.h,
 	  src/hildon-im-ui.c,
 	  src/hildon-im-ui.h: Fixes several errors in gtk-doc annotations.
+	* debian/control: Adds entry to generate new package 'libhildon-im-ui-doc'.
+	* debian/libhildon-im-ui-doc.install: (new file) Install file corresponding to new
+	  documentation package.
+	* debian/rules: Adds '--enable-gtk-doc' flag in 'configure' rule to build gtk-doc
+	  documentation during debian package build.
 	* Fixes : NB#122448
 
 2010-03-02 Eduardo Lima Mitev <e-lima@maemo.org>
