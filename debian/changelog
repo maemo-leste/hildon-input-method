@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.48-1) unstable; urgency=low
+
+  * make it build on leste
+
+ -- Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>  Tue, 15 May 2018 16:44:14 +0300
+
 hildon-input-method (1:2.1.47-1) unstable; urgency=low
 
   * Version 1:2.1.47-1
