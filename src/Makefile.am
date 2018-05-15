@@ -14,6 +14,7 @@ INCLUDES = \
 	$(LIBXML_CFLAGS) \
 	$(HILDON_LGPL_CFLAGS) \
 	$(DBUS_CFLAGS) \
+	$(X11_CFLAGS) \
 	$(MAEMO_LAUNCHER_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\"
 
@@ -47,15 +48,14 @@ libhildon_im_ui_la_SOURCES = \
 	hildon-im-settings-plugin.c internal.h
 libhildon_im_ui_la_LIBADD = \
 	$(GTK_LIBS) $(GCONF_LIBS) $(ESD_LIBS) $(HILDON_LIBS) \
-	$(LIBOSSO_LIBS) $(HILDON_IMF_LIBS)\
-	$(LIBIMLAYOUTS_LIBS) $(DBUS_LIBS)
+	$(LIBOSSO_LIBS) $(HILDON_IMF_LIBS) $(GLIB_LIBS) \
+	$(LIBIMLAYOUTS_LIBS) $(DBUS_LIBS) $(X11_LIBS) -ldl
 libhildon_im_ui_la_LDFLAGS = -version-info $(LIBVERSION)
 
 hildon_input_methodincludeinstdir = $(includedir)/hildon-input-method
 hildon_input_methodincludeinst_DATA = \
 	hildon-im-ui.h \
 	hildon-im-plugin.h \
-	hildon-im-widget-loader.h \
 	hildon-im-widget-loader.h \
 	hildon-im-languages.h \
 	hildon-im-settings-plugin.h
