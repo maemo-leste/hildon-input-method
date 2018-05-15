@@ -99,8 +99,9 @@ main(int argc, char *argv[])
   struct sigaction sv;
   DBusConnection *dbus_connection = NULL;
   DBusError dbus_error_code;
-
+#if !GLIB_CHECK_VERSION(2,32,0)
   if (!g_thread_supported ()) g_thread_init (NULL);
+#endif
   hildon_gtk_init(&argc, &argv);
   /* TODO call hildon_init() here
    * or replace both calls with hildon_gtk_init() */

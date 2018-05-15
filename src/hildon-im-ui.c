@@ -1724,7 +1724,6 @@ hildon_im_ui_init_root_window_properties(HildonIMUI *self)
   GtkWidget *widget;
   Atom atom;
   Window xid;
-  int result;
 
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
@@ -1734,7 +1733,7 @@ hildon_im_ui_init_root_window_properties(HildonIMUI *self)
   gtk_widget_realize(widget);
   xid = GDK_WINDOW_XID(widget->window);
 
-  result = XChangeProperty(GDK_DISPLAY(), GDK_ROOT_WINDOW(), atom,
+  XChangeProperty(GDK_DISPLAY(), GDK_ROOT_WINDOW(), atom,
                   XA_WINDOW, HILDON_IM_WINDOW_ID_FORMAT, PropModeReplace,
                   (unsigned char *) &xid, 1);
 
@@ -2039,6 +2038,8 @@ activate_plugin (HildonIMUI *self, PluginData *plugin,
 
   if (plugin->info->type == HILDON_IM_TYPE_SPECIAL || plugin->info->type == HILDON_IM_TYPE_SPECIAL_STANDALONE)
     activate_special = TRUE;
+
+  (void)activate_special;
 
   flush_plugins(self, plugin, FALSE);
 
