@@ -111,6 +111,7 @@ binary-arch: build install
 #	dh_installcron
 #	dh_installinfo
 	dh_installman
+	dh_gconf
 	dh_link
 	dh_strip --dbg-package=hildon-input-method
 	dh_compress

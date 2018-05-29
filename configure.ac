@@ -135,6 +135,5 @@ AM_GLIB_GNU_GETTEXT
 
 AC_OUTPUT([Makefile \
 	hildon-input-method-ui-3.0.pc \
-	debian/libhildon-im-ui3.postinst \
 	src/Makefile \
 	docs/Makefile])

@@ -28,7 +28,7 @@ Architecture: all
 Provides: libhildon-input-method-ui-dev
 Replaces: libhildon-input-method-ui-dev (<< 3.0.0-1), hildon-input-method-header
 Conflicts: libhildon-input-method-ui-dev (<< 3.0.0-1), hildon-input-method-header
-Depends: libhildon-im-ui3 (= ${binary:Version}), hildon-input-method-framework-dev, libxsp-dev, ${shlibs:Depends}, ${misc:Depends}
+Depends: libhildon-im-ui3 (= ${binary:Version}), hildon-input-method-framework-dev, ${shlibs:Depends}, ${misc:Depends}
 Description: Development package for Hildon Input Method UI
  This package installs the development package for Hildon Input Method UI.
 
