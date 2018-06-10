@@ -49,6 +49,7 @@ setup_translation_library (const gchar *libname, const gchar *func_name)
   if (handle == NULL)
   {
     g_warning("Opening %s failed! (%s)", libname, dlerror());
+    return;
   }
 
   translate_function = G_GNUC_EXTENSION (translate_func) dlsym(handle, func_name);
