@@ -1,3 +1,11 @@
+hildon-input-method (1:2.1.49-1) unstable; urgency=low
+
+  * Install schemas in proper place
+  * Remove libxsp dep
+  * Fix segfault when translation .so is missing
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Tue, 10 Jul 2018 23:59:00 +0200
+
 hildon-input-method (1:2.1.48-1) unstable; urgency=low
 
   * make it build on leste
