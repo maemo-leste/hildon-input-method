@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.50-1) unstable; urgency=low
+
+  * Deprecate g_type_class_add_private
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Fri, 24 Jan 2020 14:16:26 +0100
+
 hildon-input-method (1:2.1.49-1) unstable; urgency=low
 
   * Install schemas in proper place
