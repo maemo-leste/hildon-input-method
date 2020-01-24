@@ -228,7 +228,7 @@ static void hildon_im_ui_send_long_press_settings (HildonIMUI *self);
 
 static gint get_window_pid (Window window);
 
-G_DEFINE_TYPE(HildonIMUI, hildon_im_ui, GTK_TYPE_WINDOW)
+G_DEFINE_TYPE_WITH_CODE(HildonIMUI, hildon_im_ui, GTK_TYPE_WINDOW, G_ADD_PRIVATE(HildonIMUI))
 
 static gint
 _plugin_by_trigger_type (gconstpointer a, gconstpointer b)
@@ -1834,9 +1834,7 @@ hildon_im_ui_init(HildonIMUI *self)
 
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
-  self->priv = priv = G_TYPE_INSTANCE_GET_PRIVATE(self,
-                                                  HILDON_IM_TYPE_UI,
-                                                  HildonIMUIPrivate);
+  self->priv = priv = (HildonIMUIPrivate*)hildon_im_ui_get_instance_private(self);
 
   priv->current_plugin = NULL;
   priv->surrounding = g_strdup("");
@@ -1905,8 +1903,6 @@ hildon_im_ui_init(HildonIMUI *self)
 static void
 hildon_im_ui_class_init(HildonIMUIClass *klass)
 {
-  g_type_class_add_private(klass, sizeof(HildonIMUIPrivate));
-
   G_OBJECT_CLASS(klass)->finalize = hildon_im_ui_finalize;
 }
 
