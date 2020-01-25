@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.51-1) unstable; urgency=medium
+
+  * Pressing hardware Enter key shouldn't trigger vkb visibility
+
+ -- Arthur Demchenkov <spinal.by@gmail.com>  Sun, 26 Jan 2020 01:42:10 +0300
+
 hildon-input-method (1:2.1.50-1) unstable; urgency=low
 
   * Deprecate g_type_class_add_private
