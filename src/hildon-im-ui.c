@@ -163,7 +163,6 @@ struct _HildonIMUIPrivate
 
   gboolean first_boot;
 
-  gboolean return_key_pressed;
   gboolean use_finger_kb;
 
   GSList *all_methods;
@@ -1346,28 +1345,6 @@ hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
     }
   }
 
-  if (self->priv->return_key_pressed &&
-      msg->type == GDK_KEY_RELEASE &&
-      msg->keyval == GDK_Return)
-  {
-    /* Allow the client widget to insert a new line/activate */
-    if (self->priv->keyboard_available)
-    {
-      hildon_im_ui_send_communication_message(self,
-          HILDON_IM_CONTEXT_HANDLE_ENTER);
-    }
-    else /* Toggle the visibility of the IM */
-    {
-      self->priv->trigger = HILDON_IM_TRIGGER_STYLUS;
-      if(GTK_WIDGET_DRAWABLE(self))
-        hildon_im_ui_hide(self);
-      else
-        hildon_im_ui_show(self);
-    }
-  }
-  self->priv->return_key_pressed = (msg->keyval == GDK_Return &&
-                                    msg->type == GDK_KEY_PRESS);
- 
   hildon_im_ui_foreach_plugin_va(self,
                                  hildon_im_plugin_key_event,
                                  msg->type,
