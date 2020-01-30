@@ -1351,7 +1351,7 @@ hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
       msg->keyval == GDK_Return)
   {
     /* Allow the client widget to insert a new line/activate */
-    if (self->priv->keyboard_available)
+    if (self->priv->keyboard_available || !self->priv->use_finger_kb)
     {
       hildon_im_ui_send_communication_message(self,
           HILDON_IM_CONTEXT_HANDLE_ENTER);
