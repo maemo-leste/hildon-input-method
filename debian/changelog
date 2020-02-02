@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.52-1) unstable; urgency=low
+
+  * Do not double Return key press when CTRL is pressed
+
+ -- Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>  Sun, 02 Feb 2020 09:58:21 +0200
+
 hildon-input-method (1:2.1.51-1) unstable; urgency=low
 
   * Do not try to show VKB on Return key pressed if VKB is disabled
