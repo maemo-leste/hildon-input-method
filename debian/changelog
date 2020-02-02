@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.53-1) unstable; urgency=low
+
+  * Depend on hildon-input-method-framework (>= 1:2.1.66-1)
+
+ -- Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>  Sun, 02 Feb 2020 19:06:52 +0200
+
 hildon-input-method (1:2.1.52-1) unstable; urgency=low
 
   * Do not double Return key press when CTRL is pressed
