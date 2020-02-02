@@ -1325,6 +1325,8 @@ hildon_im_ui_toggle_special_plugin(HildonIMUI *self)
 static void
 hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
 {
+  gboolean return_key_pressed;
+
   self->priv->input_window = msg->input_window;
 
   if (msg->type == GDK_KEY_PRESS && self->priv->current_banner != NULL)
@@ -1350,23 +1352,30 @@ hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
       msg->type == GDK_KEY_RELEASE &&
       msg->keyval == GDK_Return)
   {
-    /* Allow the client widget to insert a new line/activate */
+    /* Toggle the visibility of the IM */
+    self->priv->trigger = HILDON_IM_TRIGGER_STYLUS;
+    if(GTK_WIDGET_DRAWABLE(self))
+      hildon_im_ui_hide(self);
+    else
+      hildon_im_ui_show(self);
+  }
+
+  return_key_pressed =
+      msg->keyval == GDK_Return &&
+      msg->type == GDK_KEY_PRESS &&
+      (msg->state & GDK_CONTROL_MASK) == 0;
+
+  if (return_key_pressed)
+  {
     if (self->priv->keyboard_available || !self->priv->use_finger_kb)
     {
       hildon_im_ui_send_communication_message(self,
           HILDON_IM_CONTEXT_HANDLE_ENTER);
-    }
-    else /* Toggle the visibility of the IM */
-    {
-      self->priv->trigger = HILDON_IM_TRIGGER_STYLUS;
-      if(GTK_WIDGET_DRAWABLE(self))
-        hildon_im_ui_hide(self);
-      else
-        hildon_im_ui_show(self);
+      return_key_pressed = FALSE;
     }
   }
-  self->priv->return_key_pressed = (msg->keyval == GDK_Return &&
-                                    msg->type == GDK_KEY_PRESS);
+
+  self->priv->return_key_pressed = return_key_pressed;
  
   hildon_im_ui_foreach_plugin_va(self,
                                  hildon_im_plugin_key_event,
