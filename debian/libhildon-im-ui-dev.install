@@ -3,5 +3,5 @@ usr/include/hildon-input-method/hildon-im-plugin.h
 usr/include/hildon-input-method/hildon-im-settings-plugin.h
 usr/include/hildon-input-method/hildon-im-widget-loader.h
 usr/include/hildon-input-method/hildon-im-languages.h
-usr/lib/pkgconfig/hildon-input-method-ui-3.0.pc
-usr/lib/*.so
+usr/lib/*/pkgconfig/hildon-input-method-ui-3.0.pc
+usr/lib/*/*.so
