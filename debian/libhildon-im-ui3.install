@@ -1,2 +1,2 @@
-usr/lib/libhildon-im-ui.so.*
+usr/lib/*/libhildon-im-ui.so.*
 etc/gconf/*

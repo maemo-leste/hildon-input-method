@@ -7,23 +7,16 @@
 # Released under the terms of LGPL version 2.1
 #
 
-AC_INIT(Makefile.am)
-VERSION=2.0.4
+AC_INIT([hildon-input-method], [2.0.4])
+AC_CONFIG_SRCDIR([Makefile.am])
+AM_INIT_AUTOMAKE
+
 LIBVERSION=3
-MAJORVERSION=`echo $VERSION|cut -d . -f1`
-AC_SUBST(VERSION)
 AC_SUBST(LIBVERSION)
-AC_SUBST(MAJORVERSION)
-AM_INIT_AUTOMAKE(hildon-input-method, $VERSION)
+
 AM_CONFIG_HEADER(config.h)
 
 CFLAGS="$CFLAGS -Werror -Wall -Wmissing-prototypes -Wmissing-declarations -fno-strict-aliasing"
-
-GCCVERSION=`gcc -dumpversion`;
-if test x$GCCVERSION = "x3.4.4"
-then
-	LDFLAGS = "$LDFLAGS -Wl,--as-needed"
-fi
 
 AC_CANONICAL_HOST
 
@@ -78,12 +71,6 @@ PKG_CHECK_MODULES(GCONF, gconf-2.0 >= 2.6.2)
 AC_SUBST(GCONF_LIBS)
 AC_SUBST(GCONF_CFLAGS)
 
-AC_PATH_PROG(GCONFTOOL, gconftool-2, no)
-AC_SUBST(GCONFTOOL)
-if test "x$GCONFTOOL" = "xno"; then
-	AC_MSG_ERROR([gconftool-2 executable not found in your path - should be installed with GConf])
-fi
-AC_SUBST(GCONF_SCHEMA_SUBDIRS)
 AM_GCONF_SOURCE_2
 
 PKG_CHECK_MODULES(LIBOSSO, libosso >= 0.7.6)

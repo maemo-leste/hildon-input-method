@@ -4,7 +4,7 @@
 #
 # Contact: Mohammad Anwari <Mohammad.Anwari.com>
 
-INCLUDES = \
+AM_CPPFLAGS = \
 	$(GTK_CFLAGS) \
 	$(HILDON_CFLAGS) \
 	$(HILDON_IMF_CFLAGS)\
@@ -30,11 +30,11 @@ HIM_LIBS = $(GTK_LIBS) $(GCONF_LIBS) $(ESD_LIBS) \
 bin_PROGRAMS = hildon-input-method hildon-im-recache
 hildon_input_method_SOURCES = $(HIM_SRCS)
 hildon_input_method_LDADD = $(HIM_LIBS) $(MAEMO_LAUNCHER_LIBS)
-hildon_input_method_LDFLAGS = $(MAEMO_LAUNCHER_LDFLAGS)
+hildon_input_method_LDFLAGS = -Wl,--as-needed $(MAEMO_LAUNCHER_LDFLAGS)
 
 hildon_im_recache_SOURCES = hildon-im-recache.c
 hildon_im_recache_LDADD = cache.lo $(GLIB_LIBS) -ldl
-hildon_im_recache_LDFLAGS = -rdynamic
+hildon_im_recache_LDFLAGS = -Wl,--as-needed -rdynamic
 
 libhildon_im_ui_la_SOURCES = \
 	hildon-im-ui.h \
@@ -50,7 +50,7 @@ libhildon_im_ui_la_LIBADD = \
 	$(GTK_LIBS) $(GCONF_LIBS) $(ESD_LIBS) $(HILDON_LIBS) \
 	$(LIBOSSO_LIBS) $(HILDON_IMF_LIBS) $(GLIB_LIBS) \
 	$(LIBIMLAYOUTS_LIBS) $(DBUS_LIBS) $(X11_LIBS) -ldl
-libhildon_im_ui_la_LDFLAGS = -version-info $(LIBVERSION)
+libhildon_im_ui_la_LDFLAGS = -Wl,--as-needed -version-info $(LIBVERSION)
 
 hildon_input_methodincludeinstdir = $(includedir)/hildon-input-method
 hildon_input_methodincludeinst_DATA = \

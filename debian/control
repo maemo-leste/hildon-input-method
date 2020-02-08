@@ -1,20 +1,22 @@
 Source: hildon-input-method
 Section: x11
 Priority: optional
-Maintainer: Mohammad Anwari <Mohammad.Anwari@nokia.com>
-Build-Depends: debhelper, cdbs, pkg-config, libgtk2.0-dev (>= 2.14.7-1maemo15), libosso-dev (>=0.9.10-2), libgconf2-dev, libhildon1-dev, hildon-input-method-framework-dev (>= 1:2.1.66-1), libdbus-1-dev, maemo-launcher-dev (>= 0.23-1), gtk-doc-tools
+Maintainer: Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>
+Build-Depends: debhelper(>= 10),pkg-config, libgtk2.0-dev (>= 2.14.7-1maemo15), libosso-dev (>=0.9.10-2), libgconf2-dev, libhildon1-dev, hildon-input-method-framework-dev (>= 1:2.1.66-1), libdbus-1-dev, maemo-launcher-dev (>= 0.23-1), gtk-doc-tools
 Standards-Version: 3.6.0
 
 Package: hildon-input-method
 Section: x11
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, hildon-input-method-l10n-mr | hildon-input-method-l10n-mr0
+Multi-Arch: same
+Depends: ${launcher:Depends}, ${shlibs:Depends}, ${misc:Depends}, hildon-input-method-l10n-mr | hildon-input-method-l10n-mr0
 Description: Hildon Input method
  This package provides Hildon Input Method application binary.
 
 Package: libhildon-im-ui3
 Section: x11
 Architecture: any
+Multi-Arch: same
 Conflicts: libhildon-input-method-ui2 (<< 3.0.0-1), libhildon-input-method-ui-sdk2 (<< 3.0.0-1)
 Replaces: libhildon-input-method-ui2 (<< 3.0.0-1)
 Depends: ${shlibs:Depends}, ${misc:Depends}, hildon-input-method-l10n-mr0 | hildon-input-method-l10n-mr, hildon-common-strings-l10n-mr | hildon-common-strings-l10n-mr0
@@ -24,31 +26,19 @@ Description: Hildon Input method UI library
 
 Package: libhildon-im-ui-dev
 Section: x11
-Architecture: all
+Architecture: any
+Multi-Arch: same
 Provides: libhildon-input-method-ui-dev
 Replaces: libhildon-input-method-ui-dev (<< 3.0.0-1), hildon-input-method-header
 Conflicts: libhildon-input-method-ui-dev (<< 3.0.0-1), hildon-input-method-header
-Depends: libhildon-im-ui3 (= ${binary:Version}), hildon-input-method-framework-dev, ${shlibs:Depends}, ${misc:Depends}
+Depends: libhildon-im-ui3 (= ${binary:Version}), hildon-input-method-framework-dev, ${misc:Depends}
 Description: Development package for Hildon Input Method UI
  This package installs the development package for Hildon Input Method UI.
-
-Package: libhildon-im-ui3-dbg
-Section: x11
-Architecture: any
-Depends: libhildon-im-ui3 (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: Debug versions of the Hildon Input Method UI library
- Symbols for Hildon Input Method UI library.
-
-Package: hildon-input-method-dbg
-Section: x11
-Architecture: any
-Depends: hildon-input-method (= ${binary:Version}), ${shlibs:Depends}, ${misc:Depends}
-Description: Hildon Input method debugging package.
- This package provides symbols of Hildon Input Method application binary.
 
 Package: libhildon-im-ui-doc
 Section: doc
 Architecture: all
+Multi-Arch: foreign
 Depends: ${misc:Depends}, lynx | www-browser
 Recommends: libgtk2.0-doc
 Description: Hildon Input Method library documentation
