@@ -105,7 +105,7 @@ hildon_im_plugin_module_load(GTypeModule *module)
 
   if (!himp_module->library)
   {
-    g_warning (g_module_error());
+    g_warning("%s", g_module_error());
     return FALSE;
   }
 
@@ -119,7 +119,7 @@ hildon_im_plugin_module_load(GTypeModule *module)
       !g_module_symbol(himp_module->library, "module_create",
                        (gpointer *)&himp_module->create))
   {
-    g_warning (g_module_error());
+    g_warning("%s", g_module_error());
     g_module_close (himp_module->library);
 
     return FALSE;

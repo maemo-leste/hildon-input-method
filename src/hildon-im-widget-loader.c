@@ -106,7 +106,7 @@ hildon_im_widget_loader_load(GTypeModule *module)
 
   if(widget_loader->library == NULL)
   {
-    g_warning (g_module_error());
+    g_warning("%s", g_module_error());
     return FALSE;
   }
 
@@ -124,7 +124,7 @@ hildon_im_widget_loader_load(GTypeModule *module)
                        (gpointer *) &widget_loader->create);
   if (!re)
   {
-    g_warning(g_module_error());
+    g_warning("%s", g_module_error());
     g_module_close(widget_loader->library);
 
     return FALSE;

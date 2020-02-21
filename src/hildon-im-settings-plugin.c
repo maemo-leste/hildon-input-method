@@ -107,7 +107,7 @@ module_load (GTypeModule *_module)
 
   if (module->lib == NULL)
   {
-    g_warning (g_module_error());
+    g_warning("%s", g_module_error());
     return FALSE;
   }
 
