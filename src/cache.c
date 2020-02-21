@@ -35,17 +35,16 @@ get_cache_file (gint mode)
 	switch (mode)
 	{
 		case CACHE_FILENAME_TMP:
-			retval = g_strconcat (PREFIX, G_DIR_SEPARATOR_S, 
-				"lib", G_DIR_SEPARATOR_S, 
+			retval = g_strconcat (LIBDIR, G_DIR_SEPARATOR_S,
 				IM_PLUGIN_DIR, G_DIR_SEPARATOR_S,
 				CACHE_FILE, ".tmp", NULL);	
 			break;
 		case CACHE_FILENAME:
-			retval = g_build_filename (PREFIX, "lib", 
+			retval = g_build_filename (LIBDIR,
 				IM_PLUGIN_DIR, CACHE_FILE, NULL);
 			break;
 		case CACHE_DIRECTORY:
-			retval = g_build_filename (PREFIX, "lib", 
+			retval = g_build_filename (LIBDIR,
 				IM_PLUGIN_DIR, NULL);
 			break;
 	}

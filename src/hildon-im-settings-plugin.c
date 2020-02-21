@@ -345,8 +345,7 @@ load_module (HildonIMSettingsPluginManager *m, const gchar *filename)
   if (module_found == NULL)
   {
     module = g_object_new (HILDON_IM_TYPE_SETTINGS_MODULE, NULL);
-    module->path = g_build_filename (PREFIX, "lib", IM_PLUGIN_DIR, 
-      filename, NULL);
+    module->path = g_build_filename (LIBDIR, IM_PLUGIN_DIR, filename, NULL);
     add_module = TRUE;
   } else {
     module = (HildonIMSettingsModule *)module_found->data;
@@ -408,7 +407,7 @@ hildon_im_settings_plugin_manager_load_plugins (HildonIMSettingsPluginManager *m
   GDir *dir;
   const gchar *entry;
 
-  plugin_dir_name = g_build_filename (PREFIX, "lib", IM_PLUGIN_DIR, NULL);
+  plugin_dir_name = g_build_filename (LIBDIR, IM_PLUGIN_DIR, NULL);
   dir = g_dir_open (plugin_dir_name, 0, NULL);
   g_free (plugin_dir_name);
   if (dir == FALSE)

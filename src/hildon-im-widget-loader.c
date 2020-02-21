@@ -208,8 +208,7 @@ hildon_im_widget_load(const gchar *library_name, const gchar *widget_name,
   {
     module = g_object_new(HILDON_IM_TYPE_WIDGET_LOADER, NULL);
     g_type_module_set_name(G_TYPE_MODULE(module), widget_name);
-    module->library_name = g_strconcat(PREFIX, G_DIR_SEPARATOR_S, 
-				"lib", G_DIR_SEPARATOR_S,
+    module->library_name = g_strconcat(LIBDIR, G_DIR_SEPARATOR_S,
 				IM_WIDGET_DIR, G_DIR_SEPARATOR_S,
 				library_name, ".", G_MODULE_SUFFIX,
 				NULL);

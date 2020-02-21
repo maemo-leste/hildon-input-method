@@ -16,7 +16,8 @@ AM_CPPFLAGS = \
 	$(DBUS_CFLAGS) \
 	$(X11_CFLAGS) \
 	$(MAEMO_LAUNCHER_CFLAGS) \
-	-DLOCALEDIR=\"$(localedir)\"
+	-DLOCALEDIR=\"$(localedir)\" \
+	-DLIBDIR=\"$(libdir)\"
 
 uilibdir = $(libdir)
 uilib_LTLIBRARIES = libhildon-im-ui.la
