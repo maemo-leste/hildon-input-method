@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.56-1) unstable; urgency=low
+
+  * Fix some compile-time warnings
+
+ -- Ivan J. <parazyd@dyne.org>  Fri, 21 Feb 2020 20:08:27 +0100
+
 hildon-input-method (1:2.1.55-1) unstable; urgency=low
 
   * Use arch specific lib path for loading of plugins and widgets
