@@ -226,7 +226,7 @@ static void hildon_im_ui_foreach_plugin(HildonIMUI *self,
 
 static void hildon_im_ui_send_long_press_settings (HildonIMUI *self);
 
-static gint get_window_pid (Window window);
+static unsigned long get_window_pid (Window window);
 
 G_DEFINE_TYPE_WITH_CODE(HildonIMUI, hildon_im_ui, GTK_TYPE_WINDOW, G_ADD_PRIVATE(HildonIMUI))
 
@@ -1626,7 +1626,7 @@ hildon_im_ui_x_window_want_im_hidden(Window window)
   return ret;
 }
 
-static gint
+static unsigned long
 get_window_pid (Window window)
 {
   Atom atom, actual_type;
@@ -1634,7 +1634,7 @@ get_window_pid (Window window)
   unsigned long nitems;
   unsigned long bytes_after;
   unsigned char *prop = NULL;
-  gint pid = -1, status = -1;
+  unsigned long pid = -1, status = -1;
 
   atom = XInternAtom(GDK_DISPLAY(), "_NET_WM_PID", True);
   
@@ -1643,9 +1643,9 @@ get_window_pid (Window window)
                                window,
                                atom,
                                0,
-                               1024,
+                               1,
                                False,
-                               AnyPropertyType,
+                               XA_CARDINAL,
                                &actual_type,
                                &actual_format,
                                &nitems,
@@ -1658,8 +1658,8 @@ get_window_pid (Window window)
   }
   else if (status == 0 && prop != NULL)
   {
-    pid = prop[1] * 256;
-    pid += prop[0];
+    if (actual_format == 32)
+      pid = *((unsigned long *)prop);
 
     XFree (prop);
   }
