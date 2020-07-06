@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.57-1) unstable; urgency=medium
+
+  * Try enabling vkb by default.
+
+ -- Ivan J. <parazyd@dyne.org>  Mon, 06 Jul 2020 02:51:00 +0200
+
 hildon-input-method (1:2.1.56-1) unstable; urgency=low
 
   * Fix some compile-time warnings
