@@ -45,6 +45,7 @@ if test x$maemo_launcher = xtrue
 then
 	PKG_CHECK_MODULES(MAEMO_LAUNCHER, [maemo-launcher-app])
 	AC_SUBST(MAEMO_LAUNCHER_CFLAGS)
+	MAEMO_LAUNCHER_LIBS="-Xcompiler \"$MAEMO_LAUNCHER_LIBS\""
 	AC_SUBST(MAEMO_LAUNCHER_LIBS)
 	echo "Enabling maemo launcher"
 fi
