@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.58-1) unstable; urgency=medium
+
+  * Make sure libtool does not interfere with maemo-launcher linker flags
+
+ -- Ivaylo Dimitrov <ivo.g.dimitrov.75@gmail.com>  Sun, 01 Nov 2020 16:03:11 +0200
+
 hildon-input-method (1:2.1.57-1) unstable; urgency=medium
 
   * Try enabling vkb by default.
