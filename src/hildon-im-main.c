@@ -49,6 +49,11 @@
 #define LOCALE_SIGNAL "locale_changed"
 #define LOCALE_RULE "type='signal',interface='" LOCALE_IFACE "',member='" LOCALE_SIGNAL "'"
 
+#define DBUS_IFACE_HIM "org.maemo.him"
+#define DBUS_SIGNAL_SET_VISIBLE "set_visible"
+#define DBUS_MATCH_RULE "type='signal',interface='" DBUS_IFACE_HIM "',member='" DBUS_SIGNAL_SET_VISIBLE "'"
+
+
 GtkWidget *keyboard = NULL;
 
 static void
@@ -58,7 +63,7 @@ handle_sigterm(gint t)
 }
 
 static DBusHandlerResult
-dbus_msg_handler (DBusConnection *connection,
+dbus_system_msg_handler (DBusConnection *connection,
                   DBusMessage *msg,
                   void *user_data)
 {
@@ -93,12 +98,132 @@ dbus_msg_handler (DBusConnection *connection,
   return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
+static DBusHandlerResult
+dbus_msg_handler (DBusConnection *connection,
+                  DBusMessage *msg,
+                  void *user_data)
+{
+  const char *interface = dbus_message_get_interface(msg);
+  const char *method = dbus_message_get_member(msg);
+  const char *sender = dbus_message_get_sender(msg);
+  gint message_type = -1;
+    
+  if (!(message_type = dbus_message_get_type(msg)) ||
+      !sender || !interface || !method)
+    return FALSE;
+  
+  if (message_type == DBUS_MESSAGE_TYPE_SIGNAL)
+  {
+    if (strcmp(interface, DBUS_IFACE_HIM) == 0 &&
+        strcmp(method, DBUS_SIGNAL_SET_VISIBLE) == 0)
+    {
+      gboolean visible = TRUE;
+      dbus_message_get_args(msg, NULL,
+			    DBUS_TYPE_BOOLEAN, &visible,
+			    DBUS_TYPE_INVALID);
+      hildon_im_ui_set_visible((HildonIMUI *)keyboard, visible);
+      return DBUS_HANDLER_RESULT_HANDLED;
+    }
+  }
+  
+  return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+}
+
+static DBusConnection *
+register_on_system_dbus()
+{
+  DBusConnection *dbus_connection_system = NULL;
+  DBusError dbus_error_code;
+  
+  dbus_error_init(&dbus_error_code);
+
+  /* Establish DBus connection */
+  if (!(dbus_connection_system = dbus_bus_get(DBUS_BUS_SYSTEM, &dbus_error_code)))
+  {
+    g_warning("DBUS connection failed: %s\n", dbus_error_code.message);
+    dbus_error_free (&dbus_error_code);
+  }
+
+  if (dbus_connection_system)
+  {
+    dbus_bus_add_match(dbus_connection_system, LOCALE_RULE, &dbus_error_code);
+    if (dbus_error_is_set(&dbus_error_code))
+    {
+      g_warning("Unable to add match for locale change: %s\n",
+                dbus_error_code.message);
+      dbus_error_free(&dbus_error_code);
+    }
+  }
+  
+  if (!dbus_connection_add_filter(dbus_connection_system,
+                                  dbus_system_msg_handler,
+                                  NULL, NULL))
+  {
+    g_warning("Failed to add filter: %s\n", dbus_error_code.message);
+    dbus_error_free(&dbus_error_code);
+  }
+  return dbus_connection_system;
+}
+
+static DBusConnection *
+register_on_session_dbus()
+{
+  DBusConnection *dbus_connection = NULL;
+  DBusError dbus_error_code;
+
+  dbus_error_init(&dbus_error_code);
+
+  /* Establish DBus connection */
+  if (!(dbus_connection = dbus_bus_get(DBUS_BUS_SESSION, &dbus_error_code)))
+  {
+    g_warning("DBUS connection failed: %s\n", dbus_error_code.message);
+    dbus_error_free (&dbus_error_code);
+  }
+
+  if (dbus_connection)
+  {
+    int ret;
+    ret = dbus_bus_request_name(dbus_connection, DBUS_IFACE_HIM, 0, &dbus_error_code);
+    if (dbus_error_is_set(&dbus_error_code))
+    {
+      g_warning("Cant own dbus name: %s because: %s\n", DBUS_IFACE_HIM,
+                dbus_error_code.message);
+      dbus_error_free(&dbus_error_code);
+    }
+    else if (ret == DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER)
+    {
+      g_info("Registered dbus interface: %s\n", DBUS_IFACE_HIM);
+    }
+    else
+    {
+      g_info("Unable to own primary dbus interface name: %s\n", DBUS_IFACE_HIM);
+    }
+
+    dbus_bus_add_match(dbus_connection, DBUS_MATCH_RULE, &dbus_error_code);
+    if (dbus_error_is_set(&dbus_error_code))
+    {
+      g_warning("Unable to add match for set_visible: %s\n",
+                dbus_error_code.message);
+      dbus_error_free(&dbus_error_code);
+    }
+  }
+  
+  if (!dbus_connection_add_filter(dbus_connection,
+                                  dbus_msg_handler,
+                                  NULL, NULL))
+  {
+    g_warning("Failed to add filter: %s\n", dbus_error_code.message);
+    dbus_error_free(&dbus_error_code);
+  }
+  return dbus_connection;
+}
+
 int
 main(int argc, char *argv[])
 {
   struct sigaction sv;
-  DBusConnection *dbus_connection = NULL;
-  DBusError dbus_error_code;
+  DBusConnection *dbus_connection;
+  DBusConnection *dbus_connection_system;
 #if !GLIB_CHECK_VERSION(2,32,0)
   if (!g_thread_supported ()) g_thread_init (NULL);
 #endif
@@ -118,32 +243,10 @@ main(int argc, char *argv[])
 
   g_signal_connect(keyboard, "destroy", gtk_main_quit, NULL);
 
-  dbus_error_init(&dbus_error_code);
-  /* Establish DBus connection */
-  if (!(dbus_connection = dbus_bus_get(DBUS_BUS_SYSTEM, &dbus_error_code)))
-  {
-    g_warning("DBUS connection failed: %s\n", dbus_error_code.message);
-    dbus_error_free (&dbus_error_code);
-  }
-
-  if (dbus_connection)
-  {
-    dbus_bus_add_match(dbus_connection, LOCALE_RULE, &dbus_error_code);
-    if (dbus_error_is_set(&dbus_error_code))
-    {
-      g_warning("Unable to add match for locale change: %s\n",
-                dbus_error_code.message);
-      dbus_error_free(&dbus_error_code);
-    }
-  }
-  
-  if (!dbus_connection_add_filter(dbus_connection,
-                                  dbus_msg_handler,
-                                  NULL, NULL))
-  {
-    g_warning("Failed to add filter: %s\n", dbus_error_code.message);
-    dbus_error_free(&dbus_error_code);
-  }
+  dbus_connection_system = register_on_system_dbus();
+  dbus_connection = register_on_session_dbus();
+  (void)dbus_connection;
+  (void)dbus_connection_system;
 
   /* gtk_main_quit at SIGTERM */
   sigemptyset(&sv.sa_mask);

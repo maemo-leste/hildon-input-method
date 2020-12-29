@@ -53,6 +53,7 @@
 #include "hildon-im-plugin.h"
 #include "hildon-im-protocol.h"
 #include "hildon-im-languages.h"
+#include "hildon-im-xcode.h"
 #include "internal.h"
 #include "cache.h"
 
@@ -140,6 +141,7 @@ struct _HildonIMUIPrivate
   Window input_window;
   Window app_window;
   Window transiency;
+  Atom net_active_window;
 
   HildonGtkInputMode input_mode;
   HildonGtkInputMode default_input_mode;
@@ -631,7 +633,7 @@ static void
 hildon_im_ui_show(HildonIMUI *self)
 {
   PluginData *plugin = NULL;
-
+  
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
   if (self->priv->trigger == HILDON_IM_TRIGGER_UNKNOWN)
@@ -1045,49 +1047,6 @@ hildon_im_ui_foreach_plugin(HildonIMUI *self,
   }
 }
 
-/* Call a plugin function for each loaded plugin.
-   Supported plugin API functions:
-   - hildon_im_plugin_key_event
-*/
-static void
-hildon_im_ui_foreach_plugin_va(HildonIMUI *self,
-                               void *function,
-                               ...)
-{
-  PluginData *plugin;
-  GSList *iter;
-  va_list ap;
-
-  GdkEventType event_type = GDK_NOTHING;
-  guint state = 0;
-  guint keyval = 0;
-  guint hardware_keycode = 0;
-
-  va_start(ap, function);
-  if (function == hildon_im_plugin_key_event)
-  {
-    event_type = va_arg(ap, GdkEventType);
-    state = va_arg(ap, guint);
-    keyval = va_arg(ap, guint);
-    hardware_keycode = va_arg(ap, guint);
-  }
-  va_end(ap);
-
-  for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
-  {
-    plugin = (PluginData*) iter->data;
-
-    if (plugin->widget == NULL)
-      continue;
-
-    if (function == hildon_im_plugin_key_event)
-    {
-      hildon_im_plugin_key_event(HILDON_IM_PLUGIN(plugin->widget),
-                                 event_type, state, keyval, hardware_keycode);
-    }
-  }
-}
-
 static void
 hildon_im_ui_send_long_press_settings (HildonIMUI *self)
 {
@@ -1108,30 +1067,31 @@ hildon_im_ui_send_long_press_settings (HildonIMUI *self)
 
 static void
 hildon_im_ui_set_client(HildonIMUI *self,
-                        HildonIMActivateMessage *msg,
+                        Window input_window,
+                        gboolean set_client,
                         gboolean show)
 {
   gboolean input_window_changed;
   g_return_if_fail(HILDON_IM_IS_UI(self));
 
   /* Workaround for matchbox feature. */
-  if (self->priv->transiency != msg->app_window)
+  if (self->priv->transiency != self->priv->app_window)
   {
     hildon_im_ui_hide(self);
-    self->priv->transiency = msg->app_window;
+    self->priv->transiency = self->priv->app_window;
   }
   XSetTransientForHint(GDK_DISPLAY(),
                        GDK_WINDOW_XID(GTK_WIDGET(self)->window),
-                       msg->app_window);
+                       self->priv->app_window);
 
   /* Try to avoid unneededly calling client_widget_changed(), because we
      can get here if popup menu closes and we get another focus_in event.
      We don't want word completion list to clear because of it. */
-  input_window_changed = self->priv->input_window != msg->input_window;
-  if (input_window_changed || msg->cmd == HILDON_IM_SETCLIENT)
+  input_window_changed = self->priv->input_window != input_window;
+  if (input_window_changed || set_client)
   {
     PluginData *info = NULL;
-    self->priv->input_window = msg->input_window;
+    self->priv->input_window = input_window;
 
     info = CURRENT_PLUGIN (self);
 
@@ -1238,7 +1198,7 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
     case HILDON_IM_MODE:/*already done what needs to be done*/
       break;
     case HILDON_IM_SETCLIENT:
-      hildon_im_ui_set_client(self, msg, FALSE);
+      hildon_im_ui_set_client(self, msg->input_window, TRUE, FALSE);
       break;
     case HILDON_IM_SHOW:
       self->priv->trigger = msg->trigger;
@@ -1246,7 +1206,7 @@ hildon_im_ui_process_activate_message(HildonIMUI *self,
       break;
     case HILDON_IM_SETNSHOW:
       self->priv->trigger = msg->trigger;
-      hildon_im_ui_set_client(self, msg, TRUE);
+      hildon_im_ui_set_client(self, msg->input_window, FALSE, TRUE);
       break;
     case HILDON_IM_HIDE:
       hildon_im_ui_hide(self);
@@ -1320,69 +1280,6 @@ hildon_im_ui_toggle_special_plugin(HildonIMUI *self)
   {
     hildon_im_ui_activate_plugin (self, info->info->special_plugin, TRUE);
   }
-}
-
-static void
-hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
-{
-  gboolean return_key_pressed;
-
-  self->priv->input_window = msg->input_window;
-
-  if (msg->type == GDK_KEY_PRESS && self->priv->current_banner != NULL)
-  {
-    gtk_widget_destroy (self->priv->current_banner);
-    self->priv->current_banner = NULL;
-  }
-  
-  /* Typing a printable character forces the plugin to show */
-  if (self->priv->keyboard_available &&
-      !GTK_WIDGET_VISIBLE(self))
-  {
-    guint c = gdk_keyval_to_unicode(msg->keyval);
-
-    if ((g_unichar_isprint(c) || msg->keyval == GDK_Multi_key) &&
-        (msg->state & GDK_CONTROL_MASK) == 0)
-    {
-      hildon_im_ui_show(self);
-    }
-  }
-
-  if (self->priv->return_key_pressed &&
-      msg->type == GDK_KEY_RELEASE &&
-      msg->keyval == GDK_Return)
-  {
-    /* Toggle the visibility of the IM */
-    self->priv->trigger = HILDON_IM_TRIGGER_STYLUS;
-    if(GTK_WIDGET_DRAWABLE(self))
-      hildon_im_ui_hide(self);
-    else
-      hildon_im_ui_show(self);
-  }
-
-  return_key_pressed =
-      msg->keyval == GDK_Return &&
-      msg->type == GDK_KEY_PRESS &&
-      (msg->state & GDK_CONTROL_MASK) == 0;
-
-  if (return_key_pressed)
-  {
-    if (self->priv->keyboard_available || !self->priv->use_finger_kb)
-    {
-      hildon_im_ui_send_communication_message(self,
-          HILDON_IM_CONTEXT_HANDLE_ENTER);
-      return_key_pressed = FALSE;
-    }
-  }
-
-  self->priv->return_key_pressed = return_key_pressed;
- 
-  hildon_im_ui_foreach_plugin_va(self,
-                                 hildon_im_plugin_key_event,
-                                 msg->type,
-                                 msg->state,
-                                 msg->keyval,
-                                 msg->hardware_keycode);
 }
 
 /*filters client messages to see if we need to show/hide the ui*/
@@ -1503,17 +1400,6 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
       hildon_im_plugin_preedit_committed(CURRENT_IM_PLUGIN (self),
                                          self->priv->committed_preedit);
 
-      return GDK_FILTER_REMOVE;
-    }
-    
-    if (cme->message_type ==
-        hildon_im_protocol_get_atom( HILDON_IM_KEY_EVENT )
-        && cme->format == HILDON_IM_KEY_EVENT_FORMAT)
-    {
-      HildonIMKeyEventMessage *msg =
-        (HildonIMKeyEventMessage *) &cme->data; 
-
-      hildon_im_ui_handle_key_message (self, msg);
       return GDK_FILTER_REMOVE;
     }
 
@@ -1947,6 +1833,12 @@ hildon_im_ui_new()
   atoms[1] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_INPUT", False);
   XChangeProperty(dpy, win, atoms[0], XA_ATOM, 32, PropModeReplace,
                   (unsigned char *) &atoms[1], 1);
+  
+  self->priv->net_active_window = XInternAtom(dpy, "_MB_CURRENT_APP_WINDOW", False);
+  if (!self->priv->net_active_window)
+    g_warning("can not get atom _NET_ACTIVE_WINDOW");
+  else
+    g_info("_NET_ACTIVE_WINDOW %lu", self->priv->net_active_window);
 
   hildon_im_ui_init_root_window_properties(self);
   return GTK_WIDGET(self);
@@ -2209,20 +2101,14 @@ hildon_im_ui_send_communication_message(HildonIMUI *self,
   hildon_im_ui_send_event(self, self->priv->input_window, &event);
 }
 
-void
-hildon_im_ui_send_surrounding_content(HildonIMUI *self,
+static void
+hildon_im_ui_send_surrounding_content_hildon(HildonIMUI *self,
                                       const gchar *surrounding)
 {
   HildonIMSurroundingContentMessage *msg=NULL;
   XEvent event;
   gint flag;
-
-  g_return_if_fail(HILDON_IM_IS_UI(self));
-
-  if (surrounding == NULL || self->priv->input_window == None)
-  {
-    return;
-  }
+  
   flag = HILDON_IM_MSG_START;
 
   /* Split surrounding context into pieces that are small enough */
@@ -2259,6 +2145,47 @@ hildon_im_ui_send_surrounding_content(HildonIMUI *self,
   msg = (HildonIMSurroundingContentMessage *) &event.xclient.data;
   msg->msg_flag = HILDON_IM_MSG_END;
   hildon_im_ui_send_event(self, self->priv->input_window, &event);
+}
+
+static void
+hildon_im_ui_send_surrounding_content_xlib(HildonIMUI *self,
+                                      const gchar *surrounding)
+{
+  int revert_mode;
+  Window focused_window;
+  const gchar *utf_pointer = surrounding;
+  Display *dpy = GDK_DISPLAY();
+  
+  if (surrounding[0] == '\0')
+    return;
+
+  XGetInputFocus(dpy, &focused_window, &revert_mode);
+  XSetInputFocus(dpy, self->priv->app_window, RevertToParent, CurrentTime);
+  XSync(dpy, False);
+
+  do
+  {
+    hildon_im_send_utf_via_xlib(dpy, g_utf8_get_char(utf_pointer));
+  } while (*(utf_pointer = g_utf8_next_char(utf_pointer)));
+
+  XSetInputFocus(dpy, focused_window, revert_mode, CurrentTime);
+  XSync(dpy, False);
+}
+
+void
+hildon_im_ui_send_surrounding_content(HildonIMUI *self,
+                                      const gchar *surrounding)
+{
+  if (surrounding == NULL)
+    return;
+  
+  g_return_if_fail(HILDON_IM_IS_UI(self));
+
+  if (self->priv->input_window != None)
+    hildon_im_ui_send_surrounding_content_hildon(self, surrounding);
+  else
+    hildon_im_ui_send_surrounding_content_xlib(self, surrounding);
+  
 }
 
 void
@@ -2472,10 +2399,83 @@ hildon_im_ui_clear_plugin_buffer(HildonIMUI *ui)
   g_string_truncate(ui->priv->plugin_buffer, 0);
 }
 
+static unsigned long 
+hildon_im_ui_read_prop(Display *display, Window wid, Atom atom, 
+                                            unsigned char **prop, int *format)
+{
+    Atom returnedAtom;
+    unsigned long nitems;
+    unsigned long bytes_after;
+    int ret;
+
+    XLockDisplay(display);
+    ret = XGetWindowProperty(
+        display, 
+        wid, 
+        atom,
+        0, G_MAXLONG, False,
+        XA_WINDOW, 
+        &returnedAtom, 
+        format, 
+        &nitems, 
+        &bytes_after,
+        prop);
+    XUnlockDisplay(display);
+    (void)returnedAtom;
+    (void)bytes_after;
+    if (ret != Success) 
+    {
+      g_error("XGetWindowProperty failed!\n");
+      return 0;
+    }
+    else return (*format)/8*nitems < G_MAXLONG ? 
+                  (*format)/8*nitems : G_MAXLONG;
+}
+
+static Window 
+hildon_im_ui_get_active_window(HildonIMUI *ui)
+{
+  unsigned char* data = NULL;
+  int format;
+  unsigned long length;
+  Window wid = 0;
+  Display *dpy = GDK_DISPLAY();
+  
+  length = hildon_im_ui_read_prop(dpy, GDK_ROOT_WINDOW(), 
+                                  ui->priv->net_active_window, &data, &format);
+  
+  if (format == 32 && length == 4)  
+    wid = *((Window*)(data));
+  else
+    g_warning("format length mismatch %d %lu\n", format, length);
+  XFree(data);
+  return wid;
+}
+
 void
 hildon_im_ui_set_visible(HildonIMUI *ui, gboolean visible)
 {
-  /* always hidden */
+  if (visible)
+  {
+    Window win;
+    win = hildon_im_ui_get_active_window(ui);
+    if (win)
+    {
+      ui->priv->app_window = win;
+      ui->priv->input_window = None;
+      ui->priv->commit_mode = HILDON_IM_COMMIT_SURROUNDING;
+      ui->priv->trigger = HILDON_IM_TRIGGER_FINGER;
+      hildon_im_ui_show(ui);
+    }
+    else
+    {
+      g_warning("Can not get active window");
+    }
+  }
+  else
+  {
+    hildon_im_ui_hide(ui);
+  }
 }
 
 static gboolean

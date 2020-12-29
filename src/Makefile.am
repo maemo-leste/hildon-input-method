@@ -40,6 +40,8 @@ hildon_im_recache_LDFLAGS = -Wl,--as-needed -rdynamic
 libhildon_im_ui_la_SOURCES = \
 	hildon-im-ui.h \
 	hildon-im-ui.c \
+	hildon-im-xcode.h\
+	hildon-im-xcode.c\
 	hildon-im-plugin.h \
 	hildon-im-plugin.c \
 	hildon-im-widget-loader.c \
@@ -50,7 +52,7 @@ libhildon_im_ui_la_SOURCES = \
 libhildon_im_ui_la_LIBADD = \
 	$(GTK_LIBS) $(GCONF_LIBS) $(ESD_LIBS) $(HILDON_LIBS) \
 	$(LIBOSSO_LIBS) $(HILDON_IMF_LIBS) $(GLIB_LIBS) \
-	$(LIBIMLAYOUTS_LIBS) $(DBUS_LIBS) $(X11_LIBS) -ldl
+	$(LIBIMLAYOUTS_LIBS) $(DBUS_LIBS) $(X11_LIBS) $(XTST_LIBS) -ldl
 libhildon_im_ui_la_LDFLAGS = -Wl,--as-needed -version-info $(LIBVERSION)
 
 hildon_input_methodincludeinstdir = $(includedir)/hildon-input-method

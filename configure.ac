@@ -16,7 +16,7 @@ AC_SUBST(LIBVERSION)
 
 AM_CONFIG_HEADER(config.h)
 
-CFLAGS="$CFLAGS -Werror -Wall -Wmissing-prototypes -Wmissing-declarations -fno-strict-aliasing"
+CFLAGS="$CFLAGS -Wall -Wmissing-prototypes -Wmissing-declarations -fno-strict-aliasing"
 
 AC_CANONICAL_HOST
 
@@ -85,6 +85,9 @@ AC_SUBST(DBUS_CFLAGS)
 PKG_CHECK_MODULES(X11, x11)
 AC_SUBST(X11_LIBS)
 AC_SUBST(X11_CFLAGS)
+
+PKG_CHECK_MODULES(XTST, xtst)
+AC_SUBST(XTST_LIBS)
 
 localedir=${datadir}/locale
 
