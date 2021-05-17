@@ -19,6 +19,7 @@
 
 #include <X11/keysym.h>
 #include <X11/extensions/XTest.h>
+#include <X11/XKBlib.h>
 
 #include "hildon-im-xcode.h"
 #include "hildon-im-xcode-keysyms.h"
@@ -57,10 +58,7 @@ static KeySym hildon_im_utf_to_keysym_heuristic(gunichar utf_char)
 
 void hildon_im_send_utf_via_xlib(Display *dpy, gunichar utf_char)
 {
-  KeySym sym;
-  gboolean require_shift = g_unichar_isalpha(utf_char) && g_unichar_isupper(utf_char);
-
-  sym = hildon_im_utf_to_keysym(utf_char);
+  KeySym sym = hildon_im_utf_to_keysym(utf_char);
   
   if (sym == NoSymbol)
     sym = hildon_im_utf_to_keysym_heuristic(utf_char);
@@ -73,6 +71,8 @@ void hildon_im_send_utf_via_xlib(Display *dpy, gunichar utf_char)
   }
   if(code)
   {
+    gboolean require_shift = (XkbKeycodeToKeysym(dpy, code, 0, 0) != sym);
+
     if (require_shift)
       XTestFakeKeyEvent(dpy,  XKeysymToKeycode(dpy, XK_Shift_L), True, CurrentTime);
     
