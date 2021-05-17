@@ -24,8 +24,6 @@
 #include <X11/Xlib.h>
 #include <gmodule.h>
 
-KeySym hildon_im_utf_to_keysym(gunichar utf_char);
-
 void hildon_im_send_utf_via_xlib(Display *dpy, gunichar utf_char);
 
 #endif
