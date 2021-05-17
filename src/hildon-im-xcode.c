@@ -21,43 +21,38 @@
 #include <X11/extensions/XTest.h>
 
 #include "hildon-im-xcode.h"
+#include "hildon-im-xcode-keysyms.h"
 
-KeySym hildon_im_utf_to_keysym(gunichar utf_char)
+static size_t hildon_im_find_code(gunichar utf_char)
 {
-  KeySym sym = NoSymbol;
-  char buf[6];
+	size_t i = 0;
+	for (; i < sizeof(hildon_im_utfcode)/sizeof(gunichar) && hildon_im_utfcode[i]; ++i) 
+		if (hildon_im_utfcode[i] == utf_char) 
+			break;
+	return i;
+}
 
-  if (g_unichar_to_utf8(utf_char, buf) > 0)
+static KeySym hildon_im_utf_to_keysym(gunichar utf_char)
+{
+  size_t codeindex = hildon_im_find_code(utf_char);
+
+  switch (utf_char)
   {
-    switch (buf[0])
-    {
-      case ' ':
-      return XK_space;
-      case '\n':
-      return XK_Return;
-      case '.':
-      return XK_period;
-      case '!':
-      return XK_exclam;
-      case '?':
-      return XK_question;
-      case ':':
-      return XK_colon;
-      case '-':
-      return XK_minus;
-      case '/':
-      return XK_slash;
-      case '\\':
-      return XK_backslash;
-      case '&':
-      return XK_ampersand;
-    }
-
-    buf[1] = '\0';
-    sym = XStringToKeysym(buf);
+    case ' ':
+    return XK_space;
+    case '\n':
+    return XK_Return;
   }
+  
+  if (hildon_im_xsymcode[codeindex])
+    return hildon_im_xsymcode[codeindex];
+  else
+    return NoSymbol;
+}
 
-  return sym;
+static KeySym hildon_im_utf_to_keysym_heuristic(gunichar utf_char)
+{
+    return utf_char + 0x01000000;
 }
 
 void hildon_im_send_utf_via_xlib(Display *dpy, gunichar utf_char)
@@ -67,25 +62,26 @@ void hildon_im_send_utf_via_xlib(Display *dpy, gunichar utf_char)
 
   sym = hildon_im_utf_to_keysym(utf_char);
   
-  if (sym != NoSymbol)
+  if (sym == NoSymbol)
+    sym = hildon_im_utf_to_keysym_heuristic(utf_char);
+  
+  KeyCode code = XKeysymToKeycode(dpy, sym);
+  if(!code && sym != hildon_im_utf_to_keysym_heuristic(utf_char))
   {
-    KeyCode code =  XKeysymToKeycode(dpy, sym);
-    if(code)
-    {
-      if (require_shift)
-        XTestFakeKeyEvent(dpy,  XKeysymToKeycode(dpy, XK_Shift_L), True, CurrentTime);
-      
-      XTestFakeKeyEvent(dpy, code, True, CurrentTime);
-      XTestFakeKeyEvent(dpy, code, False, CurrentTime);
+    sym = hildon_im_utf_to_keysym_heuristic(utf_char);
+    code = XKeysymToKeycode(dpy, sym);
+  }
+  if(code)
+  {
+    if (require_shift)
+      XTestFakeKeyEvent(dpy,  XKeysymToKeycode(dpy, XK_Shift_L), True, CurrentTime);
+    
+    XTestFakeKeyEvent(dpy, code, True, CurrentTime);
+    XTestFakeKeyEvent(dpy, code, False, CurrentTime);
 
-      if (require_shift)
-        XTestFakeKeyEvent(dpy,  XKeysymToKeycode(dpy, XK_Shift_L), False, CurrentTime);
-    }
-    else
-      g_warning("no KeyCode for %u\n", utf_char);
+    if (require_shift)
+      XTestFakeKeyEvent(dpy,  XKeysymToKeycode(dpy, XK_Shift_L), False, CurrentTime);
   }
   else
-  {
-    g_warning("no KeySym for %u\n", utf_char);
-  }
+    g_warning("no KeyCode for %u\n", utf_char);
 }
