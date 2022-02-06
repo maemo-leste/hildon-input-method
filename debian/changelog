@@ -1,3 +1,9 @@
+hildon-input-method (1:2.1.61-1) unstable; urgency=medium
+
+  * Restore plugins functionality (this makes special keys work again)
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Sun, 06 Feb 2022 20:37:47 +0100
+
 hildon-input-method (1:2.1.60-1) unstable; urgency=medium
 
   * Add support for more unicode chars in plain X windows (by uvos)
