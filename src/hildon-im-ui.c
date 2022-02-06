@@ -1047,6 +1047,49 @@ hildon_im_ui_foreach_plugin(HildonIMUI *self,
   }
 }
 
+/* Call a plugin function for each loaded plugin.
+   Supported plugin API functions:
+   - hildon_im_plugin_key_event
+*/
+static void
+hildon_im_ui_foreach_plugin_va(HildonIMUI *self,
+                               void *function,
+                               ...)
+{
+  PluginData *plugin;
+  GSList *iter;
+  va_list ap;
+
+  GdkEventType event_type = GDK_NOTHING;
+  guint state = 0;
+  guint keyval = 0;
+  guint hardware_keycode = 0;
+
+  va_start(ap, function);
+  if (function == hildon_im_plugin_key_event)
+  {
+    event_type = va_arg(ap, GdkEventType);
+    state = va_arg(ap, guint);
+    keyval = va_arg(ap, guint);
+    hardware_keycode = va_arg(ap, guint);
+  }
+  va_end(ap);
+
+  for (iter = self->priv->all_methods; iter != NULL; iter = iter->next)
+  {
+    plugin = (PluginData*) iter->data;
+
+    if (plugin->widget == NULL)
+      continue;
+
+    if (function == hildon_im_plugin_key_event)
+    {
+      hildon_im_plugin_key_event(HILDON_IM_PLUGIN(plugin->widget),
+                                 event_type, state, keyval, hardware_keycode);
+    }
+  }
+}
+
 static void
 hildon_im_ui_send_long_press_settings (HildonIMUI *self)
 {
@@ -1282,6 +1325,25 @@ hildon_im_ui_toggle_special_plugin(HildonIMUI *self)
   }
 }
 
+static void
+hildon_im_ui_handle_key_message (HildonIMUI *self, HildonIMKeyEventMessage *msg)
+{
+  self->priv->input_window = msg->input_window;
+
+  if (msg->type == GDK_KEY_PRESS && self->priv->current_banner != NULL)
+  {
+    gtk_widget_destroy (self->priv->current_banner);
+    self->priv->current_banner = NULL;
+  }
+
+  hildon_im_ui_foreach_plugin_va(self,
+                                 hildon_im_plugin_key_event,
+                                 msg->type,
+                                 msg->state,
+                                 msg->keyval,
+                                 msg->hardware_keycode);
+}
+
 /*filters client messages to see if we need to show/hide the ui*/
 static GdkFilterReturn
 hildon_im_ui_client_message_filter(GdkXEvent *xevent,
@@ -1400,6 +1462,17 @@ hildon_im_ui_client_message_filter(GdkXEvent *xevent,
       hildon_im_plugin_preedit_committed(CURRENT_IM_PLUGIN (self),
                                          self->priv->committed_preedit);
 
+      return GDK_FILTER_REMOVE;
+    }
+
+    if (cme->message_type ==
+        hildon_im_protocol_get_atom( HILDON_IM_KEY_EVENT )
+        && cme->format == HILDON_IM_KEY_EVENT_FORMAT)
+    {
+      HildonIMKeyEventMessage *msg =
+        (HildonIMKeyEventMessage *) &cme->data;
+
+      hildon_im_ui_handle_key_message (self, msg);
       return GDK_FILTER_REMOVE;
     }
 
