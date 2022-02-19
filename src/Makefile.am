@@ -1,8 +1,8 @@
 # This file is part of hildon-input-method
 #
 # Copyright (C) 2005-2007 Nokia Corporation.
+# Copyright (C) 2022 Carl Klemm.
 #
-# Contact: Mohammad Anwari <Mohammad.Anwari.com>
 
 AM_CPPFLAGS = \
 	$(GTK_CFLAGS) \
@@ -16,6 +16,8 @@ AM_CPPFLAGS = \
 	$(DBUS_CFLAGS) \
 	$(X11_CFLAGS) \
 	$(MAEMO_LAUNCHER_CFLAGS) \
+	$(ATSPI2_CFLAGS) \
+	$(MCE_CFLAGS) \
 	-DLOCALEDIR=\"$(localedir)\" \
 	-DLIBDIR=\"$(libdir)\"
 
@@ -23,9 +25,14 @@ uilibdir = $(libdir)
 uilib_LTLIBRARIES = libhildon-im-ui.la
 
 HIM_SRCS = hildon-im-main.c
-HIM_LIBS = $(GTK_LIBS) $(GCONF_LIBS) $(ESD_LIBS) \
-        $(HILDON_LIBS) $(LIBOSSO_LIBS) \
+HIM_LIBS = \
+	$(GTK_LIBS) \
+	$(GCONF_LIBS) \
+	$(ESD_LIBS) \
+        $(HILDON_LIBS) \
+	$(LIBOSSO_LIBS) \
         $(LIBXML_LIBS)  \
+	$(ATSPI2_LIBS) \
         libhildon-im-ui.la
 
 bin_PROGRAMS = hildon-input-method hildon-im-recache
